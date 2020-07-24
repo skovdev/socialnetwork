@@ -1,0 +1,20 @@
+.group-detail {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-basis: 200px;
+}
+
+.group-detail .group-title {
+    flex-basis: 100px;
+}
+
+.group-detail .group-avatar {
+    margin: 0;
+    padding: 0;
+}
+
+.group-detail .group-avatar img {
+    display: block;
+    width: 350px;
+}

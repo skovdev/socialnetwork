@@ -1,0 +1,40 @@
+.edit-profile {
+    display: block;
+    margin: 0 auto;
+    margin-top: 20px;
+    width: 500px;
+}
+
+.edit-profile .current-profile-avatar {
+    margin: 20px 0 20px 0;
+    padding: 0;
+}
+
+.edit-profile .current-profile-avatar img {
+    display: block;
+    width: 297px;
+    border: black;
+}
+
+.edit-profile .avatar-buttons-wrapper {
+    display: flex;
+    flex-direction: row;
+}
+
+.edit-profile .button-upload-avatar {
+    position: relative;
+    overflow: hidden;
+    display: inline-block;
+}
+
+.edit-profile .button-upload-avatar input[type=file] {
+    font-size: 100px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    opacity: 0;
+}
+
+.edit-profile .input-width {
+    width: 297px;
+}

@@ -1,0 +1,7 @@
+/.idea
+/socialnetwork-app-client/target
+/socialnetwork-api/target
+/socialnetwork-core/target
+/socialnetwork-model/target
+/socialnetwork-app-client/node_modules
+/socialnetwork-app-client/.vscode

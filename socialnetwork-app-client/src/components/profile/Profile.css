@@ -1,0 +1,22 @@
+.profile {
+    display: block;
+    width: 100%;
+}
+
+.profile .disabled {
+    font-size: 25px;
+    margin-top: 20px;
+    text-align: center;
+}
+
+.profile .profile-first-column{
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+}
+
+.profile .profile-second-column{
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+}

@@ -1,0 +1,24 @@
+.group-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.group-list .button-create-group {
+    margin-top: 10px;
+}
+
+.group-list .group {
+    display: flex;
+    margin: 15px;
+    padding: 10px;
+    width: 350px;
+}
+
+.group-list .group img {
+    width: 100px;
+}
+
+.group-list .group .group-info {
+    padding: 18px;
+}
