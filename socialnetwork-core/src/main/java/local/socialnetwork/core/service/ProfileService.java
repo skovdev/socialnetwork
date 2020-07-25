@@ -1,5 +1,7 @@
 package local.socialnetwork.core.service;
 
+import local.socialnetwork.core.exception.ProfileServiceException;
+
 import local.socialnetwork.model.dto.EditProfileDto;
 
 import local.socialnetwork.model.profile.Profile;
@@ -18,10 +20,10 @@ public interface ProfileService {
     Profile findById(UUID id);
     Profile findProfileByUserId(UUID userId);
     void save(Profile profile);
-    void update(Profile profile, EditProfileDto editProfileDto);
+    void update(UUID id, EditProfileDto editProfileDto) throws ProfileServiceException;
     void delete(UUID id);
-    String setDefaultAvatar(String username) throws IOException;
-    void updateAvatarProfile(MultipartFile multipartFile) throws IOException;
-    void changeStatus(String username, boolean isActive);
-    EditProfileDto editProfileByUsername(String username);
+    String setDefaultAvatar(String username) throws IOException, ProfileServiceException;
+    void updateAvatarProfile(String username, MultipartFile multipartFile) throws IOException, ProfileServiceException;
+    boolean changeStatus(String username, boolean isActive);
+    EditProfileDto editProfileByUsername(String username) throws ProfileServiceException;
 }
