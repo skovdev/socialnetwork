@@ -20,7 +20,7 @@ const Avatar = (props) => {
 
     const loadAvatarProfile = () => {
 
-        const urlGetAvatar = AppConstants.API_HOST + "/api/v1/profile/avatar";
+        const urlGetAvatar = AppConstants.API_HOST + "/api/v1/profiles/avatar";
         const token = AuthService.getToken();
 
         fetch(urlGetAvatar, {
