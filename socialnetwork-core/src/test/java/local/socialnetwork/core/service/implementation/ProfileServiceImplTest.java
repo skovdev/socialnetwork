@@ -4,6 +4,8 @@ import local.socialnetwork.common.auth.AuthenticationHelper;
 
 import local.socialnetwork.core.TestUtil;
 
+import local.socialnetwork.core.exception.ProfileServiceException;
+
 import local.socialnetwork.core.repository.UserRepository;
 import local.socialnetwork.core.repository.ProfileRepository;
 
@@ -201,7 +203,7 @@ public class ProfileServiceImplTest {
     }
 
     @Test
-    public void deleteAvatarProfileByUsernameTest() throws IOException {
+    public void deleteAvatarProfileByUsernameTest() throws IOException, ProfileServiceException {
 
         UUID userId = UUID.randomUUID();
         UUID profileId = UUID.randomUUID();
@@ -234,18 +236,18 @@ public class ProfileServiceImplTest {
 
         customUser.setProfile(profile);
 
-        Mockito.when(userRepository.findByUsername(username)).thenReturn(customUser);
+        Mockito.when(profileRepository.findProfileByUsername(username)).thenReturn(profile);
         Mockito.when(resourceUtil.getEncodedResource(pathDefaultAvatar)).thenReturn(pathDefaultAvatar);
 
         profileServiceImpl.setDefaultAvatar(username);
 
-        Mockito.verify(userRepository).findByUsername(username);
+        Mockito.verify(profileRepository).findProfileByUsername(username);
         Mockito.verify(resourceUtil).getEncodedResource(pathDefaultAvatar);
 
     }
 
     @Test
-    public void addAvatarProfileTest() throws IOException {
+    public void addAvatarProfileTest() throws IOException, ProfileServiceException {
 
         UUID userId = UUID.randomUUID();
         UUID profileId = UUID.randomUUID();
@@ -280,10 +282,10 @@ public class ProfileServiceImplTest {
 
         MockMultipartFile file = new MockMultipartFile(avatar, avatar.getBytes());
 
-        Mockito.when(authenticationHelper.getAuthenticatedUser()).thenReturn(customUser);
+        Mockito.when(profileRepository.findProfileByUsername(username)).thenReturn(profile);
         Mockito.when(resourceUtil.writeResource(file, pathUploadAvatar)).thenReturn(avatar);
 
-        profileServiceImpl.updateAvatarProfile(file);
+        profileServiceImpl.updateAvatarProfile(username, file);
 
         Mockito.verify(resourceUtil).writeResource(file, pathUploadAvatar);
         Mockito.verify(profileRepository).save(profile);
@@ -324,7 +326,7 @@ public class ProfileServiceImplTest {
 
         customUser.setProfile(profile);
 
-        Mockito.when(authenticationHelper.getAuthenticatedUser()).thenReturn(customUser);
+        Mockito.when(profileRepository.findProfileByUsername(username)).thenReturn(profile);
 
         profileServiceImpl.changeStatus(username, true);
 
