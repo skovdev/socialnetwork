@@ -36,7 +36,7 @@ const EditProfile = (props) => {
 
     const loadProfileAvatar = () => {
 
-        const urlGetProfileAvatar = AppConstants.API_HOST + "/api/v1/profile/avatar";
+        const urlGetProfileAvatar = AppConstants.API_HOST + "/api/v1/profiles/avatar";
 
         fetch(urlGetProfileAvatar, {
             method: "GET",
@@ -66,7 +66,7 @@ const EditProfile = (props) => {
 
     const loadProfileInformationByUsername = () => {
 
-        const urlGetProfileByUsername = AppConstants.API_HOST + "/api/v1/profile/" + props.match.params.username + "/edit";
+        const urlGetProfileByUsername = AppConstants.API_HOST + "/api/v1/profiles/" + props.match.params.username + "/edit";
 
         fetch(urlGetProfileByUsername, {
             method: "GET",
@@ -101,7 +101,7 @@ const EditProfile = (props) => {
 
         const profileId = AuthService.getProfile().sub;
 
-        const urlUpdateProfile = AppConstants.API_HOST + "/api/v1/profile/" + profileId;
+        const urlUpdateProfile = AppConstants.API_HOST + "/api/v1/profiles/" + profileId;
 
         let updatedProfile = {
             firstName: firstName ? firstName : profile.firstName,
@@ -158,7 +158,7 @@ const EditProfile = (props) => {
 
         data.append("profileAvatar", file);
 
-        const urlUpdateAvatar = AppConstants.API_HOST + "/api/v1/profile/avatar";
+        const urlUpdateAvatar = AppConstants.API_HOST + "/api/v1/profiles/avatar?username=" + AuthService.getProfile().username;
 
         fetch(urlUpdateAvatar, {
             method: "POST",
@@ -189,7 +189,7 @@ const EditProfile = (props) => {
 
     const defaultAvatar = () => {
 
-        const urlSetDefaultAvatar = AppConstants.API_HOST + "/api/v1/profile/avatar?username=" + AuthService.getProfile().username;
+        const urlSetDefaultAvatar = AppConstants.API_HOST + "/api/v1/profiles/avatar?username=" + AuthService.getProfile().username;
 
         fetch(urlSetDefaultAvatar, {
             method: "DELETE",
