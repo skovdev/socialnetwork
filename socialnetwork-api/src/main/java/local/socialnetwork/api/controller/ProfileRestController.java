@@ -2,6 +2,8 @@ package local.socialnetwork.api.controller;
 
 import local.socialnetwork.common.auth.AuthenticationHelper;
 
+import local.socialnetwork.core.exception.ProfileServiceException;
+
 import local.socialnetwork.core.service.ProfileService;
 
 import local.socialnetwork.model.dto.EditProfileDto;
@@ -35,7 +37,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping(value = "/api/v1/profile")
+@RequestMapping("/api/v1/profiles")
 public class ProfileRestController {
 
     private ProfileService profileService;
@@ -57,69 +59,84 @@ public class ProfileRestController {
         return profileService.findAll();
     }
 
-    @GetMapping("/test")
+    @GetMapping("/user")
     public Profile findByUserId(@RequestParam("userId") UUID userId) {
         return profileService.findProfileByUserId(userId);
     }
 
     @GetMapping("/{username}")
-    public Profile findProfileByUsername(@PathVariable("username") String username) {
+    public ResponseEntity<Profile> findProfileByUsername(@PathVariable("username") String username) {
 
         CustomUser authenticatedUser = authenticationHelper.getAuthenticatedUser();
 
         if (authenticatedUser != null && authenticatedUser.getUsername().equalsIgnoreCase(username)) {
-            return authenticatedUser.getProfile();
+            return new ResponseEntity<>(authenticatedUser.getProfile(), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-
-        return null;
-
     }
 
     @GetMapping("/{username}/edit")
-    public EditProfileDto editProfileByUsername(@PathVariable("username") String username) {
-        return profileService.editProfileByUsername(username);
+    public ResponseEntity<EditProfileDto> editProfileByUsername(@PathVariable("username") String username) {
+
+        try {
+            return new ResponseEntity<>(profileService.editProfileByUsername(username), HttpStatus.OK);
+        } catch (ProfileServiceException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse> update(@PathVariable("id") UUID id, @RequestBody EditProfileDto editProfileDto) {
 
-        var profile = profileService.findProfileByUserId(id);
-
-        if (profile != null) {
-            profileService.update(profile, editProfileDto);
-            return new ResponseEntity<>(new ApiResponse("Profile with ID: " + profile.getId() + " has updated successfully"), HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(new ApiResponse("Profile is not found"), HttpStatus.NO_CONTENT);
+        try {
+            profileService.update(id, editProfileDto);
+            return new ResponseEntity<>(new ApiResponse("Profile with ID: " + id + " has updated successfully"), HttpStatus.OK);
+        } catch (ProfileServiceException e) {
+            return new ResponseEntity<>(new ApiResponse("Profile has not found"), HttpStatus.NOT_FOUND);
         }
     }
 
     @GetMapping("/avatar")
-    public String getAvatar() {
+    public ResponseEntity<String> getAvatar() {
 
         CustomUser customUser = authenticationHelper.getAuthenticatedUser();
 
         if (customUser != null) {
-            return customUser.getProfile().getAvatar();
+            return new ResponseEntity<>(customUser.getProfile().getAvatar(), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-
-        return null;
-
     }
 
     @PostMapping("/avatar")
-    public ResponseEntity<ApiResponse> updateAvatar(@RequestParam("profileAvatar") MultipartFile multipartFile) throws IOException {
-        profileService.updateAvatarProfile(multipartFile);
-        return new ResponseEntity<>(new ApiResponse("Avatar has updated successfully"), HttpStatus.OK);
+    public ResponseEntity<ApiResponse> updateAvatar(@RequestParam("username") String username, @RequestParam("profileAvatar") MultipartFile multipartFile) throws IOException {
+
+        try {
+            profileService.updateAvatarProfile(username, multipartFile);
+            return new ResponseEntity<>(new ApiResponse("Avatar has updated successfully"), HttpStatus.OK);
+        } catch (ProfileServiceException e) {
+            return new ResponseEntity<>(new ApiResponse("Avatar has not updated"), HttpStatus.NOT_FOUND);
+        }
     }
 
     @DeleteMapping("/avatar")
-    public String defaultAvatar(@RequestParam("username") String username) throws IOException {
-        return profileService.setDefaultAvatar(username);
+    public ResponseEntity<String> defaultAvatar(@RequestParam("username") String username) throws IOException {
+
+        try {
+            return new ResponseEntity<>(profileService.setDefaultAvatar(username), HttpStatus.OK);
+        } catch (ProfileServiceException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
     @PutMapping
     public ResponseEntity<ApiResponse> changeStatus(@RequestParam("username") String username, @RequestParam("isActive") boolean isActive) {
-        profileService.changeStatus(username, isActive);
-        return new ResponseEntity<>(new ApiResponse("Status has changed successfully"), HttpStatus.OK);
+
+        if (profileService.changeStatus(username, isActive)) {
+            return new ResponseEntity<>(new ApiResponse("Status has changed successfully"), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(new ApiResponse("Status has not changed"), HttpStatus.NOT_FOUND);
+        }
     }
 }
