@@ -2,12 +2,13 @@ import React, { useEffect, useState } from "react";
 
 import "./Group.css";
 
+import GroupProfile from "./profile/GroupProfile";
+
 import Header from "../../header/Header";
 
 import AppConstants from "../../../constants/AppConstants";
 
 import AuthService from "../../../service/auth/AuthService";
-import GroupProfile from "./profile/GroupProfile";
 
 const Group = (props) => {
 

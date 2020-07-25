@@ -22,7 +22,7 @@ const Profile = (props) => {
 
         let username = props.match.params.username;
 
-        const urlGetProfileByUsername = AppConstants.API_HOST + "/api/v1/profile/" + username;
+        const urlGetProfileByUsername = AppConstants.API_HOST + "/api/v1/profiles/" + username;
         const token = AuthService.getToken();
 
         fetch(urlGetProfileByUsername, {
