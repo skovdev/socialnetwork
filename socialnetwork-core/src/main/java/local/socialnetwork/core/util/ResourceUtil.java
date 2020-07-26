@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import java.util.Base64;
+import java.util.UUID;
 
 @Component
 public class ResourceUtil {
@@ -32,7 +33,7 @@ public class ResourceUtil {
 
         byte[] byteFile = file.getBytes();
 
-        var filePath = Paths.get(path + file.getOriginalFilename());
+        var filePath = Paths.get(path + generateRandomFilename() + "." + getFormatFileFromMimeType(file.getContentType()));
 
         Files.write(filePath, byteFile);
 
@@ -51,5 +52,9 @@ public class ResourceUtil {
 
         return EMPTY;
 
+    }
+
+    public String generateRandomFilename() {
+        return UUID.randomUUID().toString().replaceAll("-", "");
     }
 }
