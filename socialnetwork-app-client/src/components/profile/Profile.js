@@ -15,6 +15,8 @@ import AppConstants from "../../constants/AppConstants";
 const Profile = (props) => {
 
     const [isProfileDisabled, setIsProfileDisabled] = useState(false);
+    const [error, setError] = useState(false)
+    const [errorMessage, setErrorMessage] = useState("")
 
     const history = useHistory()
 
@@ -34,7 +36,7 @@ const Profile = (props) => {
         }).then(response => {
 
             if (!response.ok) {
-                throw new Error()
+                throw new Error("Failed load profile of user")
             }
 
             return response.json()
@@ -44,7 +46,9 @@ const Profile = (props) => {
             if (!data.isActive) {
                 setIsProfileDisabled(true);
             }
-        }).catch(() => {
+        }).catch(error => {
+            setError(true)
+            setErrorMessage(error.message);
             AuthService.logout();
             history.push("/");
         });
@@ -59,20 +63,24 @@ const Profile = (props) => {
         )
     } else {
 
-        return (
-        
-            <div className="profile">
-                <Header />
-                <div className="profile-first-column">
-                    <Menu />
-                    <Avatar username={props.match.params.username} />
-                    <PersonalInfo />
+        if (error) {
+            return <div>{errorMessage}</div>
+        }  else {
+    
+            return (
+            
+                <div className="profile">
+                    <Header />
+                    <div className="profile-first-column">
+                        <Menu />
+                        <Avatar username={props.match.params.username} />
+                        <PersonalInfo />
+                    </div>
+                    <div className="profile-second-column">
+                    </div>
                 </div>
-                <div className="profile-second-column">
-                </div>
-            </div>
-
-        );
+            );
+        }
     }
 }
 

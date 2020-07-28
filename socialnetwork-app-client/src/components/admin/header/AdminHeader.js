@@ -13,6 +13,7 @@ const AdminHeader = () => {
     const [profile, setProfile] = useState({})
     const [isLoaded, setIsLoaded] = useState(false)
     const [error, serError] = useState(false)
+    const [errorMessage, setErrorMessage] = useState("")
 
     useEffect(() => {
         loadUserProfile();
@@ -35,7 +36,7 @@ const AdminHeader = () => {
         }).then(response => {
 
             if (!response.ok) {
-                throw new Error()
+                throw new Error("Failed load profile of user")
             }
 
             return response.json()
@@ -45,12 +46,12 @@ const AdminHeader = () => {
             setIsLoaded(true)
         }).catch(error => {
             serError(true)
-            console.error(error);
+            setErrorMessage(error.message)
         })
     }
 
     if (error) {
-        return <div>Error</div>
+        return <div>{errorMessage}</div>
     } else if (!isLoaded) {
         return <div>Loading...</div>
     } else {

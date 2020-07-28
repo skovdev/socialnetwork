@@ -13,6 +13,7 @@ const Avatar = (props) => {
     const [avatar, setAvatar] = useState({})
     const [isLoaded, setIsLoaded] = useState(false)
     const [error, serError] = useState(false)
+    const [errorMessage, setErrorMessage] = useState("")
 
     useEffect(() => {
         loadAvatarProfile();
@@ -32,7 +33,7 @@ const Avatar = (props) => {
         }).then(response => {
 
             if (!response.ok) {
-                throw new Error()
+                throw new Error("Failed load avatar of profile")
             }
 
             return response.text()
@@ -42,12 +43,12 @@ const Avatar = (props) => {
             setIsLoaded(true)
         }).catch(error => {
             serError(true)
-            console.log(error);
+            setErrorMessage(error.message)
         })
     }
 
     if (error) {
-        return <div>Error</div>
+        return <div>{errorMessage}</div>
     } else if (!isLoaded) {
         return <div>Loading...</div>
     } else {

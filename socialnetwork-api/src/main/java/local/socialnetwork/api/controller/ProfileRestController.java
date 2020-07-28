@@ -93,7 +93,7 @@ public class ProfileRestController {
             profileService.update(id, editProfileDto);
             return new ResponseEntity<>(new ApiResponse("Profile with ID: " + id + " has updated successfully"), HttpStatus.OK);
         } catch (ProfileServiceException e) {
-            return new ResponseEntity<>(new ApiResponse("Profile has not found"), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
@@ -116,7 +116,7 @@ public class ProfileRestController {
             profileService.updateAvatarProfile(username, multipartFile);
             return new ResponseEntity<>(new ApiResponse("Avatar has updated successfully"), HttpStatus.OK);
         } catch (ProfileServiceException e) {
-            return new ResponseEntity<>(new ApiResponse("Avatar has not updated"), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
@@ -136,7 +136,7 @@ public class ProfileRestController {
         if (profileService.changeStatus(username, isActive)) {
             return new ResponseEntity<>(new ApiResponse("Status has changed successfully"), HttpStatus.OK);
         } else {
-            return new ResponseEntity<>(new ApiResponse("Status has not changed"), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 }
