@@ -12,7 +12,8 @@ const PersonalInfo = () => {
 
     const [profile, setProfile] = useState({})
     const [isLoaded, setIsLoaded] = useState(false)
-    const [error, serError] = useState(false) 
+    const [error, serError] = useState(false)
+    const [errorMessage, setErrorMessage] = useState("") 
 
     useEffect(() => {
         loadProfile();
@@ -34,7 +35,7 @@ const PersonalInfo = () => {
         }).then(response => {
 
             if (!response.ok) {
-                throw new Error()
+                throw new Error("Failed load profile of user")
             }
 
             return response.json()
@@ -42,13 +43,14 @@ const PersonalInfo = () => {
         }).then(data => {
             setProfile(data)
             setIsLoaded(true)
-        }).catch(() => {
+        }).catch(error => {
             serError(true)
+            setErrorMessage(error.message)
         });
     };
 
     if (error) {
-        return <div>Error. Message: {error.message}</div>
+        return <div>{errorMessage}</div>
     } else if (!isLoaded) {
         return <div>Loading...</div>
     } else {

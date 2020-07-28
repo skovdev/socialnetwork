@@ -11,6 +11,7 @@ const ProfileList = () => {
     const [profiles, setProfiles] = useState([])
     const [isLoaded, setIsLoaded] = useState(false)
     const [error, serError] = useState(false)
+    const [errorMessage, setErrorMessage] = useState("")
 
     useEffect(() => {
         loadUserProfiles();
@@ -30,7 +31,7 @@ const ProfileList = () => {
         }).then(response => {
 
             if (!response.ok) {
-                throw new Error()
+                throw new Error("Failed load of profiles")
             }
 
             return response.json()
@@ -40,7 +41,7 @@ const ProfileList = () => {
             setIsLoaded(true)
         }).catch(error => {
             serError(true)
-            console.error(error)
+            setErrorMessage(error.message)
         })
     }
 
@@ -61,7 +62,7 @@ const ProfileList = () => {
         }).then(response => {
 
             if (!response.ok) {
-                throw new Error()
+                throw new Error("Failed change of status")
             }
 
             return response.json()
@@ -69,12 +70,12 @@ const ProfileList = () => {
         }).then(data => {
             console.log(data.message);
         }).catch(error => {
-            console.error(error);
+            setErrorMessage(error.message)
         })
     }
 
     if (error) {
-        return <div>Error</div>
+        return <div>{errorMessage}</div>
     } else if (!isLoaded) {
         return <div>Loading...</div>
     } else {
