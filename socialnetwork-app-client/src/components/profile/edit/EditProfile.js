@@ -46,7 +46,7 @@ const EditProfile = (props) => {
         }).then(response => {
 
             if (!response.ok) {
-                throw response;
+                throw new Error("Failed load avatar of profile");
             }
 
             return response.text();
@@ -55,12 +55,9 @@ const EditProfile = (props) => {
             setAvatar(data);
             setIsLoaded(true);
         }).catch(error => {
-            
-            error.json().then(body => {
-                setIsLoaded(false);
-                setError(true);
-                setErrorMessage(body.status + " " + body.error + " " + body.message);
-            });
+            setIsLoaded(false);
+            setError(true);
+            setErrorMessage(error.message);
         });
     };
 
@@ -77,7 +74,7 @@ const EditProfile = (props) => {
         }).then(response => {
 
             if (!response.ok) {
-                throw response;
+                throw new Error("Failed load information of profile");
             }
             
             return response.json();
@@ -86,12 +83,9 @@ const EditProfile = (props) => {
             setProfile(data);
             setIsLoaded(true);
         }).catch(error => {
-
-            error.json().then(body => {
-                setIsLoaded(false);
-                setError(true);
-                setErrorMessage(body.status + " " + body.error + " " + body.message);
-            });
+            setIsLoaded(false);
+            setError(true);
+            setErrorMessage(error.message);
         });
     };
 
@@ -124,7 +118,7 @@ const EditProfile = (props) => {
         }).then(response => {
 
             if (!response.ok) {
-                throw response;
+                throw new Error("Failed update information of profile");
             }
 
             return response.json();
@@ -134,12 +128,10 @@ const EditProfile = (props) => {
             alert("Updated");
             console.log(data);
         }).catch(error => {
-
-            error.json().then(body => {
-                setIsLoaded(false);
-                setError(true);
-                setErrorMessage(body.status + " " + body.error + " " + body.message);
-            });
+            setIsLoaded(false);
+            setError(true);
+            setErrorMessage(error.message);
+            
         });
     };
 
@@ -169,7 +161,7 @@ const EditProfile = (props) => {
         }).then(response => {
 
             if (!response.ok) {
-                throw response;
+                throw new Error("Failed update avatar of profile");
             }
 
             return response.json();
@@ -178,12 +170,9 @@ const EditProfile = (props) => {
             setIsLoaded(true);
             console.log(data);
         }).catch(error => {
-
-            error.json().then(body => {
-                setIsLoaded(false);
-                setError(true);
-                setErrorMessage(body.status + " " + body.error + " " + body.message);
-            });
+            setIsLoaded(false);
+            setError(true);
+            setErrorMessage(error.message);
         });
     }
 
@@ -199,7 +188,7 @@ const EditProfile = (props) => {
         }).then(response => {
 
             if (!response.ok) {
-                throw response;
+                throw new Error("Failed set default avatar for profile");
             }
 
             return response.text();
@@ -209,12 +198,9 @@ const EditProfile = (props) => {
             setIsLoaded(true);
             console.log(data);
         }).catch(error => {
-
-            error.json().then(body => {
-                setIsLoaded(false);
-                setError(true);
-                setErrorMessage(body.status + " " + body.error + " " + body.message);
-            });
+            setIsLoaded(false);
+            setError(true);
+            setErrorMessage(error.message);
         });
     }
 
@@ -223,7 +209,7 @@ const EditProfile = (props) => {
         return (
 
             <div>
-                <p>Error. Message: {errorMessage}</p>
+                <p>{errorMessage}</p>
             </div>
             
         );

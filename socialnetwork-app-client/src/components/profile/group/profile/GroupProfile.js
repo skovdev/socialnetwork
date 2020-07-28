@@ -28,7 +28,7 @@ const GroupProfile = (props) => {
         }).then(response => {
 
             if (!response.ok) {
-                throw response;
+                throw new Error("Failed load profile of user");
             }
             
             return response.json();
@@ -37,22 +37,17 @@ const GroupProfile = (props) => {
             setProfile(data);
             setIsLoaded(true);
         }).catch(error => {
-
-            error.json().then(body => {
-                setIsLoaded(false);
-                setError(true);
-                setErrorMessage(body.status + " " + body.error);
-                console.log("Status: " + body.status + " - Error: " + body.error + " - Message: " + body.message);
-            });
+            setIsLoaded(false);
+            setError(true);
+            setErrorMessage(error.message);
         })
-
     }, []);
 
     if (error) {
         
         return (
             <div className="group-profile">
-                <p>Error. Message: {errorMessage}</p>
+                <p>{errorMessage}</p>
             </div>
         )
     } else if (!isLoaded) {
