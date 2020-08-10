@@ -157,9 +157,7 @@ const GroupList = (props) => {
                         <div className="group">
                             <img className="rounded" src={'data:image/jpeg;base64,' + group.groupAvatar} />
                             <div className="group-info">
-                                <p>
-                                    <Link to={"/group/" + group.id}>Name: {group.groupName}</Link>
-                                </p>
+                                <p>Name:<Link className="group-link" to={"/group/" + group.id}>{group.groupName}</Link></p>
                                 <span>Amount users: {group.groupAmountUsers}</span>
                             </div>
                         </div>
