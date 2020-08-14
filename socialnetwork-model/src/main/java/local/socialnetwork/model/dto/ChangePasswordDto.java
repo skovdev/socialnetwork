@@ -3,7 +3,7 @@ package local.socialnetwork.model.dto;
 public class ChangePasswordDto {
 
     private String username;
-    private String password;
+    private String oldPassword;
     private String newPassword;
 
     public String getUsername() {
@@ -14,12 +14,12 @@ public class ChangePasswordDto {
         this.username = username;
     }
 
-    public String getPassword() {
-        return password;
+    public String getOldPassword() {
+        return oldPassword;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setOldPassword(String oldPassword) {
+        this.oldPassword = oldPassword;
     }
 
     public String getNewPassword() {

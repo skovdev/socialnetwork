@@ -8,13 +8,13 @@ import local.socialnetwork.core.service.UserService;
 
 import local.socialnetwork.core.util.ResourceUtil;
 
+import local.socialnetwork.model.dto.ChangePasswordDto;
 import local.socialnetwork.model.user.CustomRole;
 import local.socialnetwork.model.user.CustomUser;
 import local.socialnetwork.model.user.CustomUserDetails;
 
 import local.socialnetwork.model.profile.Profile;
 
-import local.socialnetwork.model.dto.ChangePasswordDto;
 import local.socialnetwork.model.dto.RegistrationDto;
 
 import org.slf4j.Logger;
@@ -78,6 +78,12 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
+    public CustomUser findByName(String username) {
+        return userRepository.findByUsername(username);
+    }
+
+    @Transactional
+    @Override
     public void registration(RegistrationDto registrationDto) throws IOException {
 
         CustomUser newUser = new CustomUser();
@@ -122,7 +128,20 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public CustomUser findByName(String username) {
-        return userRepository.findByUsername(username);
+    public boolean checkIfValidOldPassword(ChangePasswordDto changePasswordDto) {
+        var user = userRepository.findByUsername(changePasswordDto.getUsername());
+        return user != null && passwordEncoder.matches(changePasswordDto.getOldPassword(), user.getPassword());
+    }
+
+    @Override
+    public void changePassword(ChangePasswordDto changePasswordDto) {
+
+        var user = userRepository.findByUsername(changePasswordDto.getUsername());
+
+        if (user != null) {
+            String newPassword = passwordEncoder.encode(changePasswordDto.getNewPassword());
+            user.setPassword(newPassword);
+            userRepository.save(user);
+        }
     }
 }
