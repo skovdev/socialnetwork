@@ -10,6 +10,7 @@ import local.socialnetwork.model.http.ApiResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import org.springframework.web.bind.annotation.PutMapping;
@@ -37,7 +38,7 @@ public class UserRestController {
 
         userService.changePassword(changePasswordDto);
 
-        return ResponseEntity.ok().build();
+        return new ResponseEntity<>(new ApiResponse("Password has updated successfully"), HttpStatus.OK);
 
     }
 }
