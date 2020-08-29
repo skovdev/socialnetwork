@@ -10,6 +10,8 @@ import AuthService from "../../../service/auth/AuthService";
 
 import { Modal } from "react-bootstrap";
 
+import UpdateCurrentAvatar from "./avatar/UpdateCurrentAvatar";
+
 const EditProfile = (props) => {
 
     const [profile, setProfile] = useState({});
@@ -151,47 +153,6 @@ const EditProfile = (props) => {
         });
     };
 
-    const updateAvatar = (event) => {
-
-        let reader = new FileReader();
-        let file = event.target.files[0];
-
-        reader.onloadend = () => {
-            setAvatar(reader.result.split(',')[1]);
-        }
-
-        reader.readAsDataURL(file);
-
-        let data = new FormData();
-
-        data.append("profileAvatar", file);
-
-        const urlUpdateAvatar = AppConstants.API_HOST + "/api/v1/profiles/avatar?username=" + AuthService.getProfile().username;
-
-        fetch(urlUpdateAvatar, {
-            method: "POST",
-            headers: {
-                "Authorization" : "Bearer " + AuthService.getToken()
-            },
-            body: data
-        }).then(response => {
-
-            if (!response.ok) {
-                throw new Error("Failed update avatar of profile");
-            }
-
-            return response.json();
-
-        }).then(data => {
-            setIsLoaded(true);
-            console.log(data);
-        }).catch(error => {
-            setIsLoaded(false);
-            setError(true);
-            setErrorMessage(error.message);
-        });
-    }
-
     const defaultAvatar = () => {
 
         const urlSetDefaultAvatar = AppConstants.API_HOST + "/api/v1/profiles/avatar?username=" + AuthService.getProfile().username;
@@ -302,10 +263,7 @@ const EditProfile = (props) => {
                     <div className="current-profile-avatar">
                         <img className="rounded border" src={'data:image/jpeg;base64,' + avatar} />
                         <div className="avatar-buttons-wrapper">
-                            <div className="button-upload-avatar mt-3 mr-3">
-                                <button className="btn btn-dark">Upload avatar</button>
-                                <input type="file" onChange={updateAvatar} name="profileAvatar" />
-                            </div>
+                            <UpdateCurrentAvatar setAvatar={setAvatar} />
                             <div className="mt-3">
                                 <button className="btn btn-dark" onClick={defaultAvatar}>Set Default Avatar</button>
                             </div>
