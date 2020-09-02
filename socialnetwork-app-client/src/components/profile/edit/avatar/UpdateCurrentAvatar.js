@@ -26,8 +26,7 @@ const UpdateCurrentAvatar = (props) => {
         fetch(updateAvatarEndpoint, {
             method: "POST",
             headers: {
-                "Authorization": "Bearer " + AuthService.getToken(),
-                "Content-Type": "application/json"
+                "Authorization": "Bearer " + AuthService.getToken()
             },
             body: data
         }).then(response => {
