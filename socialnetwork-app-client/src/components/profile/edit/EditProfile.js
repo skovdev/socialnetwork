@@ -11,6 +11,7 @@ import AuthService from "../../../service/auth/AuthService";
 import { Modal } from "react-bootstrap";
 
 import UpdateCurrentAvatar from "./avatar/UpdateCurrentAvatar";
+import DefaultAvatar from "./avatar/DefaultAvatar";
 
 const EditProfile = (props) => {
 
@@ -153,34 +154,6 @@ const EditProfile = (props) => {
         });
     };
 
-    const defaultAvatar = () => {
-
-        const urlSetDefaultAvatar = AppConstants.API_HOST + "/api/v1/profiles/avatar?username=" + AuthService.getProfile().username;
-
-        fetch(urlSetDefaultAvatar, {
-            method: "DELETE",
-            headers: {
-                "Authorization" : "Bearer " + AuthService.getToken()
-            }
-        }).then(response => {
-
-            if (!response.ok) {
-                throw new Error("Failed set default avatar for profile");
-            }
-
-            return response.text();
-
-        }).then(data => {
-            setAvatar(data);
-            setIsLoaded(true);
-            console.log(data);
-        }).catch(error => {
-            setIsLoaded(false);
-            setError(true);
-            setErrorMessage(error.message);
-        });
-    };
-
     const changePassword = () => {
 
         const urlChangePassword = AppConstants.API_HOST + "/api/v1/user/change-password";
@@ -264,9 +237,7 @@ const EditProfile = (props) => {
                         <img className="rounded border" src={'data:image/jpeg;base64,' + avatar} />
                         <div className="avatar-buttons-wrapper">
                             <UpdateCurrentAvatar setAvatar={setAvatar} />
-                            <div className="mt-3">
-                                <button className="btn btn-dark" onClick={defaultAvatar}>Set Default Avatar</button>
-                            </div>
+                            <DefaultAvatar setAvatar={setAvatar} />
                         </div>
                     </div>
                     <h4>Change password</h4>
