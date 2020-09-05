@@ -4,3 +4,5 @@ class HttpMethodConstants {
     static PUT = "PUT";
     static DELETE = "DELETE";
 }
+
+export default HttpMethodConstants;
