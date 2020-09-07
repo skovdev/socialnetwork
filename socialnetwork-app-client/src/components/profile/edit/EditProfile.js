@@ -8,9 +8,8 @@ import AppConstants from "../../../constants/AppConstants";
 
 import AuthService from "../../../service/auth/AuthService";
 
-import { Modal } from "react-bootstrap";
-
 import UpdateCurrentAvatar from "./avatar/UpdateCurrentAvatar";
+
 import DefaultAvatar from "./avatar/DefaultAvatar";
 
 const EditProfile = (props) => {
@@ -18,12 +17,8 @@ const EditProfile = (props) => {
     const [profile, setProfile] = useState({});
     const [isLoaded, setIsLoaded] = useState(false);
     const [error, setError] = useState(false);
-    const [errorMessage, setErrorMessage] = useState('');
-
+    
     const [avatar, setAvatar] = useState('');
-
-    const [oldPassword, setOldPassword] = useState('');
-    const [newPassword, setNewPassword] = useState('');
 
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
@@ -33,17 +28,6 @@ const EditProfile = (props) => {
     const [phone, setPhone] = useState('');
     const [birthday, setBirthday] = useState('');
     const [familyStatus, setFamilyStatus] = useState('');
-
-    const [showChangePasswordModalSuccess, setShowChangePasswordModalSuccess] = useState(false);
-
-    const handleCloseChangePasswordModalSuccess = () => setShowChangePasswordModalSuccess(false);
-    const handleShowChangePasswordModalSuccess = () => setShowChangePasswordModalSuccess(true);
-
-    const [showChangePasswordModalFail, setShowChangePasswordModalFail] = useState(false);
-
-    const handleCloseChangePasswordModalFail= () => setShowChangePasswordModalFail(false);
-    const handleShowChangePasswordModalFail = () => setShowChangePasswordModalFail(true);
-
 
     useEffect(() => {
         loadProfileInformationByUsername();
@@ -154,41 +138,6 @@ const EditProfile = (props) => {
         });
     };
 
-    const changePassword = () => {
-
-        const urlChangePassword = AppConstants.API_HOST + "/api/v1/user/change-password";
-
-        let data = {
-            username: AuthService.getProfile().username,
-            oldPassword: oldPassword,
-            newPassword: newPassword
-        }
-
-        fetch(urlChangePassword, {
-            method: "PUT",
-            headers: {
-                "Authorization": "Bearer " + AuthService.getToken(),
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(data)
-        }).then(response => {
-
-            if (!response.ok) {
-                throw new Error("Failed change password of user");
-            }
-
-            return response.json();
-
-        }).then(() => {
-            handleCloseChangePasswordModalSuccess(false);
-            handleShowChangePasswordModalSuccess(true);
-            
-        }).catch(() => {
-            handleCloseChangePasswordModalFail(false);
-            handleShowChangePasswordModalFail(true);            
-        });
-    };
-
     if (error) {
 
         return (
@@ -211,26 +160,6 @@ const EditProfile = (props) => {
         return (
             <div>
                 <Header />
-                <div className="change-password-modal-success">
-                    <Modal show={showChangePasswordModalSuccess} onHide={handleCloseChangePasswordModalSuccess}>
-                        <Modal.Header className="alert alert-success" closeButton>
-                            <Modal.Title>Success</Modal.Title>
-                        </Modal.Header>
-                        <Modal.Body>
-                            <p>Password has created successfully</p>
-                        </Modal.Body>
-                    </Modal>
-                </div>
-                <div className="change-password-modal-fail">
-                    <Modal show={showChangePasswordModalFail} onHide={handleCloseChangePasswordModalFail}>
-                        <Modal.Header className="alert alert-danger" closeButton>
-                            <Modal.Title>Fail</Modal.Title>
-                        </Modal.Header>
-                        <Modal.Body>
-                            <p>Error. You couldn't change password</p>
-                        </Modal.Body>
-                    </Modal>
-                </div>
                 <div className="edit-profile">
                     <h2>Profile Information</h2>
                     <div className="current-profile-avatar">
@@ -242,15 +171,7 @@ const EditProfile = (props) => {
                     </div>
                     <h4>Change password</h4>
                     <div className="change-current-password">
-                        <div className="form-group input-width">
-                            <label htmlFor="oldPassword">Old password</label>
-                            <input type="password" id="oldPassword" className="form-control" onChange={e => setOldPassword(e.target.value)} />
-                        </div>
-                        <div className="form-group input-width">
-                            <label htmlFor="newPassword">New password</label>
-                            <input type="password" id="newPassword" className="form-control" onChange={e => setNewPassword(e.target.value)} />
-                        </div>
-                        <button className="btn btn-dark mb-3" onClick={changePassword}>Change</button>     
+                        <ChangePassowrdProfile /> 
                     </div>
                     <h4>Personal Information</h4>
                     <div className="form-group input-width">
