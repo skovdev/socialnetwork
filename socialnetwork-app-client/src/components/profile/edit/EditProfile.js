@@ -11,6 +11,7 @@ import AuthService from "../../../service/auth/AuthService";
 import UpdateCurrentAvatar from "./avatar/UpdateCurrentAvatar";
 
 import DefaultAvatar from "./avatar/DefaultAvatar";
+import ChangePasswordProfile from "./password/ChangePasswordProfile";
 
 const EditProfile = (props) => {
 
@@ -60,7 +61,6 @@ const EditProfile = (props) => {
         }).catch(error => {
             setIsLoaded(false);
             setError(true);
-            setErrorMessage(error.message);
         });
     };
 
@@ -88,7 +88,6 @@ const EditProfile = (props) => {
         }).catch(error => {
             setIsLoaded(false);
             setError(true);
-            setErrorMessage(error.message);
         });
     };
 
@@ -132,9 +131,7 @@ const EditProfile = (props) => {
             console.log(data);
         }).catch(error => {
             setIsLoaded(false);
-            setError(true);
-            setErrorMessage(error.message);
-            
+            setError(true);            
         });
     };
 
@@ -171,7 +168,7 @@ const EditProfile = (props) => {
                     </div>
                     <h4>Change password</h4>
                     <div className="change-current-password">
-                        <ChangePassowrdProfile /> 
+                        <ChangePasswordProfile /> 
                     </div>
                     <h4>Personal Information</h4>
                     <div className="form-group input-width">
