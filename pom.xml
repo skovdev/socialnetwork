@@ -12,10 +12,6 @@
     <packaging>pom</packaging>
 
     <modules>
-<!--        <module>socialnetwork-common</module>-->
-<!--        <module>socialnetwork-api</module>-->
-<!--        <module>socialnetwork-core</module>-->
-<!--        <module>socialnetwork-model</module>-->
         <module>socialnetwork-auth-service</module>
         <module>socialnetwork-profile-service</module>
         <module>socialnetwork-admin-service</module>
@@ -23,16 +19,27 @@
         <module>socialnetwork-service-discovery</module>
     </modules>
 
-	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.2.5.RELEASE</version>
-	</parent>
-
     <properties>
         <java.version>14</java.version>
+        <spring.boot.web.version>2.3.3.RELEASE</spring.boot.web.version>
+        <spring.cloud.netflix.eureka.server.version>2.2.5.RELEASE</spring.cloud.netflix.eureka.server.version>
+        <maven.compiler.source>14</maven.compiler.source>
+        <maven.compiler.target>14</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <version>${spring.boot.web.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
+            <version>${spring.cloud.netflix.eureka.server.version}</version>
+        </dependency>
+    </dependencies>
 
     <build>
         <plugins>
@@ -44,8 +51,5 @@
             </plugin>
         </plugins>
     </build>
-    <dependencies>
-
-    </dependencies>
 
 </project>

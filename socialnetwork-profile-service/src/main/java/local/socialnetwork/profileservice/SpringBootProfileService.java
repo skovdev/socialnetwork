@@ -1,13 +1,13 @@
-package local.socialnetwork.apigateway;
+package local.socialnetwork.profileservice;
 
 import org.springframework.boot.SpringApplication;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class SpringBootRunApiGateway {
+public class SpringBootProfileService {
 
     public static void main(String[] args) {
-        SpringApplication.run(SpringBootRunApiGateway.class);
+        SpringApplication.run(SpringBootProfileService.class);
     }
 }
