@@ -19,7 +19,7 @@
 
     <properties>
         <java.version>14</java.version>
-        <spring.version>2.3.3.RELEASE</spring.version>
+        <spring.boot.version>2.3.3.RELEASE</spring.boot.version>
         <jwt.version>0.9.1</jwt.version>
         <maven.compiler.source>14</maven.compiler.source>
         <maven.compiler.target>14</maven.compiler.target>
@@ -30,12 +30,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
-            <version>${spring.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
-            <version>${spring.version}</version>
+            <version>${spring.boot.version}</version>
         </dependency>
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
