@@ -1,6 +1,7 @@
 import React from "react";
 
 import AppConstants from "../../../../constants/AppConstants";
+import HttpMethodConstants from "../../../../constants/HttpMethodConstants";
 
 import AuthService from "../../../../service/auth/AuthService";
 
@@ -24,7 +25,7 @@ const UpdateCurrentAvatar = (props) => {
         data.append("profileAvatar", file);
 
         fetch(updateAvatarEndpoint, {
-            method: "POST",
+            method: HttpMethodConstants.POST,
             headers: {
                 "Authorization": "Bearer " + AuthService.getToken()
             },
