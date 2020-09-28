@@ -1,12 +1,13 @@
 import React from "react";
 
 import AppConstants from "../../../../constants/AppConstants";
+import HttpMethodConstants from "../../../../constants/HttpMethodConstants";
 
 import AuthService from "../../../../service/auth/AuthService";
 
 const UpdateCurrentAvatar = (props) => {
 
-    const updateCurrentAvatar = (event) => {
+    const handleOnChangeEvent = (event) => {
         
         const updateAvatarEndpoint = AppConstants.API_HOST + "/api/v1/profiles/avatar?username=" + AuthService.getProfile().username;
 
@@ -24,7 +25,7 @@ const UpdateCurrentAvatar = (props) => {
         data.append("profileAvatar", file);
 
         fetch(updateAvatarEndpoint, {
-            method: "POST",
+            method: HttpMethodConstants.POST,
             headers: {
                 "Authorization": "Bearer " + AuthService.getToken()
             },
@@ -48,7 +49,7 @@ const UpdateCurrentAvatar = (props) => {
         
         <div className="button-upload-avatar mt-3 mr-3">
             <button className="btn btn-dark">Upload avatar</button>
-            <input type="file" onChange={updateCurrentAvatar} name="profileAvatar" />
+            <input type="file" onChange={handleOnChangeEvent} name="profileAvatar" />
         </div>
 
     )
