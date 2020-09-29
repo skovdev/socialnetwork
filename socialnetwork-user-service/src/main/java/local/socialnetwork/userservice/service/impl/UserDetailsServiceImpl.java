@@ -1,4 +1,4 @@
-package local.socialnetwork.userservice.service;
+package local.socialnetwork.userservice.service.impl;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
