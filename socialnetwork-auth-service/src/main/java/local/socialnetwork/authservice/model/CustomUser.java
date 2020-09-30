@@ -3,15 +3,15 @@ package local.socialnetwork.authservice.model;
 import java.util.List;
 import java.util.UUID;
 
-public class User {
+public class CustomUser {
 
     private UUID id;
     private String firstName;
     private String lastName;
     private String username;
     private String password;
-    private UserDetails userDetails;
-    private List<Role> roles;
+    private CustomUserDetails userDetails;
+    private List<CustomRole> roles;
 
     public UUID getId() {
         return id;
@@ -53,19 +53,19 @@ public class User {
         this.password = password;
     }
 
-    public UserDetails getUserDetails() {
+    public CustomUserDetails getUserDetails() {
         return userDetails;
     }
 
-    public void setUserDetails(UserDetails userDetails) {
+    public void setUserDetails(CustomUserDetails userDetails) {
         this.userDetails = userDetails;
     }
 
-    public List<Role> getRoles() {
+    public List<CustomRole> getRoles() {
         return roles;
     }
 
-    public void setRoles(List<Role> roles) {
+    public void setRoles(List<CustomRole> roles) {
         this.roles = roles;
     }
 }

@@ -7,4 +7,5 @@ import java.util.UUID;
 
 public interface UserService {
     Optional<CustomUser> findById(UUID id);
+    Optional<CustomUser> findByUsername(String username);
 }

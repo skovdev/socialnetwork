@@ -8,8 +8,8 @@ import local.socialnetwork.authservice.dto.AuthenticationUserDto;
 
 import local.socialnetwork.authservice.exception.AuthenticationUserException;
 
-import local.socialnetwork.authservice.model.Role;
-import local.socialnetwork.authservice.model.User;
+import local.socialnetwork.authservice.model.CustomRole;
+import local.socialnetwork.authservice.model.CustomUser;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,14 +64,14 @@ public class AuthenticationRestController {
     @PostMapping("/sign")
     public ResponseEntity<Map<Object, Object>> authentication(@RequestBody AuthenticationUserDto authenticationUserDto) {
 
-        User user = userServiceProxy.findUserByUsername(authenticationUserDto.getUsername());
+        CustomUser user = userServiceProxy.findUserByUsername(authenticationUserDto.getUsername());
 
         try {
 
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authenticationUserDto.getUsername(), authenticationUserDto.getPassword()));
 
             List<String> roles = user.getRoles().stream()
-                                     .map(Role::getAuthority)
+                                     .map(CustomRole::getAuthority)
                                      .collect(Collectors.toList());
 
             String token = jwtTokenProvider.createToken(user.getId(), user.getUsername(), roles);

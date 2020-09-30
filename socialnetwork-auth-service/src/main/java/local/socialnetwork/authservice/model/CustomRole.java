@@ -1,9 +1,9 @@
 package local.socialnetwork.authservice.model;
 
-public class Role {
+public class CustomRole {
 
     private String authority;
-    private User userId;
+    private CustomUser userId;
 
     public String getAuthority() {
         return authority;
@@ -13,11 +13,11 @@ public class Role {
         this.authority = authority;
     }
 
-    public User getUserId() {
+    public CustomUser getUserId() {
         return userId;
     }
 
-    public void setUserId(User userId) {
+    public void setUserId(CustomUser userId) {
         this.userId = userId;
     }
 }

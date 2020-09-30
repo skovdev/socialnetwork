@@ -1,6 +1,6 @@
 package local.socialnetwork.authservice.model;
 
-public class UserDetails {
+public class CustomUserDetails {
 
     private String country;
     private String city;
