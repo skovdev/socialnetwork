@@ -61,7 +61,7 @@ public class AuthenticationRestController {
         this.userServiceProxy = userServiceProxy;
     }
 
-    @PostMapping("/sign")
+    @PostMapping("/signin")
     public ResponseEntity<Map<Object, Object>> authentication(@RequestBody AuthenticationUserDto authenticationUserDto) {
 
         CustomUser user = userServiceProxy.findUserByUsername(authenticationUserDto.getUsername());
