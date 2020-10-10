@@ -20,6 +20,9 @@
     <properties>
         <java.version>14</java.version>
         <spring.boot.version>2.3.3.RELEASE</spring.boot.version>
+        <spring.boot.web.version>2.3.3.RELEASE</spring.boot.web.version>
+        <spring.boot.security>2.3.3.RELEASE</spring.boot.security>
+        <spring.boot.data.jpa.version>2.3.3.RELEASE</spring.boot.data.jpa.version>
         <jackson.version>2.11.2</jackson.version>
         <jwt.version>0.9.1</jwt.version>
         <maven.compiler.source>14</maven.compiler.source>
@@ -32,6 +35,21 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
             <version>${spring.boot.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <version>${spring.boot.web.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+            <version>${spring.boot.security}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+            <version>${spring.boot.data.jpa.version}</version>
         </dependency>
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
