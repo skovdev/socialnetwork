@@ -35,7 +35,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping("/auth")
 public class AuthenticationRestController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AuthenticationRestController.class);

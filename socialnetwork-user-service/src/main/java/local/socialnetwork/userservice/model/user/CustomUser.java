@@ -1,8 +1,8 @@
 package local.socialnetwork.userservice.model.user;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import local.socialnetwork.userservice.model.AbstractBaseModel;
 
 import javax.persistence.CascadeType;
@@ -84,7 +84,7 @@ public class CustomUser extends AbstractBaseModel {
         this.userDetails = userDetails;
     }
 
-    @JsonBackReference
+    @JsonManagedReference
     public List<CustomRole> getRoles() {
         return roles;
     }
