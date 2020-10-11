@@ -1,6 +1,6 @@
 package local.socialnetwork.authservice.service.impl;
 
-import local.socialnetwork.authservice.client.UserServiceProxy;
+import local.socialnetwork.authservice.client.UserProxyService;
 
 import local.socialnetwork.authservice.model.CustomUser;
 import local.socialnetwork.authservice.model.springsecurity.UserPrincipal;
@@ -21,17 +21,17 @@ import java.util.Optional;
 @Service("userDetailsService")
 public class UserDetailsServiceImpl implements UserDetailsService {
 
-    private UserServiceProxy userServiceProxy;
+    private UserProxyService userProxyService;
 
     @Autowired
-    public void setUserServiceProxy(UserServiceProxy userServiceProxy) {
-        this.userServiceProxy = userServiceProxy;
+    public void setUserServiceProxy(UserProxyService userProxyService) {
+        this.userProxyService = userProxyService;
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        CustomUser user = userServiceProxy.findUserByUsername(username);
+        CustomUser user = userProxyService.findUserByUsername(username);
 
         Optional.ofNullable(user)
                 .orElseThrow(() -> new UsernameNotFoundException(username + " is not found"));
