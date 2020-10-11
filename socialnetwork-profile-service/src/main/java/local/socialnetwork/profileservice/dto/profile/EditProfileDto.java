@@ -1,4 +1,4 @@
-package local.socialnetwork.model.dto;
+package local.socialnetwork.profileservice.dto.profile;
 
 public class EditProfileDto {
 

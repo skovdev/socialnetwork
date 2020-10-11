@@ -1,4 +1,6 @@
-package local.socialnetwork.model.dto;
+package local.socialnetwork.profileservice.dto.profile;
+
+import local.socialnetwork.profileservice.dto.user.UserDto;
 
 public class ProfileDto {
 
