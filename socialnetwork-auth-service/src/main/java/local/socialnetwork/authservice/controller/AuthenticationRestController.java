@@ -1,6 +1,6 @@
 package local.socialnetwork.authservice.controller;
 
-import local.socialnetwork.authservice.client.UserServiceProxy;
+import local.socialnetwork.authservice.client.UserProxyService;
 
 import local.socialnetwork.authservice.config.jwt.JwtTokenProvider;
 
@@ -54,17 +54,17 @@ public class AuthenticationRestController {
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
-    private UserServiceProxy userServiceProxy;
+    private UserProxyService userProxyService;
 
     @Autowired
-    public void setUserServiceProxy(UserServiceProxy userServiceProxy) {
-        this.userServiceProxy = userServiceProxy;
+    public void setUserServiceProxy(UserProxyService userProxyService) {
+        this.userProxyService = userProxyService;
     }
 
     @PostMapping("/signin")
     public ResponseEntity<Map<Object, Object>> authentication(@RequestBody AuthenticationUserDto authenticationUserDto) {
 
-        CustomUser user = userServiceProxy.findUserByUsername(authenticationUserDto.getUsername());
+        CustomUser user = userProxyService.findUserByUsername(authenticationUserDto.getUsername());
 
         try {
 
