@@ -14,7 +14,6 @@
     <modules>
         <module>socialnetwork-auth-service</module>
         <module>socialnetwork-profile-service</module>
-        <module>socialnetwork-admin-service</module>
         <module>socialnetwork-api-gateway</module>
         <module>socialnetwork-service-discovery</module>
         <module>socialnetwork-user-service</module>
