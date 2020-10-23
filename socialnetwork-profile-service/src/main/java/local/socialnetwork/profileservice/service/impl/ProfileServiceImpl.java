@@ -1,13 +1,14 @@
 package local.socialnetwork.profileservice.service.impl;
 
-import local.socialnetwork.profileservice.client.UserProxyService;
+import local.socialnetwork.profileservice.client.user.UserProxyService;
 
-import local.socialnetwork.profileservice.dto.profile.EditProfileDto;
-import local.socialnetwork.profileservice.dto.profile.ProfileDto;
+import local.socialnetwork.profileservice.model.dto.profile.EditProfileDto;
+import local.socialnetwork.profileservice.model.dto.profile.ProfileDto;
 
-import local.socialnetwork.profileservice.dto.user.UserDto;
+import local.socialnetwork.profileservice.model.dto.user.UserDetailsDto;
+import local.socialnetwork.profileservice.model.dto.user.UserDto;
 
-import local.socialnetwork.profileservice.entity.profile.Profile;
+import local.socialnetwork.profileservice.model.entity.profile.Profile;
 
 import local.socialnetwork.profileservice.exception.ProfileServiceException;
 
@@ -16,6 +17,7 @@ import local.socialnetwork.profileservice.repository.ProfileRepository;
 import local.socialnetwork.profileservice.service.ProfileService;
 
 import local.socialnetwork.profileservice.util.ResourceUtil;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,6 +33,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -69,14 +72,54 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public List<Profile> findAll() {
-        return profileRepository.findAll();
+    public List<ProfileDto> findAll() {
+
+        ProfileDto profileDto = new ProfileDto();
+        UserDto userDto = new UserDto();
+        UserDetailsDto userDetailsDto = new UserDetailsDto();
+
+        List<ProfileDto> profileList = new ArrayList<>();
+
+        for (var profile : profileRepository.findAll()) {
+
+            profileDto.setId(profile.getId());
+            profileDto.setAvatar(profile.getAvatar());
+            profileDto.setActive(profile.isActive());
+
+            var user = userProxyService.findUserByUserId(profile.getUserId());
+
+            if (user != null) {
+
+                userDto.setId(user.getId());
+                userDto.setFirstName(user.getFirstName());
+                userDto.setLastName(user.getLastName());
+
+                userDetailsDto.setCountry(user.getUserDetails().getCountry());
+                userDetailsDto.setCity(user.getUserDetails().getCity());
+                userDetailsDto.setAddress(user.getUserDetails().getAddress());
+                userDetailsDto.setPhone(user.getUserDetails().getPhone());
+                userDetailsDto.setBirthday(user.getUserDetails().getBirthday());
+                userDetailsDto.setFamilyStatus(user.getUserDetails().getFamilyStatus());
+
+                userDto.setUserDetails(userDetailsDto);
+                userDto.setRoles(user.getRoles());
+
+                profileDto.setUser(userDto);
+
+                profileList.add(profileDto);
+
+            }
+        }
+
+        return profileList;
+
     }
 
+    @Transactional
     @Override
-    public ProfileDto findProfileByUsername(String username) {
-        UserDto user = userProxyService.findUserByUsername(username);
-        return user.getProfile();
+    public Profile findProfileByUsername(String username) {
+        var user = userProxyService.findUserByUsername(username);
+        return profileRepository.findProfileByUserId(user.getId());
     }
 
     @Override
@@ -93,10 +136,15 @@ public class ProfileServiceImpl implements ProfileService {
         return profileRepository.findProfileById(id);
     }
 
+    @Transactional
     @Override
-    public ProfileDto findProfileByUserId(UUID userId) {
-        UserDto user = userProxyService.findUserByUserId(userId);
-        return user.getProfile();
+    public Profile findProfileByUserId(UUID userId) {
+        return profileRepository.findProfileByUserId(userId);
+    }
+
+    @Override
+    public void save(Profile profile) {
+        profileRepository.save(profile);
     }
 
     @Override
@@ -147,6 +195,7 @@ public class ProfileServiceImpl implements ProfileService {
         }
     }
 
+    @Transactional
     @Override
     public String setDefaultAvatar(String username) throws IOException, ProfileServiceException {
 
@@ -175,18 +224,81 @@ public class ProfileServiceImpl implements ProfileService {
 
     }
 
+    @Transactional
     @Override
     public void updateAvatarProfile(String username, MultipartFile multipartFile) throws IOException, ProfileServiceException {
 
+        UserDto user = userProxyService.findUserByUsername(username);
+
+        if (user != null) {
+
+            Profile profile = profileRepository.findProfileByUserId(user.getId());
+
+            if (profile != null) {
+
+                var encodedAvatar = resourceUtil.writeResource(multipartFile, pathUploadAvatar);
+
+                profile.setAvatar(encodedAvatar);
+
+                profileRepository.save(profile);
+
+                LOGGER.info("Profile with ID: {} has updated avatar", profile.getId());
+
+            } else {
+                throw new ProfileServiceException("Avatar for profile has not updated");
+            }
+        }
     }
 
+    @Transactional
     @Override
     public boolean changeStatus(String username, boolean isActive) {
+
+        UserDto user = userProxyService.findUserByUsername(username);
+
+        if (user != null) {
+
+            Profile profile = profileRepository.findProfileByUserId(user.getId());
+
+            if (profile != null) {
+
+                profile.setActive(isActive);
+
+                profileRepository.save(profile);
+
+                LOGGER.info("Profile with ID: {} has changed status", profile.getId());
+
+                return true;
+
+            }
+        }
+
         return false;
     }
 
     @Override
     public EditProfileDto editProfileByUsername(String username) throws ProfileServiceException {
+
+        UserDto user = userProxyService.findUserByUsername(username);
+
+        if (user != null) {
+
+            EditProfileDto editProfile = new EditProfileDto();
+
+            editProfile.setFirstName(user.getFirstName());
+            editProfile.setLastName(user.getLastName());
+            editProfile.setCountry(user.getUserDetails().getCountry());
+            editProfile.setCity(user.getUserDetails().getCity());
+            editProfile.setAddress(user.getUserDetails().getAddress());
+            editProfile.setPhone(user.getUserDetails().getPhone());
+            editProfile.setBirthday(user.getUserDetails().getBirthday());
+            editProfile.setFamilyStatus(user.getUserDetails().getFamilyStatus());
+
+            return editProfile;
+
+        }
+
         return null;
+
     }
 }

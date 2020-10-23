@@ -1,31 +1,13 @@
-package local.socialnetwork.profileservice.dto.profile;
+package local.socialnetwork.authservice.model.dto;
 
-public class EditProfileDto {
+public class UserDetailsDto {
 
-    private String firstName;
-    private String lastName;
     private String country;
     private String city;
     private String address;
     private String phone;
     private String birthday;
     private String familyStatus;
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
 
     public String getCountry() {
         return country;

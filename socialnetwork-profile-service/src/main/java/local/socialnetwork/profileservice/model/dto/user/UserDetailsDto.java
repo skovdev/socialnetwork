@@ -1,6 +1,6 @@
-package local.socialnetwork.authservice.model;
+package local.socialnetwork.profileservice.model.dto.user;
 
-public class CustomUserDetails {
+public class UserDetailsDto {
 
     private String country;
     private String city;

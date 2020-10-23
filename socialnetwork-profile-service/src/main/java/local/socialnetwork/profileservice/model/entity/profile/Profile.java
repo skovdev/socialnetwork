@@ -1,8 +1,8 @@
-package local.socialnetwork.profileservice.entity.profile;
+package local.socialnetwork.profileservice.model.entity.profile;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import local.socialnetwork.profileservice.entity.AbstractBaseModel;
+import local.socialnetwork.profileservice.model.entity.AbstractBaseModel;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,10 +12,10 @@ import javax.persistence.Table;
 import java.util.UUID;
 
 @Entity
-@Table(name = "profiles")
+@Table(name = "sn_profile")
 public class Profile extends AbstractBaseModel {
 
-    @Column(name = "is_activce")
+    @Column(name = "is_active")
     private boolean isActive;
 
     @Lob
