@@ -1,9 +1,8 @@
-package local.socialnetwork.common.auth;
+package local.socialnetwork.authservice.helper;
 
-import local.socialnetwork.model.springsecurity.UserPrincipal;
+import local.socialnetwork.authservice.model.springsecurity.UserPrincipal;
 
 import org.springframework.security.core.context.SecurityContextHolder;
-
 import org.springframework.stereotype.Component;
 
 @Component
@@ -15,7 +14,7 @@ public class AuthenticationHelper {
         return (T) ((UserPrincipal) SecurityContextHolder.getContext()
                                                          .getAuthentication()
                                                          .getPrincipal())
-                                                         .getCustomUser();
+                                                         .getUser();
 
     }
 }
