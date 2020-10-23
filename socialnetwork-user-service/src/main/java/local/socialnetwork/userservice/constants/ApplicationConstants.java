@@ -1,4 +1,4 @@
-package local.socialnetwork.profileservice.constants;
+package local.socialnetwork.userservice.constants;
 
 public final class ApplicationConstants {
 
@@ -10,8 +10,7 @@ public final class ApplicationConstants {
 
     public static final class Services {
 
-        public static final String AUTH_SERVICE_URL = "auth-service";
-        public static final String USER_SERVICE_URL = "user-service";
+        public static final String PROFILE_SERVICE_URL = "profile-service";
 
         private Services() {
 
