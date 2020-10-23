@@ -8,11 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.http.ResponseEntity;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
@@ -37,5 +33,16 @@ public class UserRestController {
     public ResponseEntity<CustomUser> findByUsername(@RequestParam("username") String username) {
         CustomUser user = userService.findByUsername(username).orElseThrow(NullPointerException::new);
         return ResponseEntity.ok().body(user);
+    }
+
+    @PutMapping
+    public ResponseEntity<CustomUser> update(@RequestBody CustomUser user) {
+
+        if (user != null) {
+            userService.update(user);
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 }
