@@ -1,8 +1,8 @@
-package local.socialnetwork.authservice.model;
+package local.socialnetwork.authservice.model.dto;
 
 import java.util.UUID;
 
-public class CustomRole {
+public class RoleDto {
 
     private UUID id;
     private String authority;

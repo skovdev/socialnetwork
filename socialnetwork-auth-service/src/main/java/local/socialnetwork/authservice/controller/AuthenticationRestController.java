@@ -8,8 +8,9 @@ import local.socialnetwork.authservice.dto.AuthenticationUserDto;
 
 import local.socialnetwork.authservice.exception.AuthenticationUserException;
 
-import local.socialnetwork.authservice.model.CustomRole;
-import local.socialnetwork.authservice.model.CustomUser;
+import local.socialnetwork.authservice.helper.AuthenticationHelper;
+import local.socialnetwork.authservice.model.dto.RoleDto;
+import local.socialnetwork.authservice.model.dto.UserDto;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -54,6 +56,13 @@ public class AuthenticationRestController {
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
+    private AuthenticationHelper authenticationHelper;
+
+    @Autowired
+    public void setAuthenticationHelper(AuthenticationHelper authenticationHelper) {
+        this.authenticationHelper = authenticationHelper;
+    }
+
     private UserProxyService userProxyService;
 
     @Autowired
@@ -64,14 +73,14 @@ public class AuthenticationRestController {
     @PostMapping("/signin")
     public ResponseEntity<Map<Object, Object>> authentication(@RequestBody AuthenticationUserDto authenticationUserDto) {
 
-        CustomUser user = userProxyService.findUserByUsername(authenticationUserDto.getUsername());
+        UserDto user = userProxyService.findUserByUsername(authenticationUserDto.getUsername());
 
         try {
 
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authenticationUserDto.getUsername(), authenticationUserDto.getPassword()));
 
             List<String> roles = user.getRoles().stream()
-                                     .map(CustomRole::getAuthority)
+                                     .map(RoleDto::getAuthority)
                                      .collect(Collectors.toList());
 
             String token = jwtTokenProvider.createToken(user.getId(), user.getUsername(), roles);
@@ -88,6 +97,11 @@ public class AuthenticationRestController {
         } catch (RuntimeException e) {
             throw new AuthenticationUserException(e.getMessage());
         }
+    }
+
+    @GetMapping("/current")
+    public UserDto getAuthenticationUser() {
+        return authenticationHelper.getAuthenticatedUser();
     }
 
     @ExceptionHandler(AuthenticationUserException.class)

@@ -1,17 +1,17 @@
-package local.socialnetwork.authservice.model;
+package local.socialnetwork.authservice.model.dto;
 
 import java.util.List;
 import java.util.UUID;
 
-public class CustomUser {
+public class UserDto {
 
     private UUID id;
     private String firstName;
     private String lastName;
     private String username;
     private String password;
-    private CustomUserDetails userDetails;
-    private List<CustomRole> roles;
+    private UserDetailsDto userDetails;
+    private List<RoleDto> roles;
 
     public UUID getId() {
         return id;
@@ -53,19 +53,19 @@ public class CustomUser {
         this.password = password;
     }
 
-    public CustomUserDetails getUserDetails() {
+    public UserDetailsDto getUserDetails() {
         return userDetails;
     }
 
-    public void setUserDetails(CustomUserDetails userDetails) {
+    public void setUserDetails(UserDetailsDto userDetails) {
         this.userDetails = userDetails;
     }
 
-    public List<CustomRole> getRoles() {
+    public List<RoleDto> getRoles() {
         return roles;
     }
 
-    public void setRoles(List<CustomRole> roles) {
+    public void setRoles(List<RoleDto> roles) {
         this.roles = roles;
     }
 }
