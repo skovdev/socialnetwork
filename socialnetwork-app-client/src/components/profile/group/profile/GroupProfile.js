@@ -17,7 +17,7 @@ const GroupProfile = (props) => {
 
         const userId = props.userId;
 
-        const getProfilesByUserId = AppConstants.API_HOST + "/api/v1/profiles/user?userId=" + userId;
+        const getProfilesByUserId = AppConstants.API_HOST + "/profile-service/profiles/user?userId=" + userId;
 
         fetch(getProfilesByUserId, {
             method: "GET",

@@ -24,7 +24,7 @@ const Profile = (props) => {
 
         let username = props.match.params.username;
 
-        const urlGetProfileByUsername = AppConstants.API_HOST + "/api/v1/profiles/" + username;
+        const urlGetProfileByUsername = AppConstants.API_HOST + "/profile-service/profiles/user/" + username;
         const token = AuthService.getToken();
 
         fetch(urlGetProfileByUsername, {
@@ -43,7 +43,7 @@ const Profile = (props) => {
 
         }).then(data => {
 
-            if (!data.isActive) {
+            if (!data.active) {
                 setIsProfileDisabled(true);
             }
         }).catch(error => {
