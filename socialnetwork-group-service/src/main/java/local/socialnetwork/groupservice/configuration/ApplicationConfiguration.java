@@ -1,11 +1,7 @@
-package local.socialnetwork.userservice.configuration;
+package local.socialnetwork.groupservice.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -35,10 +31,5 @@ public class ApplicationConfiguration {
 
         return new CorsFilter(source);
 
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
     }
 }
