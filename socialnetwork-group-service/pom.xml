@@ -12,8 +12,8 @@
         <version>1.0</version>
     </parent>
 
-    <groupId>local.socialnetwork.authservice</groupId>
-    <artifactId>socialnetwork-auth-service</artifactId>
+    <groupId>local.socialnetwork.groupservice</groupId>
+    <artifactId>socialnetwork-group-service</artifactId>
     <version>1.0</version>
     <packaging>war</packaging>
 
@@ -21,9 +21,8 @@
         <java.version>14</java.version>
         <spring.boot.version>2.3.3.RELEASE</spring.boot.version>
         <spring.boot.web.version>2.3.3.RELEASE</spring.boot.web.version>
-        <spring.boot.security>2.3.3.RELEASE</spring.boot.security>
+        <spring.boot.data.jpa.version>2.3.3.RELEASE</spring.boot.data.jpa.version>
         <jackson.version>2.11.2</jackson.version>
-        <jwt.version>0.9.1</jwt.version>
         <maven.compiler.source>14</maven.compiler.source>
         <maven.compiler.target>14</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -31,9 +30,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter</artifactId>
-            <version>${spring.boot.version}</version>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter</artifactId>
+          <version>${spring.boot.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -42,18 +41,8 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
-            <version>${spring.boot.security}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt</artifactId>
-            <version>${jwt.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>${jackson.version}</version>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+            <version>${spring.boot.data.jpa.version}</version>
         </dependency>
     </dependencies>
 </project>
