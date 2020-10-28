@@ -42,7 +42,7 @@ const GroupList = (props) => {
 
         const username = props.match.params.username;
 
-        const urlLoadUserGroups = AppConstants.API_HOST + "/api/v1/group?username=" + username;
+        const urlLoadUserGroups = AppConstants.API_HOST + "/group-service/groups?username=" + username;
 
         fetch(urlLoadUserGroups, {
             method: "GET",
@@ -63,7 +63,7 @@ const GroupList = (props) => {
 
         const token = AuthService.getToken();
 
-        const urlCreateGroup = AppConstants.API_HOST + "/api/v1/group";
+        const urlCreateGroup = AppConstants.API_HOST + "/group-service/groups";
 
         const data = {
             groupName: groupName,
@@ -155,7 +155,7 @@ const GroupList = (props) => {
                 {groups.map(group => {
                     return (
                         <div className="group">
-                            <img className="rounded" src={'data:image/jpeg;base64,' + group.groupAvatar} />
+                            <img className="rounded" src={'data:image/jpeg;base64,' + group.avatar} />
                             <div className="group-info">
                                 <p>Name:<Link className="group-link" to={"/group/" + group.id}>{group.groupName}</Link></p>
                                 <span>Amount users: {group.groupAmountUsers}</span>
