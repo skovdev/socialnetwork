@@ -6,6 +6,8 @@ import local.socialnetwork.userservice.model.dto.ChangePasswordDto;
 import local.socialnetwork.userservice.model.dto.ProfileDto;
 import local.socialnetwork.userservice.model.dto.RegistrationDto;
 
+import local.socialnetwork.userservice.model.dto.profile.EditProfileDto;
+
 import local.socialnetwork.userservice.model.user.CustomRole;
 import local.socialnetwork.userservice.model.user.CustomUser;
 
@@ -91,8 +93,29 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void update(CustomUser user) {
-        userRepository.save(user);
+    public void update(UUID id, EditProfileDto editProfile) {
+
+        Optional<CustomUser> user = userRepository.findById(id);
+
+        user.ifPresent(u -> {
+
+            u.setFirstName(editProfile.getFirstName());
+            u.setLastName(editProfile.getLastName());
+
+            CustomUserDetails userDetails = new CustomUserDetails();
+
+            userDetails.setCountry(editProfile.getCountry());
+            userDetails.setCity(editProfile.getCity());
+            userDetails.setAddress(editProfile.getAddress());
+            userDetails.setPhone(editProfile.getPhone());
+            userDetails.setBirthday(editProfile.getBirthday());
+            userDetails.setFamilyStatus(editProfile.getFamilyStatus());
+
+            u.setUserDetails(userDetails);
+
+            userRepository.save(u);
+
+        });
     }
 
     @Transactional

@@ -1,5 +1,7 @@
 package local.socialnetwork.userservice.controller;
 
+import local.socialnetwork.userservice.model.dto.profile.EditProfileDto;
+
 import local.socialnetwork.userservice.model.user.CustomUser;
 
 import local.socialnetwork.userservice.service.UserService;
@@ -35,11 +37,11 @@ public class UserRestController {
         return ResponseEntity.ok().body(user);
     }
 
-    @PutMapping
-    public ResponseEntity<CustomUser> update(@RequestBody CustomUser user) {
+    @PutMapping("/{id}")
+    public ResponseEntity<EditProfileDto> update(@PathVariable("id") UUID id, @RequestBody EditProfileDto editProfile) {
 
-        if (user != null) {
-            userService.update(user);
+        if (editProfile != null) {
+            userService.update(id, editProfile);
             return ResponseEntity.ok().build();
         } else {
             return ResponseEntity.notFound().build();

@@ -20,7 +20,7 @@ public class CustomRole extends AbstractBaseModel {
     private String authority;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "id_user", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private CustomUser user;
 
 

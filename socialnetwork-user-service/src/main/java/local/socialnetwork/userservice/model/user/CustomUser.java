@@ -1,5 +1,6 @@
 package local.socialnetwork.userservice.model.user;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -15,6 +16,7 @@ import javax.persistence.Table;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 @Entity
 @Table(name = "sn_users")
@@ -31,6 +33,9 @@ public class CustomUser extends AbstractBaseModel {
 
     @Column(name = "password", nullable = false)
     private String password;
+
+    @Column(name = "group_id")
+    private UUID groupId;
 
     @Embedded
     private CustomUserDetails userDetails;
@@ -74,7 +79,15 @@ public class CustomUser extends AbstractBaseModel {
         this.password = password;
     }
 
-    @JsonManagedReference
+    public UUID getGroupId() {
+        return groupId;
+    }
+
+    @JsonProperty(value = "groupId")
+    public void setGroupId(UUID groupId) {
+        this.groupId = groupId;
+    }
+
     public CustomUserDetails getUserDetails() {
         return userDetails;
     }
