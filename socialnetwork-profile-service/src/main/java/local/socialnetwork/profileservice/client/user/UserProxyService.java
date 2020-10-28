@@ -2,6 +2,7 @@ package local.socialnetwork.profileservice.client.user;
 
 import local.socialnetwork.profileservice.constants.ApplicationConstants;
 
+import local.socialnetwork.profileservice.model.dto.profile.EditProfileDto;
 import local.socialnetwork.profileservice.model.dto.user.UserDto;
 
 import org.springframework.cloud.openfeign.FeignClient;
@@ -27,8 +28,8 @@ public interface UserProxyService {
     @RequestMapping(value = "/users", method = RequestMethod.GET)
     List<UserDto> findUserByFirstName(@RequestParam("firstName") String username);
 
-    @RequestMapping(value = "/users", method = RequestMethod.PUT)
-    void update(@RequestBody UserDto user);
+    @RequestMapping(value = "/users/{id}", method = RequestMethod.PUT)
+    void updateProfile(@PathVariable("id") UUID id, @RequestBody EditProfileDto editProfile);
 
     @RequestMapping(value = "/users", method = RequestMethod.DELETE)
     void delete(@RequestBody UserDto user);

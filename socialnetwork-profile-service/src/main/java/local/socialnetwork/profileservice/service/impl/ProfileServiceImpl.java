@@ -153,26 +153,7 @@ public class ProfileServiceImpl implements ProfileService {
         var user = userProxyService.findUserByUserId(id);
 
         if (user != null) {
-
-            user.setFirstName(editProfileDto.getFirstName());
-            user.setLastName(editProfileDto.getLastName());
-
-            var userDetails = user.getUserDetails();
-
-            if (userDetails != null) {
-
-                userDetails.setCountry(editProfileDto.getCountry());
-                userDetails.setCity(editProfileDto.getCity());
-                userDetails.setAddress(editProfileDto.getAddress());
-                userDetails.setPhone(editProfileDto.getPhone());
-                userDetails.setBirthday(editProfileDto.getBirthday());
-                userDetails.setFamilyStatus(editProfileDto.getFamilyStatus());
-
-                userProxyService.update(user);
-
-                LOGGER.info("Profile has updated successfully");
-
-            }
+            userProxyService.updateProfile(id, editProfileDto);
         } else {
             throw new ProfileServiceException("Profile has not updated");
         }
