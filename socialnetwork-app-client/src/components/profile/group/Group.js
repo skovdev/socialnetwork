@@ -25,7 +25,7 @@ const Group = (props) => {
 
         const groupId = props.match.params.id;
 
-        const urlGetGroupById = AppConstants.API_HOST + "/api/v1/group/" + groupId;
+        const urlGetGroupById = AppConstants.API_HOST + "/group-service/groups/" + groupId;
 
         fetch(urlGetGroupById, {
             method: "GET",

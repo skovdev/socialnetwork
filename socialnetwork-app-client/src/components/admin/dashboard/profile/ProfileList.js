@@ -19,7 +19,7 @@ const ProfileList = () => {
 
     const loadUserProfiles = () => {
 
-        const urlFindAllProfile = AppConstants.API_HOST + "/api/v1/profiles"
+        const urlFindAllProfile = AppConstants.API_HOST + "/profile-service/profiles"
         const token = AuthService.getToken();
 
         fetch(urlFindAllProfile, {
@@ -35,7 +35,7 @@ const ProfileList = () => {
             }
 
             return response.json()
-
+                    
         }).then(data => {
             setProfiles(data)
             setIsLoaded(true)
@@ -51,7 +51,7 @@ const ProfileList = () => {
 
         const token = AuthService.getToken()
 
-        const urlChangeStatusProfile = AppConstants.API_HOST + `/api/v1/profiles?username=${username}&isActive=${status}`
+        const urlChangeStatusProfile = AppConstants.API_HOST + `/profile-service/profiles?username=${username}&isActive=${status}`
 
         fetch(urlChangeStatusProfile, {
             method: "PUT",
@@ -99,16 +99,16 @@ const ProfileList = () => {
                             return (
                                 <tr key={profile.id}>
                                     <th scope="row">{profile.id}</th>
-                                    <th>{profile.customUser.username}</th>
-                                    <th>{profile.customUser.firstName}</th>
-                                    <th>{profile.customUser.lastName}</th>
+                                    <th>{profile.user.username}</th>
+                                    <th>{profile.user.firstName}</th>
+                                    <th>{profile.user.lastName}</th>
                                     <th>{profile.isActive ? 
                                         <img className="status" src={process.env.PUBLIC_URL + "/images/profile/status/active.png"} /> 
                                         : 
                                         <img className="status" src={process.env.PUBLIC_URL + "/images/profile/status/inactive.png"} />}
                                     </th>
                                     <th>
-                                        <select onChange={e => changeStatus(e, profile.customUser.username)} className="custom-select custom-select-sm">
+                                        <select onChange={e => changeStatus(e, profile.user.username)} className="custom-select custom-select-sm">
                                             <option hidden>-- Select --</option>
                                             <option value="true">ACTIVE</option>
                                             <option value="false">INACTIVE</option>

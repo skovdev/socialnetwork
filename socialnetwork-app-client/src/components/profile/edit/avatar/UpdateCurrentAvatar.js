@@ -9,7 +9,7 @@ const UpdateCurrentAvatar = (props) => {
 
     const handleOnChangeEvent = (event) => {
         
-        const updateAvatarEndpoint = AppConstants.API_HOST + "/api/v1/profiles/avatar?username=" + AuthService.getProfile().username;
+        const updateAvatarEndpoint = AppConstants.API_HOST + "/profile-service/profiles/avatar?username=" + AuthService.getProfile().username;
 
         let reader = new FileReader();
         let file = event.target.files[0];

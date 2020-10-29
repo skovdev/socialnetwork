@@ -23,7 +23,7 @@ const PersonalInfo = () => {
 
         let username = AuthService.getProfile().username;
 
-        const urlGetProfileDetails = AppConstants.API_HOST + "/api/v1/profiles/" + username;
+        const urlGetProfileDetails = AppConstants.API_HOST + "/profile-service/profiles/user/" + username;
         const token = AuthService.getToken();
 
         fetch(urlGetProfileDetails, {
@@ -60,26 +60,26 @@ const PersonalInfo = () => {
 
                 <div className="personal-info">
                      <div className="full-name">
-                        <h4>{profile.customUser.firstName} {profile.customUser.lastName}</h4>
+                        <h4>{profile.user.firstName} {profile.user.lastName}</h4>
                     </div>
                     <div className="additional-info">
                         <div className="biirthday">
-                            <h5>Birthday: {profile.customUser.customUserDetails.birthday}</h5>
+                            <h5>Birthday: {profile.user.userDetails.birthday}</h5>
                         </div>
                         <div className="country">
-                            <h5>Country: {profile.customUser.customUserDetails.country}</h5>
+                            <h5>Country: {profile.user.userDetails.country}</h5>
                         </div>
                         <div className="city">
-                            <h5>City: {profile.customUser.customUserDetails.city}</h5>
+                            <h5>City: {profile.user.userDetails.city}</h5>
                         </div>
                         <div className="family-status">
-                            <h5>Family status: {profile.customUser.customUserDetails.familyStatus}</h5>
+                            <h5>Family status: {profile.user.userDetails.familyStatus}</h5>
                         </div>
                         <div className="phone">
-                            <h5>Phone: {profile.customUser.customUserDetails.phone}</h5>
+                            <h5>Phone: {profile.user.userDetails.phone}</h5>
                         </div>
                         <div className="address">
-                            <h5>Address: {profile.customUser.customUserDetails.address}</h5>
+                            <h5>Address: {profile.user.userDetails.address}</h5>
                          </div>
                     </div>
                 </div>
