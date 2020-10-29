@@ -25,7 +25,7 @@ const AdminHeader = () => {
 
         const decodedToken = DecodeJwtToken.decode(token);
 
-        const urlLoadUserProfile = AppConstants.API_HOST + "/api/v1/profiles/" + decodedToken.username;
+        const urlLoadUserProfile = AppConstants.API_HOST + "/profile-service/profiles/user/" + decodedToken.username;
 
         fetch(urlLoadUserProfile, {
             method: "GET",
@@ -62,9 +62,9 @@ const AdminHeader = () => {
                 <div className="admin-profile">
                     <img src={'data:image/jpeg;base64,' + profile.avatar} className="rounded" />
                     <div className="dropdown-profile">
-                        <p className="username">{profile.customUser.username}</p>
+                        <p className="username">{profile.user.username}</p>
                         <div className="dropdown-profile-content">
-                            <a href={"/profile/" + profile.customUser.username}>Profile</a>
+                            <a href={"/profile/" + profile.user.username}>Profile</a>
                             <a href="#">Edit</a>
                             <a href="#">Logout</a>
                         </div>

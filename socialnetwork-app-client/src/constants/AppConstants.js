@@ -1,5 +1,5 @@
 class AppConstants  {
-    static API_HOST = "http://localhost:8080"
+    static API_HOST = "http://localhost:8762"
 }
 
 export default AppConstants;

@@ -1,7 +1,8 @@
 /.idea
-/socialnetwork-app-client/target
-/socialnetwork-api/target
-/socialnetwork-core/target
-/socialnetwork-model/target
-/socialnetwork-app-client/node_modules
+/socialnetwork-profile-service/
+/socialnetwork-user-service/
+/socialnetwork-service-discovery/
+/socialnetwork-api-gateway/
+/socialnetwork-auth-service/
 /socialnetwork-app-client/.vscode
+/socialnetwork-app-client/node_modules

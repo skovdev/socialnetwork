@@ -38,7 +38,7 @@ const Header = () => {
 
         event.preventDefault();
 
-        const registrationUrl = AppConstants.API_HOST + "/api/v1/registration";
+        const registrationUrl = AppConstants.API_HOST + "/user-service/registration";
 
         let data = {
             username: username,

@@ -8,7 +8,7 @@ const DefaultAvatar = (props) => {
 
     const setDefaultAvatar = () => {
 
-        const setDefaultAvatarEndpoint = AppConstants.API_HOST + "/api/v1/profiles/avatar?username=" + AuthService.getProfile().username;
+        const setDefaultAvatarEndpoint = AppConstants.API_HOST + "/profile-service/profiles/avatar?username=" + AuthService.getProfile().username;
 
         fetch(setDefaultAvatarEndpoint, {
             method: "DELETE",
