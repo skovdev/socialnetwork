@@ -44,7 +44,7 @@ public class Group extends AbstractBaseModel {
         return name;
     }
 
-    @JsonProperty(value = "name")
+    @JsonProperty(value = "groupName")
     public void setName(String name) {
         this.name = name;
     }
