@@ -63,7 +63,7 @@ const GroupList = (props) => {
 
         const token = AuthService.getToken();
 
-        const urlCreateGroup = AppConstants.API_HOST + "/group-service/groups";
+        const urlCreateGroup = AppConstants.API_HOST + "/group-service/groups?username=" + AuthService.getProfile().username;
 
         const data = {
             groupName: groupName,
