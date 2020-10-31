@@ -12,6 +12,7 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>socialnetwork-config-server</module>
         <module>socialnetwork-auth-service</module>
         <module>socialnetwork-profile-service</module>
         <module>socialnetwork-api-gateway</module>
