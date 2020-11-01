@@ -25,7 +25,7 @@ const UpdateCurrentAvatar = (props) => {
         data.append("profileAvatar", file);
 
         fetch(updateAvatarEndpoint, {
-            method: HttpMethodConstants.POST,
+            method: HttpMethodConstants.PUT,
             headers: {
                 "Authorization": "Bearer " + AuthService.getToken()
             },
