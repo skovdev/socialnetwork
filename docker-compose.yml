@@ -1,0 +1,107 @@
+version: '3.7'
+
+services:
+  socialnetwork-user-service-database:
+    image: postgres
+    environment:
+      POSTGERS_DB: sn_user_service_db
+      POSTGRES_USER: sn_user_service_user
+      POSTGRES_PASSWORD: sn_user_service_password
+    ports:
+      - "5432:5432"
+
+  socialnetwork-profile-service-database:
+    image: postgres
+    environment:
+      POSTGERS_DB: sn_profile_service_db
+      POSTGRES_USER: sn_profile_service_user
+      POSTGRES_PASSWORD: sn_profile_service_password
+    ports:
+      - "5433:5433"
+
+  socialnetwork-group-service-database:
+    image: postgres
+    environment:
+      POSTGERS_DB: sn_group_service_db
+      POSTGRES_USER: sn_group_service_user
+      POSTGRES_PASSWORD: sn_group_service_password
+    ports:
+      - "5434:5434"
+
+  socialnetwork-config-server:
+    image: socialnetwork-config-server-1.0
+    ports:
+      - "8888:8888"
+    depends_on:
+      - socialnetwork-eureka-service-discovery
+
+  socialnetwork-eureka-service-discovery:
+    image: socialnetwork-service-discovery-1.0
+    ports:
+      - "8761:8761"
+
+  socialnetwork-zuul-api-gateway:
+    image: socialnetwork-api-gateway-1.0
+    ports:
+      - "8762:8762"
+    depends_on:
+      - socialnetwork-eureka-service-discovery
+
+  socialnetwork-auth-service:
+    image: socialnetwork-auth-service-1.0
+    environment:
+      SPRING_PROFILE_ACTIVE: local
+    ports:
+      - "8080:8080"
+    depends_on:
+      - socialnetwork-eureka-service-discovery
+      - socialnetwork-config-server
+      - socialnetwork-zuul-api-gateway
+    entrypoint: ./wait-for-it.sh socialnetwork-config-server:8888 --timeout=15 -- java -jar socialnetwork-auth-service-1.0.jar
+
+  socialnetwork-user-service:
+    image: socialnetwork-user-service-1.0
+    environment:
+      SPRING_PROFILE_ACTIVE: local
+    ports:
+      - "8084:8084"
+    depends_on:
+      - socialnetwork-eureka-service-discovery
+      - socialnetwork-config-server
+      - socialnetwork-zuul-api-gateway
+      - socialnetwork-user-service-database
+    entrypoint: ./wait-for-it.sh socialnetwork-config-server:8888 --timeout=15 -- java -jar socialnetwork-user-service-1.0.jar
+
+  socialnetwork-profile-service:
+    image: socialnetwork-profile-service-1.0
+    environment:
+      SPRING_PROFILE_ACTIVE: local
+    ports:
+      - "8081:8081"
+    depends_on:
+      - socialnetwork-eureka-service-discovery
+      - socialnetwork-config-server
+      - socialnetwork-zuul-api-gateway
+      - socialnetwork-profile-service-database
+    entrypoint:  ./wait-for-it.sh socialnetwork-config-server:8888 --timeout=15 -- java -jar socialnetwork-profile-service-1.0.jar
+
+  socialnetwork-group-service:
+    image: socialnetwork-group-service-1.0
+    environment:
+      SPRING_PROFILE_ACTIVE: local
+    ports:
+      - "8085:8085"
+    depends_on:
+      - socialnetwork-eureka-service-discovery
+      - socialnetwork-config-server
+      - socialnetwork-zuul-api-gateway
+      - socialnetwork-group-service-database
+    entrypoint:  ./wait-for-it.sh socialnetwork-config-server:8888 --timeout=15 -- java -jar socialnetwork-group-service-1.0.jar
+
+  socialnetwork-app-client:
+    image: socialnetwork-app-client
+    ports:
+    - "3000:3000"
+    volumes:
+    - /app/node_modules
+    - ./:/app
