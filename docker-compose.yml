@@ -3,6 +3,9 @@ version: '3.7'
 services:
   socialnetwork-database:
     image: postgresql-local-socialnetwork
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
     ports:
       - "5432:5432"
 
