@@ -20,6 +20,7 @@
         <module>socialnetwork-user-service</module>
         <module>socialnetwork-group-service</module>
         <module>socialnetwork-unit-testing</module>
+        <module>socialnetwork-integration-test</module>
     </modules>
 
     <properties>
