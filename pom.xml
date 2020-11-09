@@ -19,6 +19,7 @@
         <module>socialnetwork-service-discovery</module>
         <module>socialnetwork-user-service</module>
         <module>socialnetwork-group-service</module>
+        <module>socialnetwork-unit-testing</module>
     </modules>
 
     <properties>
