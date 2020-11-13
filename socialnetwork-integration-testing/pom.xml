@@ -13,7 +13,7 @@
     </parent>
 
     <groupId>local.socialnetwork.integration</groupId>
-    <artifactId>socialnetwork-integration-test</artifactId>
+    <artifactId>socialnetwork-integration-testing</artifactId>
     <version>1.0</version>
     <packaging>jar</packaging>
 
