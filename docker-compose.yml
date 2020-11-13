@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   socialnetwork-database:
-    image: postgresql-local-socialnetwork
+    image: socialnetwork-postgresql
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -34,11 +34,12 @@ services:
       - SPRING_PROFILE_ACTIVE=local
     ports:
       - "8080:8080"
+      - "5005:5005"
     depends_on:
       - socialnetwork-eureka-service-discovery
       - socialnetwork-config-server
       - socialnetwork-zuul-api-gateway
-    entrypoint: ./wait-for-it.sh socialnetwork-config-server:8888 --timeout=15 -- java -jar socialnetwork-auth-service-1.0.jar
+    entrypoint: ./wait-for-it.sh socialnetwork-config-server:8888 --timeout=15 -- java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar socialnetwork-auth-service-1.0.jar
 
   socialnetwork-user-service:
     image: socialnetwork-user-service-1.0
@@ -49,12 +50,13 @@ services:
       - SOCIALNETWORK_JDBC_PASSWORD=sn_user_service_password
     ports:
       - "8084:8084"
+      - "5006:5006"
     depends_on:
       - socialnetwork-eureka-service-discovery
       - socialnetwork-config-server
       - socialnetwork-zuul-api-gateway
       - socialnetwork-database
-    entrypoint: ./wait-for-it.sh socialnetwork-config-server:8888 --timeout=15 -- java -jar socialnetwork-user-service-1.0.jar
+    entrypoint: ./wait-for-it.sh socialnetwork-config-server:8888 --timeout=15 -- java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5006 -jar socialnetwork-user-service-1.0.jar
 
   socialnetwork-profile-service:
     image: socialnetwork-profile-service-1.0
@@ -65,12 +67,13 @@ services:
         - SOCIALNETWORK_JDBC_PASSWORD=sn_profile_service_password
     ports:
       - "8081:8081"
+      - "5007:5007"
     depends_on:
       - socialnetwork-eureka-service-discovery
       - socialnetwork-config-server
       - socialnetwork-zuul-api-gateway
       - socialnetwork-database
-    entrypoint:  ./wait-for-it.sh socialnetwork-config-server:8888 --timeout=15 -- java -jar socialnetwork-profile-service-1.0.jar
+    entrypoint: ./wait-for-it.sh socialnetwork-config-server:8888 --timeout=15 -- java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5007 -jar socialnetwork-profile-service-1.0.jar
 
   socialnetwork-group-service:
     image: socialnetwork-group-service-1.0
@@ -81,12 +84,13 @@ services:
       - SOCIALNETWORK_JDBC_PASSWORD=sn_group_service_password
     ports:
       - "8085:8085"
+      - "5008:5008"
     depends_on:
       - socialnetwork-eureka-service-discovery
       - socialnetwork-config-server
       - socialnetwork-zuul-api-gateway
       - socialnetwork-database
-    entrypoint:  ./wait-for-it.sh socialnetwork-config-server:8888 --timeout=15 -- java -jar socialnetwork-group-service-1.0.jar
+    entrypoint: ./wait-for-it.sh socialnetwork-config-server:8888 --timeout=15 -- java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5008 -jar socialnetwork-group-service-1.0.jar
 
   socialnetwork-app-client:
     image: socialnetwork-app-client
