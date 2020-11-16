@@ -44,7 +44,7 @@ public class UserServiceImpl implements UserService {
 
     private static final String DEFAULT_USER_ROLE = "USER";
 
-    @Value("${sn.profile.default.avatar.dir}")
+    @Value("${sn.profile.default.avatar.path}")
     private String pathDefaultAvatar;
 
     private UserRepository userRepository;
