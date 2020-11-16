@@ -9,6 +9,11 @@ services:
     ports:
       - "5432:5432"
 
+  socialnetwork-eureka-service-discovery:
+    image: socialnetwork-service-discovery-1.0
+    ports:
+      - "8761:8761"
+
   socialnetwork-config-server:
     image: socialnetwork-config-server-1.0
     ports:
@@ -16,17 +21,13 @@ services:
     depends_on:
       - socialnetwork-eureka-service-discovery
 
-  socialnetwork-eureka-service-discovery:
-    image: socialnetwork-service-discovery-1.0
-    ports:
-      - "8761:8761"
-
   socialnetwork-zuul-api-gateway:
     image: socialnetwork-api-gateway-1.0
     ports:
       - "8762:8762"
     depends_on:
       - socialnetwork-eureka-service-discovery
+      - socialnetwork-config-server
     entrypoint: ./wait-for-it.sh socialnetwork-config-server:8888 --timeout=15 -- java -jar socialnetwork-api-gateway-1.0.jar
 
   socialnetwork-auth-service:
