@@ -27,6 +27,7 @@ services:
       - "8762:8762"
     depends_on:
       - socialnetwork-eureka-service-discovery
+    entrypoint: ./wait-for-it.sh socialnetwork-config-server:8888 --timeout=15 -- java -jar socialnetwork-api-gateway-1.0.jar
 
   socialnetwork-auth-service:
     image: socialnetwork-auth-service-1.0
