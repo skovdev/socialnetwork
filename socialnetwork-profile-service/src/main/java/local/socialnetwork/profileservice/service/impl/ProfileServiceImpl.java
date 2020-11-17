@@ -47,7 +47,7 @@ public class ProfileServiceImpl implements ProfileService {
     @Value("${sn.profile.avatar.dir}")
     private String pathUploadAvatar;
 
-    @Value("${sn.profile.default.avatar.dir}")
+    @Value("${sn.profile.default.avatar.path}")
     private String pathDefaultAvatar;
 
     private UserProxyService userProxyService;
