@@ -44,7 +44,7 @@ public class ProfileServiceImpl implements ProfileService {
 
     private final Logger LOGGER = LoggerFactory.getLogger(ProfileServiceImpl.class);
 
-    @Value("${sn.profile.avatar.dir}")
+    @Value("${sn.profile.upload.avatar.dir.path}")
     private String pathUploadAvatar;
 
     @Value("${sn.profile.default.avatar.path}")
