@@ -76,7 +76,8 @@ services:
       - socialnetwork-zuul-api-gateway
       - socialnetwork-database
     entrypoint: ./wait-for-it.sh socialnetwork-config-server:8888 --timeout=15 -- java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5007 -jar socialnetwork-profile-service-1.0.jar
-
+    volumes:
+       - /avatar/
   socialnetwork-group-service:
     image: socialnetwork-group-service-1.0
     environment:
