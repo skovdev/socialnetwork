@@ -34,7 +34,7 @@ public class ResourceUtil {
 
         byte[] byteFile = file.getBytes();
 
-        var filePath = Paths.get(path + generateRandomFilename() + "." + getFormatFileFromMimeType(file.getContentType()));
+        var filePath = Paths.get(new ClassPathResource(path).getPath() + generateRandomFilename() + "." + getFormatFileFromMimeType(file.getContentType()));
 
         Files.write(filePath, byteFile);
 
