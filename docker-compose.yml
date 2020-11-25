@@ -30,6 +30,19 @@ services:
       - socialnetwork-config-server
     entrypoint: ./wait-for-it.sh socialnetwork-config-server:8888 --timeout=15 -- java -jar socialnetwork-api-gateway-1.0.jar
 
+  socialnetwork-zookeeper:
+    image: wurstmeister/zookeeper
+    expose:
+      - "2182"
+
+  socialnetwork-kafka:
+    image: wurstmeister/kafka
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: localhost
+      KAFKA_ZOOKEEPER_CONNECT: socialnetwork-zookeeper:2181
+
   socialnetwork-auth-service:
     image: socialnetwork-auth-service-1.0
     environment:
