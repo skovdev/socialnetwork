@@ -22,6 +22,7 @@
         <spring.boot.version>2.3.3.RELEASE</spring.boot.version>
         <spring.boot.data.jpa.version>2.3.3.RELEASE</spring.boot.data.jpa.version>
         <spring.cloud.config.starter.version>2.2.5.RELEASE</spring.cloud.config.starter.version>
+        <spring.kafka.version>2.6.3</spring.kafka.version>
         <jackson.version>2.11.3</jackson.version>
         <maven.compiler.source>14</maven.compiler.source>
         <maven.compiler.target>14</maven.compiler.target>
@@ -43,6 +44,11 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-config</artifactId>
             <version>${spring.cloud.config.starter.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
+            <version>${spring.kafka.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
