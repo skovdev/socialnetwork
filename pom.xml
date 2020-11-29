@@ -21,7 +21,6 @@
         <module>socialnetwork-group-service</module>
         <module>socialnetwork-unit-testing</module>
         <module>socialnetwork-integration-testing</module>
-        <module>socialnetwork-kafka-server</module>
     </modules>
 
     <properties>
