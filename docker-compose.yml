@@ -63,6 +63,7 @@ services:
       - socialnetwork-eureka-service-discovery
       - socialnetwork-config-server
       - socialnetwork-zuul-api-gateway
+      - kafka
     entrypoint: ./wait-for-it.sh socialnetwork-config-server:8888 --timeout=15 -- java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar socialnetwork-auth-service-1.0.jar
 
   socialnetwork-user-service:
@@ -80,6 +81,7 @@ services:
       - socialnetwork-config-server
       - socialnetwork-zuul-api-gateway
       - socialnetwork-database
+      - kafka
     entrypoint: ./wait-for-it.sh socialnetwork-config-server:8888 --timeout=15 -- java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5006 -jar socialnetwork-user-service-1.0.jar
 
   socialnetwork-profile-service:
@@ -97,9 +99,11 @@ services:
       - socialnetwork-config-server
       - socialnetwork-zuul-api-gateway
       - socialnetwork-database
+      - kafka
     entrypoint: ./wait-for-it.sh socialnetwork-config-server:8888 --timeout=15 -- java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5007 -jar socialnetwork-profile-service-1.0.jar
     volumes:
        - /avatar/
+
   socialnetwork-group-service:
     image: socialnetwork-group-service-1.0
     environment:
@@ -115,6 +119,7 @@ services:
       - socialnetwork-config-server
       - socialnetwork-zuul-api-gateway
       - socialnetwork-database
+      - kafka
     entrypoint: ./wait-for-it.sh socialnetwork-config-server:8888 --timeout=15 -- java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5008 -jar socialnetwork-group-service-1.0.jar
 
   socialnetwork-app-client:
