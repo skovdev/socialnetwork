@@ -129,3 +129,15 @@ services:
     volumes:
       - /app/node_modules
       - ./:/app
+
+  socialnetwork-unit-testing:
+    image: socialnetwork-unit-testing-1.0
+    environment:
+      - SPRING_PROFILE_ACTIVE=local
+    ports:
+      - "8087:8087"
+      - "5009:5009"
+    depends_on:
+      - socialnetwork-user-service
+      - socialnetwork-profile-service
+      - socialnetwork-group-service
