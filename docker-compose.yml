@@ -36,9 +36,6 @@ services:
     image: wurstmeister/zookeeper
     ports:
       - "2181:2181"
-    volumes:
-      - ./zookeeper/data:var/lib/zookeeper/data
-      - ./zookeeper/log:/var/lib/zookeeper/log
 
   kafka:
     image: wurstmeister/kafka
@@ -49,8 +46,6 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_CREATE_TOPIC: "user, profile, group"
-    volumes:
-      - ./kafka/data:/var/lib/kafka/data
     depends_on:
       - zookeeper
 
