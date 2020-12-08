@@ -19,6 +19,8 @@ import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 
+import org.springframework.kafka.support.serializer.JsonDeserializer;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,8 +37,8 @@ public class KafkaConsumerConfig {
         Map<String, Object> config = new HashMap<>();
 
         config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaServer);
-        config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
 
         return config;
 
