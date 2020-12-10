@@ -1,15 +1,13 @@
 package local.socialnetwork.profileservice.controller;
 
-import local.socialnetwork.profileservice.client.auth.AuthenticationProxyHelper;
-
 import local.socialnetwork.profileservice.client.user.UserProxyService;
 
 import local.socialnetwork.profileservice.model.dto.profile.EditProfileDto;
 import local.socialnetwork.profileservice.model.dto.profile.ProfileDto;
 
-import local.socialnetwork.profileservice.model.dto.user.RoleDto;
 import local.socialnetwork.profileservice.model.dto.user.UserDetailsDto;
 import local.socialnetwork.profileservice.model.dto.user.UserDto;
+
 import local.socialnetwork.profileservice.model.entity.profile.Profile;
 
 import local.socialnetwork.profileservice.exception.ProfileServiceException;
@@ -43,13 +41,6 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/profiles")
 public class ProfileRestController {
-
-    private AuthenticationProxyHelper authenticationProxyHelper;
-
-    @Autowired
-    public void setAuthenticationProxyHelper(AuthenticationProxyHelper authenticationProxyHelper) {
-        this.authenticationProxyHelper = authenticationProxyHelper;
-    }
 
     private UserProxyService userProxyService;
 
