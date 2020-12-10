@@ -19,4 +19,5 @@ public interface UserService {
     void registration(RegistrationDto registrationDTO) throws IOException;
     boolean checkIfValidOldPassword(ChangePasswordDto changePasswordDto);
     void changePassword(ChangePasswordDto changePasswordDto);
+    void deleteById(UUID id);
 }
