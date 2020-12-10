@@ -1,7 +1,6 @@
 package local.socialnetwork.profileservice.service.impl;
 
-import local.socialnetwork.profileservice.client.user.UserProxyService;
-
+import local.socialnetwork.profileservice.kafka.producer.user.UserProducer;
 import local.socialnetwork.profileservice.model.dto.profile.EditProfileDto;
 import local.socialnetwork.profileservice.model.dto.profile.ProfileDto;
 
@@ -50,11 +49,13 @@ public class ProfileServiceImpl implements ProfileService {
     @Value("${sn.profile.default.avatar.path}")
     private String pathDefaultAvatar;
 
-    private UserProxyService userProxyService;
+    private static final String TOPIC_USER_DELETE = "topic.user.delete";
+
+    private UserProducer userProducer;
 
     @Autowired
-    public void setUserProxyService(UserProxyService userProxyService) {
-        this.userProxyService = userProxyService;
+    public void setUserProducer(UserProducer userProducer) {
+        this.userProducer = userProducer;
     }
 
     private ProfileRepository profileRepository;
@@ -171,7 +172,7 @@ public class ProfileServiceImpl implements ProfileService {
 
             if (user != null && profile.getUserId().equals(user.getId())) {
                 profileRepository.delete(profile);
-                userProxyService.delete(user);
+                userProducer.sendUserId(TOPIC_USER_DELETE, user.getId());
             }
         }
     }
