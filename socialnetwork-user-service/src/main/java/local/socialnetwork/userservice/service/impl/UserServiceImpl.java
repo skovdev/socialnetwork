@@ -1,16 +1,16 @@
 package local.socialnetwork.userservice.service.impl;
 
-import local.socialnetwork.userservice.client.ProfileProxyService;
+import local.socialnetwork.kafka.model.dto.profile.ProfileDto;
+
+import local.socialnetwork.userservice.kafka.producer.user.UserProducer;
 
 import local.socialnetwork.userservice.model.dto.ChangePasswordDto;
-import local.socialnetwork.userservice.model.dto.ProfileDto;
 import local.socialnetwork.userservice.model.dto.RegistrationDto;
 
 import local.socialnetwork.userservice.model.dto.profile.EditProfileDto;
 
 import local.socialnetwork.userservice.model.user.CustomRole;
 import local.socialnetwork.userservice.model.user.CustomUser;
-
 import local.socialnetwork.userservice.model.user.CustomUserDetails;
 
 import local.socialnetwork.userservice.repository.RoleRepository;
@@ -44,8 +44,17 @@ public class UserServiceImpl implements UserService {
 
     private static final String DEFAULT_USER_ROLE = "USER";
 
+    private static final String TOPIC_PROFILE_NEW = "topic.profile.new";
+
     @Value("${sn.profile.default.avatar.path}")
     private String pathDefaultAvatar;
+
+    private UserProducer userProducer;
+
+    @Autowired
+    public void setUserProducer(UserProducer userProducer) {
+        this.userProducer = userProducer;
+    }
 
     private UserRepository userRepository;
 
@@ -59,13 +68,6 @@ public class UserServiceImpl implements UserService {
     @Autowired
     public void setRoleRepository(RoleRepository roleRepository) {
         this.roleRepository = roleRepository;
-    }
-
-    private ProfileProxyService profileProxyService;
-
-    @Autowired
-    public void setProfileProxyService(ProfileProxyService profileProxyService) {
-        this.profileProxyService = profileProxyService;
     }
 
     private PasswordEncoder passwordEncoder;
@@ -159,7 +161,7 @@ public class UserServiceImpl implements UserService {
         userRepository.save(newUser);
         roleRepository.save(newRole);
 
-        profileProxyService.save(newProfile);
+        userProducer.send(TOPIC_PROFILE_NEW, newProfile);
 
     }
 
