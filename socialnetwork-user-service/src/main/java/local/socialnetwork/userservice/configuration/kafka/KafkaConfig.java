@@ -59,7 +59,7 @@ public class KafkaConfig {
     }
 
     @Bean
-    public ProducerFactory<String, Object> producerFactory() {
+    public ProducerFactory<String, Request> producerFactory() {
         return new DefaultKafkaProducerFactory<>(producerConfig());
     }
 
@@ -78,18 +78,18 @@ public class KafkaConfig {
     }
 
     @Bean
-    public ConsumerFactory<String, Object> consumerFactory() {
+    public ConsumerFactory<String, Reply> consumerFactory() {
         return new DefaultKafkaConsumerFactory<>(consumerConfig());
     }
 
     @Bean
-    public KafkaTemplate<String, Object> kafkaTemplate() {
+    public KafkaTemplate<String, Request> kafkaTemplate() {
         return new KafkaTemplate<>(producerFactory());
     }
 
     @Bean
-    public ReplyingKafkaTemplate<String, Object, Reply> replyingKafkaTemplate(ProducerFactory<String, Object> producerFactory, KafkaMessageListenerContainer<String, Reply> listenerContainer) {
-        ReplyingKafkaTemplate<String, Object, Reply> replyReplyingKafkaTemplate = new ReplyingKafkaTemplate<>(producerFactory, listenerContainer);
+    public ReplyingKafkaTemplate<String, Request, Reply> replyingKafkaTemplate(ProducerFactory<String, Request> producerFactory, KafkaMessageListenerContainer<String, Reply> listenerContainer) {
+        ReplyingKafkaTemplate<String, Request, Reply> replyReplyingKafkaTemplate = new ReplyingKafkaTemplate<>(producerFactory, listenerContainer);
         replyReplyingKafkaTemplate.setSharedReplyTopic(true);
         return replyReplyingKafkaTemplate;
     }
@@ -101,11 +101,10 @@ public class KafkaConfig {
     }
 
     @Bean
-    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, Object>> kafkaListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
+    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, Reply>> kafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, Reply> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
         factory.setReplyTemplate(kafkaTemplate());
         return factory;
     }
-
 }
