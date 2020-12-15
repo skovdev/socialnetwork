@@ -19,7 +19,7 @@ public class UserConsumer {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserConsumer.class);
 
     private static final String TOPIC_USER_DELETE = "topic.user.delete";
-    private static final String GROUP_USER_DELETE = "group.user.delete";
+    private static final String USER_DEFAULT_GROUP_ID = "user-default-group-id";
 
     private UserService userService;
 
@@ -28,7 +28,7 @@ public class UserConsumer {
         this.userService = userService;
     }
 
-    @KafkaListener(topics = TOPIC_USER_DELETE, groupId = GROUP_USER_DELETE)
+    @KafkaListener(topics = TOPIC_USER_DELETE, groupId = USER_DEFAULT_GROUP_ID)
     public void receiveUserIdForDeleteUser(UUID userId) {
         LOGGER.info(String.format("### -> Received id of user: %s <- ###", userId));
         userService.deleteById(userId);
