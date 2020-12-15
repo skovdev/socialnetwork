@@ -2,6 +2,7 @@ package local.socialnetwork.userservice.kafka.producer.user;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.kafka.core.KafkaTemplate;
@@ -20,8 +21,8 @@ public class UserProducer {
         this.kafkaTemplate = kafkaTemplate;
     }
 
-    public void send(String topic, Object object) {
-        LOGGER.info(String.format("### -> Producing topic %s and object -> %s", topic, object));
-        this.kafkaTemplate.send(topic, object);
+    public void send(String topic, Object value) {
+        LOGGER.info(String.format("### -> Producing topic %s and object -> %s", topic, value));
+        this.kafkaTemplate.send(topic, value);
     }
 }
