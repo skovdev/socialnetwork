@@ -1,8 +1,5 @@
 package local.socialnetwork.profileservice.configuration.kafka;
 
-import local.socialnetwork.profileservice.model.kafka.Reply;
-import local.socialnetwork.profileservice.model.kafka.Request;
-
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 
@@ -26,10 +23,6 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
-import org.springframework.kafka.listener.ContainerProperties;
-import org.springframework.kafka.listener.KafkaMessageListenerContainer;
-
-import org.springframework.kafka.requestreply.ReplyingKafkaTemplate;
 
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
@@ -40,8 +33,6 @@ import java.util.Map;
 @EnableKafka
 @Configuration
 public class KafkaConfig {
-
-    private static final String REPLY_TOPIC_COMMON = "reply.topic.common";
 
     @Value("${spring.kafka.server}")
     private String kafkaServer;
@@ -59,7 +50,7 @@ public class KafkaConfig {
     }
 
     @Bean
-    public ProducerFactory<String, Request> producerFactory() {
+    public ProducerFactory<String, Object> producerFactory() {
         return new DefaultKafkaProducerFactory<>(producerConfig());
     }
 
@@ -78,31 +69,18 @@ public class KafkaConfig {
     }
 
     @Bean
-    public ConsumerFactory<String, Reply> consumerFactory() {
+    public ConsumerFactory<String, Object> consumerFactory() {
         return new DefaultKafkaConsumerFactory<>(consumerConfig());
     }
 
     @Bean
-    public KafkaTemplate<String, Request> kafkaTemplate() {
+    public KafkaTemplate<String, Object> kafkaTemplate() {
         return new KafkaTemplate<>(producerFactory());
     }
 
     @Bean
-    public ReplyingKafkaTemplate<String, Request, Reply> replyingKafkaTemplate(ProducerFactory<String, Request> producerFactory, KafkaMessageListenerContainer<String, Reply> listenerContainer) {
-        ReplyingKafkaTemplate<String, Request, Reply> replyReplyingKafkaTemplate = new ReplyingKafkaTemplate<>(producerFactory, listenerContainer);
-        replyReplyingKafkaTemplate.setSharedReplyTopic(true);
-        return replyReplyingKafkaTemplate;
-    }
-
-    @Bean
-    public KafkaMessageListenerContainer<String, Reply> replyListenerContainer() {
-        ContainerProperties containerProperties = new ContainerProperties(REPLY_TOPIC_COMMON);
-        return new KafkaMessageListenerContainer<>(consumerFactory(), containerProperties);
-    }
-
-    @Bean
-    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, Reply>> kafkaListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, Reply> factory = new ConcurrentKafkaListenerContainerFactory<>();
+    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, Object>> kafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
         factory.setReplyTemplate(kafkaTemplate());
         return factory;
