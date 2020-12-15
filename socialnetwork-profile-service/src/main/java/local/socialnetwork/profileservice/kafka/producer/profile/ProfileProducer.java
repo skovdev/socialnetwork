@@ -1,7 +1,5 @@
 package local.socialnetwork.profileservice.kafka.producer.profile;
 
-import local.socialnetwork.profileservice.model.dto.profile.ProfileDto;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,8 +21,8 @@ public class ProfileProducer {
         this.kafkaTemplate = kafkaTemplate;
     }
 
-    public void send(String topic, ProfileDto profileDto) {
-        LOGGER.info(String.format("Producing topic: %s and object: %s", topic, profileDto));
-        kafkaTemplate.send(topic, profileDto);
+    public void send(String topic, Object value) {
+        LOGGER.info(String.format("Producing topic: %s and object: %s", topic, value));
+        kafkaTemplate.send(topic, value);
     }
 }
