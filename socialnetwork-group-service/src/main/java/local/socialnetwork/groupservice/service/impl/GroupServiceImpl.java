@@ -33,7 +33,7 @@ public class GroupServiceImpl implements GroupService {
 
     private static final Logger LOG = LoggerFactory.getLogger(GroupServiceImpl.class);
 
-    @Value("${sn.group.default.avatar.dir}")
+    @Value("${sn.group.default.avatar.path}")
     private String pathDefaultGroupAvatar;
 
     private GroupRepository groupRepository;
