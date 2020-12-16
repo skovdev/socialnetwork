@@ -1,8 +1,12 @@
 package local.socialnetwork.profileservice.service.impl;
 
+import local.socialnetwork.profileservice.client.user.UserProxyService;
+
 import local.socialnetwork.profileservice.kafka.producer.user.UserProducer;
-import local.socialnetwork.profileservice.model.dto.profile.EditProfileDto;
+
 import local.socialnetwork.profileservice.model.dto.profile.ProfileDto;
+
+import local.socialnetwork.kafka.model.dto.profile.EditProfileDto;
 
 import local.socialnetwork.profileservice.model.dto.user.UserDetailsDto;
 import local.socialnetwork.profileservice.model.dto.user.UserDto;
@@ -35,7 +39,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
 import java.util.stream.Collectors;
 
 @Service
@@ -49,6 +52,7 @@ public class ProfileServiceImpl implements ProfileService {
     @Value("${sn.profile.default.avatar.path}")
     private String pathDefaultAvatar;
 
+    private static final String TOPIC_USER_UPDATE = "topic.user.update";
     private static final String TOPIC_USER_DELETE = "topic.user.delete";
 
     private UserProducer userProducer;
@@ -63,6 +67,13 @@ public class ProfileServiceImpl implements ProfileService {
     @Autowired
     public void setProfileRepository(ProfileRepository profileRepository) {
         this.profileRepository = profileRepository;
+    }
+
+    private UserProxyService userProxyService;
+
+    @Autowired
+    public void setUserProxyService(UserProxyService userProxyService) {
+        this.userProxyService = userProxyService;
     }
 
     private ResourceUtil resourceUtil;
@@ -154,7 +165,8 @@ public class ProfileServiceImpl implements ProfileService {
         var user = userProxyService.findUserByUserId(id);
 
         if (user != null) {
-            userProxyService.updateProfile(id, editProfileDto);
+            editProfileDto.setUserId(user.getId());
+            userProducer.send(TOPIC_USER_UPDATE, editProfileDto);
         } else {
             throw new ProfileServiceException("Profile has not updated");
         }
@@ -172,7 +184,7 @@ public class ProfileServiceImpl implements ProfileService {
 
             if (user != null && profile.getUserId().equals(user.getId())) {
                 profileRepository.delete(profile);
-                userProducer.sendUserId(TOPIC_USER_DELETE, user.getId());
+                userProducer.send(TOPIC_USER_DELETE, user.getId());
             }
         }
     }
