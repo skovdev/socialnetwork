@@ -1,8 +1,9 @@
 package local.socialnetwork.profileservice.controller;
 
+import local.socialnetwork.kafka.model.dto.profile.EditProfileDto;
+
 import local.socialnetwork.profileservice.client.user.UserProxyService;
 
-import local.socialnetwork.profileservice.model.dto.profile.EditProfileDto;
 import local.socialnetwork.profileservice.model.dto.profile.ProfileDto;
 
 import local.socialnetwork.profileservice.model.dto.user.UserDetailsDto;
