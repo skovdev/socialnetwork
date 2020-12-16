@@ -1,6 +1,10 @@
 package local.socialnetwork.groupservice.util;
 
 import local.socialnetwork.groupservice.type.MimeType;
+
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+
 import org.springframework.stereotype.Component;
 
 import org.springframework.web.multipart.MultipartFile;
@@ -19,13 +23,8 @@ public class ResourceUtil {
     private static final String EMPTY = "";
 
     public String getEncodedResource(String path) throws IOException {
-
-        var resourcePath = Paths.get(path);
-
-        byte[] byteResourcePath = Files.readAllBytes(resourcePath);
-
-        return Base64.getEncoder().encodeToString(byteResourcePath);
-
+        Resource resource = new ClassPathResource(path);
+        return Base64.getEncoder().encodeToString(resource.getInputStream().readAllBytes());
     }
 
     public String writeResource(MultipartFile file, String path) throws IOException {
