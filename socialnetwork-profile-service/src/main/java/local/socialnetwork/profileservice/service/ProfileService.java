@@ -1,8 +1,9 @@
 package local.socialnetwork.profileservice.service;
 
-import local.socialnetwork.profileservice.model.dto.profile.EditProfileDto;
+import local.socialnetwork.kafka.model.dto.profile.EditProfileDto;
 
 import local.socialnetwork.profileservice.model.dto.profile.ProfileDto;
+
 import local.socialnetwork.profileservice.model.entity.profile.Profile;
 
 import local.socialnetwork.profileservice.exception.ProfileServiceException;

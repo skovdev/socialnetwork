@@ -2,7 +2,7 @@ package local.socialnetwork.userservice.client;
 
 import local.socialnetwork.userservice.constants.ApplicationConstants;
 
-import local.socialnetwork.userservice.model.dto.ProfileDto;
+import local.socialnetwork.userservice.model.dto.profile.ProfileDto;
 
 import org.springframework.cloud.openfeign.FeignClient;
 

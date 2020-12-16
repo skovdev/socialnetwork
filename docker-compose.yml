@@ -45,7 +45,7 @@ services:
       KAFKA_ADVERTISED_HOST_NAME: kafka
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_CREATE_TOPIC: "user, profile, group"
+      KAFKA_CREATE_TOPIC: "topic.user.new:1, topic.user.update:1, topic.user.delete:1, topic.profile.new:1"
     depends_on:
       - zookeeper
 
