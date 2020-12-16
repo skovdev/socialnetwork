@@ -2,12 +2,12 @@ package local.socialnetwork.userservice.service.impl;
 
 import local.socialnetwork.kafka.model.dto.profile.ProfileDto;
 
+import local.socialnetwork.kafka.model.dto.profile.EditProfileDto;
+
 import local.socialnetwork.userservice.kafka.producer.user.UserProducer;
 
 import local.socialnetwork.userservice.model.dto.ChangePasswordDto;
 import local.socialnetwork.userservice.model.dto.RegistrationDto;
-
-import local.socialnetwork.userservice.model.dto.profile.EditProfileDto;
 
 import local.socialnetwork.userservice.model.user.CustomRole;
 import local.socialnetwork.userservice.model.user.CustomUser;
@@ -95,14 +95,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void update(UUID id, EditProfileDto editProfile) {
+    public void update(EditProfileDto editProfile) {
 
-        Optional<CustomUser> user = userRepository.findById(id);
+        Optional<CustomUser> optionalUser = userRepository.findById(editProfile.getUserId());
 
-        user.ifPresent(u -> {
+        optionalUser.ifPresent(user -> {
 
-            u.setFirstName(editProfile.getFirstName());
-            u.setLastName(editProfile.getLastName());
+            user.setFirstName(editProfile.getFirstName());
+            user.setLastName(editProfile.getLastName());
 
             CustomUserDetails userDetails = new CustomUserDetails();
 
@@ -113,9 +113,9 @@ public class UserServiceImpl implements UserService {
             userDetails.setBirthday(editProfile.getBirthday());
             userDetails.setFamilyStatus(editProfile.getFamilyStatus());
 
-            u.setUserDetails(userDetails);
+            user.setUserDetails(userDetails);
 
-            userRepository.save(u);
+            userRepository.save(user);
 
         });
     }
