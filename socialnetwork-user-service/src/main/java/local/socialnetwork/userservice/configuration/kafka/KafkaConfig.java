@@ -35,8 +35,14 @@ import java.util.Map;
 @Configuration
 public class KafkaConfig {
 
-    @Value("${spring.kafka.server}")
+    @Value("${sn.kafka.server}")
     private String kafkaServer;
+
+    @Value("${sn.kafka.groupId}")
+    private String groupId;
+
+    @Value("${sn.kafka.trustedPackages}")
+    private String trustedPackages;
 
     public Map<String, Object> producerConfig() {
 
@@ -62,8 +68,8 @@ public class KafkaConfig {
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaServer);
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, "user-default-group-id");
-        props.put(JsonDeserializer.TRUSTED_PACKAGES, "*");
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
+        props.put(JsonDeserializer.TRUSTED_PACKAGES, trustedPackages);
 
         return props;
 
