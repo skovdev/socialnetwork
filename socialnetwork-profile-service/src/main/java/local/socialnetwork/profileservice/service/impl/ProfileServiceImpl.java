@@ -52,8 +52,11 @@ public class ProfileServiceImpl implements ProfileService {
     @Value("${sn.profile.default.avatar.path}")
     private String pathDefaultAvatar;
 
-    private static final String TOPIC_USER_UPDATE = "topic.user.update";
-    private static final String TOPIC_USER_DELETE = "topic.user.delete";
+    @Value("${sn.kafka.topic.user.update")
+    private String topicUserUpdate;
+
+    @Value("${sn.kafka.topic.user.delete}")
+    private String topicUserDelete;
 
     private UserProducer userProducer;
 
@@ -166,7 +169,7 @@ public class ProfileServiceImpl implements ProfileService {
 
         if (user != null) {
             editProfileDto.setUserId(user.getId());
-            userProducer.send(TOPIC_USER_UPDATE, editProfileDto);
+            userProducer.send(topicUserUpdate, editProfileDto);
         } else {
             throw new ProfileServiceException("Profile has not updated");
         }
@@ -184,7 +187,7 @@ public class ProfileServiceImpl implements ProfileService {
 
             if (user != null && profile.getUserId().equals(user.getId())) {
                 profileRepository.delete(profile);
-                userProducer.send(TOPIC_USER_DELETE, user.getId());
+                userProducer.send(topicUserDelete, user.getId());
             }
         }
     }

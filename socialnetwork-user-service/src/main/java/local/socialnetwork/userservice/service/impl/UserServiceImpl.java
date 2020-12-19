@@ -42,9 +42,11 @@ public class UserServiceImpl implements UserService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
 
-    private static final String DEFAULT_USER_ROLE = "USER";
+    @Value("${sn.user.default.role}")
+    private String defaultUserRole;
 
-    private static final String TOPIC_PROFILE_NEW = "topic.profile.new";
+    @Value("${sn.kafka.topic.profile.new}")
+    private String topicProfileNew;
 
     @Value("${sn.profile.default.avatar.path}")
     private String pathDefaultAvatar;
@@ -147,7 +149,7 @@ public class UserServiceImpl implements UserService {
 
         CustomRole newRole = new CustomRole();
 
-        newRole.setAuthority(DEFAULT_USER_ROLE);
+        newRole.setAuthority(defaultUserRole);
         newRole.setUser(newUser);
 
         ProfileDto newProfile = new ProfileDto();
@@ -161,7 +163,7 @@ public class UserServiceImpl implements UserService {
         userRepository.save(newUser);
         roleRepository.save(newRole);
 
-        userProducer.send(TOPIC_PROFILE_NEW, newProfile);
+        userProducer.send(topicProfileNew, newProfile);
 
     }
 
