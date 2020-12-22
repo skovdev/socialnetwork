@@ -52,7 +52,7 @@ public class ProfileServiceImpl implements ProfileService {
     @Value("${sn.profile.default.avatar.path}")
     private String pathDefaultAvatar;
 
-    @Value("${sn.kafka.topic.user.update")
+    @Value("${sn.kafka.topic.user.update}")
     private String topicUserUpdate;
 
     @Value("${sn.kafka.topic.user.delete}")
