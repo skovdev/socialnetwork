@@ -52,14 +52,11 @@ const Avatar = (props) => {
     } else if (!isLoaded) {
         return <div>Loading...</div>
     } else {
-
         return (
-
             <div className="avatar-profile">
                 <img src={'data:image/jpeg;base64,' + avatar} />
                 <EditButton username={props.username} />
             </div>
-
         )
     }
 }

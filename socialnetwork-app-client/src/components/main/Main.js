@@ -21,7 +21,6 @@ const Main = () => {
     })
 
     return (
-    
         <div className="main">
             <Header/>
             <div className="container">
@@ -29,7 +28,6 @@ const Main = () => {
                 <Login/>
             </div>
         </div>
-
     );
 }
  

@@ -63,18 +63,13 @@ const Login = () => {
     }
 
      if (error) {
-
         return (  
-
             <div className="login">
                 <p className="error alert alert-danger">Login or password entered incorrectly</p>
             </div>
-
         )
     } else {
-        
         return (
-
             <div className="login">
                 <form>
                     <input type="text" name="username" id="username" placeholder="Name" value={username} onChange={e => setUsername(e.target.value)} />
@@ -82,7 +77,6 @@ const Login = () => {
                     <input type="submit" className="submit btn btn-dark" onClick={handleSubmit} disabled={!username || !password} value="Sign up" />
                 </form>
             </div>
-                
         );
     }
 }
