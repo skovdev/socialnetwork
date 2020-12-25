@@ -30,8 +30,6 @@ import org.springframework.beans.factory.annotation.Value;
 
 import org.springframework.stereotype.Service;
 
-import org.springframework.transaction.annotation.Transactional;
-
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -130,7 +128,6 @@ public class ProfileServiceImpl implements ProfileService {
 
     }
 
-    @Transactional
     @Override
     public Profile findProfileByUsername(String username) {
         var user = userProxyService.findUserByUsername(username);
@@ -151,7 +148,6 @@ public class ProfileServiceImpl implements ProfileService {
         return profileRepository.findProfileById(id);
     }
 
-    @Transactional
     @Override
     public Profile findProfileByUserId(UUID userId) {
         return profileRepository.findProfileByUserId(userId);
@@ -175,7 +171,6 @@ public class ProfileServiceImpl implements ProfileService {
         }
     }
 
-    @Transactional
     @Override
     public void delete(UUID id) {
 
@@ -192,7 +187,6 @@ public class ProfileServiceImpl implements ProfileService {
         }
     }
 
-    @Transactional
     @Override
     public String setDefaultAvatar(String username) throws IOException, ProfileServiceException {
 
@@ -221,7 +215,6 @@ public class ProfileServiceImpl implements ProfileService {
 
     }
 
-    @Transactional
     @Override
     public void updateAvatarProfile(String username, MultipartFile multipartFile) throws IOException, ProfileServiceException {
 
@@ -247,7 +240,6 @@ public class ProfileServiceImpl implements ProfileService {
         }
     }
 
-    @Transactional
     @Override
     public boolean changeStatus(String username, boolean isActive) {
 
