@@ -2,7 +2,7 @@ package local.socialnetwork.groupservice.service;
 
 import local.socialnetwork.groupservice.model.dto.group.GroupDto;
 
-import local.socialnetwork.groupservice.model.group.Group;
+import local.socialnetwork.groupservice.model.entity.group.Group;
 
 import java.io.IOException;
 

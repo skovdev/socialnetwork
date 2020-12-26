@@ -1,6 +1,6 @@
 package local.socialnetwork.groupservice.repository;
 
-import local.socialnetwork.groupservice.model.group.Group;
+import local.socialnetwork.groupservice.model.entity.group.Group;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
