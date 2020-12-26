@@ -1,20 +1,24 @@
 package local.socialnetwork.groupservice.model.group;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import local.socialnetwork.groupservice.model.AbstractBaseModel;
 
 import local.socialnetwork.groupservice.type.GroupStatus;
 import local.socialnetwork.groupservice.type.GroupType;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Lob;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import java.util.UUID;
+import java.util.List;
 
 @Entity
-@Table(name = "sn_groups")
+@Table(name = "sn_group")
 public class Group extends AbstractBaseModel {
 
     @Column(name = "group_name")
@@ -33,8 +37,8 @@ public class Group extends AbstractBaseModel {
     @Column(name = "group_amount_users")
     private long groupAmountUsers;
 
-    @Column(name = "user_id")
-    private UUID userId;
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<GroupUser> groupUsers;
 
     public Group() {
 
@@ -85,12 +89,12 @@ public class Group extends AbstractBaseModel {
         this.groupAmountUsers = groupAmountUsers;
     }
 
-    public UUID getUserId() {
-        return userId;
+    public List<GroupUser> getGroupUsers() {
+        return groupUsers;
     }
 
-    @JsonProperty(value = "userId")
-    public void setUserId(UUID userId) {
-        this.userId = userId;
+    @JsonProperty(value = "groupUsers")
+    public void setGroupUsers(List<GroupUser> groupUsers) {
+        this.groupUsers = groupUsers;
     }
 }

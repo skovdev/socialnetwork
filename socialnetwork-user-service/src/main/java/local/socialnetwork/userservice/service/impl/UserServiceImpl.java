@@ -1,7 +1,6 @@
 package local.socialnetwork.userservice.service.impl;
 
 import local.socialnetwork.kafka.model.dto.profile.ProfileDto;
-
 import local.socialnetwork.kafka.model.dto.profile.EditProfileDto;
 
 import local.socialnetwork.userservice.kafka.producer.user.UserProducer;

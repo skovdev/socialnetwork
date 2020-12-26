@@ -5,6 +5,8 @@ import local.socialnetwork.groupservice.model.dto.group.GroupDto;
 
 import local.socialnetwork.groupservice.model.group.Group;
 
+import local.socialnetwork.groupservice.model.group.GroupUser;
+
 import local.socialnetwork.groupservice.repository.GroupRepository;
 
 import local.socialnetwork.groupservice.service.GroupService;
@@ -70,7 +72,12 @@ public class GroupServiceImpl implements GroupService {
         group.setGroupType(groupDto.getGroupType());
         group.setGroupStatus(GroupStatus.ACTIVE);
         group.setGroupAmountUsers(1);
-        group.setUserId(user.getId());
+
+        GroupUser groupUser = new GroupUser();
+
+        groupUser.setUserId(user.getId());
+
+        group.setGroupUsers(List.of(groupUser));
 
         groupRepository.save(group);
 
@@ -86,18 +93,5 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public Group findByName(String name) {
         return groupRepository.findByName(name);
-    }
-
-    @Override
-    public List<Group> findAllByUsername(String username) {
-
-        var user = userProxyService.findUserByUsername(username);
-
-        if (user != null) {
-            return groupRepository.findAllByUserId(user.getId());
-        }
-
-        return Collections.EMPTY_LIST;
-
     }
 }
