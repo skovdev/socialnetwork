@@ -1,4 +1,4 @@
-package local.socialnetwork.userservice.model.user;
+package local.socialnetwork.userservice.model.entity.user;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
