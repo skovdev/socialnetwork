@@ -1,4 +1,4 @@
-package local.socialnetwork.groupservice.model.group;
+package local.socialnetwork.groupservice.model.entity.group;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -7,15 +7,10 @@ import local.socialnetwork.groupservice.model.AbstractBaseModel;
 import local.socialnetwork.groupservice.type.GroupStatus;
 import local.socialnetwork.groupservice.type.GroupType;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.Lob;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
-
-import java.util.List;
 
 @Entity
 @Table(name = "sn_group")
@@ -36,9 +31,6 @@ public class Group extends AbstractBaseModel {
 
     @Column(name = "group_amount_users")
     private long groupAmountUsers;
-
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<GroupUser> groupUsers;
 
     public Group() {
 
@@ -87,14 +79,5 @@ public class Group extends AbstractBaseModel {
     @JsonProperty(value = "groupAmountUsers")
     public void setGroupAmountUsers(long groupAmountUsers) {
         this.groupAmountUsers = groupAmountUsers;
-    }
-
-    public List<GroupUser> getGroupUsers() {
-        return groupUsers;
-    }
-
-    @JsonProperty(value = "groupUsers")
-    public void setGroupUsers(List<GroupUser> groupUsers) {
-        this.groupUsers = groupUsers;
     }
 }

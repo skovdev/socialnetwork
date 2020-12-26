@@ -1,6 +1,6 @@
 package local.socialnetwork.userservice.repository;
 
-import local.socialnetwork.userservice.model.user.CustomRole;
+import local.socialnetwork.userservice.model.entity.user.CustomRole;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
