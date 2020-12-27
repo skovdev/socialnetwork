@@ -4,7 +4,7 @@ import local.socialnetwork.groupservice.model.dto.group.GroupDto;
 
 import local.socialnetwork.groupservice.model.dto.http.ApiResponse;
 
-import local.socialnetwork.groupservice.model.group.Group;
+import local.socialnetwork.groupservice.model.entity.group.Group;
 
 import local.socialnetwork.groupservice.service.GroupService;
 
@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -49,7 +50,7 @@ public class GroupRestController {
 
     @GetMapping
     public List<Group> findAllByUsername(@RequestParam("username") String username) {
-        return groupService.findAllByUsername(username);
+        return Collections.emptyList();
     }
 
     @PostMapping

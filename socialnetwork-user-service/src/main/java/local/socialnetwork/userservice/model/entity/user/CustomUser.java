@@ -1,6 +1,5 @@
-package local.socialnetwork.userservice.model.user;
+package local.socialnetwork.userservice.model.entity.user;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -33,9 +32,6 @@ public class CustomUser extends AbstractBaseModel {
 
     @Column(name = "password", nullable = false)
     private String password;
-
-    @Column(name = "group_id")
-    private UUID groupId;
 
     @Embedded
     private CustomUserDetails userDetails;
@@ -77,15 +73,6 @@ public class CustomUser extends AbstractBaseModel {
     @JsonProperty(value = "password")
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public UUID getGroupId() {
-        return groupId;
-    }
-
-    @JsonProperty(value = "groupId")
-    public void setGroupId(UUID groupId) {
-        this.groupId = groupId;
     }
 
     public CustomUserDetails getUserDetails() {

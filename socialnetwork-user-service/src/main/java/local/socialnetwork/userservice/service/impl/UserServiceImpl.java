@@ -1,7 +1,6 @@
 package local.socialnetwork.userservice.service.impl;
 
 import local.socialnetwork.kafka.model.dto.profile.ProfileDto;
-
 import local.socialnetwork.kafka.model.dto.profile.EditProfileDto;
 
 import local.socialnetwork.userservice.kafka.producer.user.UserProducer;
@@ -9,9 +8,9 @@ import local.socialnetwork.userservice.kafka.producer.user.UserProducer;
 import local.socialnetwork.userservice.model.dto.ChangePasswordDto;
 import local.socialnetwork.userservice.model.dto.RegistrationDto;
 
-import local.socialnetwork.userservice.model.user.CustomRole;
-import local.socialnetwork.userservice.model.user.CustomUser;
-import local.socialnetwork.userservice.model.user.CustomUserDetails;
+import local.socialnetwork.userservice.model.entity.user.CustomRole;
+import local.socialnetwork.userservice.model.entity.user.CustomUser;
+import local.socialnetwork.userservice.model.entity.user.CustomUserDetails;
 
 import local.socialnetwork.userservice.repository.RoleRepository;
 import local.socialnetwork.userservice.repository.UserRepository;
