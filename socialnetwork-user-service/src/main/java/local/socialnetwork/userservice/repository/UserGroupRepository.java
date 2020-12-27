@@ -1,6 +1,6 @@
 package local.socialnetwork.userservice.repository;
 
-import local.socialnetwork.userservice.model.entity.user.CustomRole;
+import local.socialnetwork.userservice.model.entity.UserGroup;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -9,6 +9,6 @@ import org.springframework.stereotype.Repository;
 import java.util.UUID;
 
 @Repository
-public interface RoleRepository extends JpaRepository<CustomRole, UUID> {
+public interface UserGroupRepository extends JpaRepository<UserGroup, UUID> {
 
 }

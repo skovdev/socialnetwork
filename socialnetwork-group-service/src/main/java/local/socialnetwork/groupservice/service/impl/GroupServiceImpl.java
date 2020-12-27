@@ -1,16 +1,24 @@
 package local.socialnetwork.groupservice.service.impl;
 
 import local.socialnetwork.groupservice.client.UserProxyService;
+
+import local.socialnetwork.groupservice.kafka.producer.UserProducer;
+
 import local.socialnetwork.groupservice.model.dto.group.GroupDto;
 
-import local.socialnetwork.groupservice.model.group.Group;
+import local.socialnetwork.groupservice.model.entity.group.Group;
+import local.socialnetwork.groupservice.model.entity.GroupUser;
 
 import local.socialnetwork.groupservice.repository.GroupRepository;
 
 import local.socialnetwork.groupservice.service.GroupService;
+import local.socialnetwork.groupservice.service.GroupUserService;
 
 import local.socialnetwork.groupservice.type.GroupStatus;
+
 import local.socialnetwork.groupservice.util.ResourceUtil;
+
+import local.socialnetwork.kafka.model.dto.GroupUserIdsDto;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,8 +30,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -35,6 +41,9 @@ public class GroupServiceImpl implements GroupService {
     @Value("${sn.group.default.avatar.path}")
     private String pathDefaultGroupAvatar;
 
+    @Value("${sn.kafka.topic.user.id")
+    private String topicUserId;
+
     private GroupRepository groupRepository;
 
     @Autowired
@@ -42,11 +51,25 @@ public class GroupServiceImpl implements GroupService {
         this.groupRepository = groupRepository;
     }
 
+    private GroupUserService groupUserService;
+
+    @Autowired
+    public void setGroupUserService(GroupUserService groupUserService) {
+        this.groupUserService = groupUserService;
+    }
+
     private UserProxyService userProxyService;
 
     @Autowired
     public void setUserProxyService(UserProxyService userProxyService) {
         this.userProxyService = userProxyService;
+    }
+
+    private UserProducer userProducer;
+
+    @Autowired
+    public void setUserProducer(UserProducer userProducer) {
+        this.userProducer = userProducer;
     }
 
     private ResourceUtil resourceUtil;
@@ -61,21 +84,42 @@ public class GroupServiceImpl implements GroupService {
 
         var user = userProxyService.findUserByUsername(username);
 
-        Group group = new Group();
+        if (user != null) {
 
-        String encodedGroupAvatar = resourceUtil.getEncodedResource(pathDefaultGroupAvatar);
+            Group group = new Group();
 
-        group.setName(groupDto.getGroupName());
-        group.setAvatar(encodedGroupAvatar);
-        group.setGroupType(groupDto.getGroupType());
-        group.setGroupStatus(GroupStatus.ACTIVE);
-        group.setGroupAmountUsers(1);
-        group.setUserId(user.getId());
+            String encodedGroupAvatar = resourceUtil.getEncodedResource(pathDefaultGroupAvatar);
 
-        groupRepository.save(group);
+            group.setName(groupDto.getGroupName());
+            group.setAvatar(encodedGroupAvatar);
+            group.setGroupType(groupDto.getGroupType());
+            group.setGroupStatus(GroupStatus.ACTIVE);
+            group.setGroupAmountUsers(1);
 
-        LOG.info("Group {} has saved", groupDto.getGroupName());
+            groupRepository.save(group);
 
+            Group savedGroup = groupRepository.findByName(group.getName());
+
+            if (savedGroup != null) {
+
+                GroupUser groupUser = new GroupUser();
+
+                groupUser.setUserId(user.getId());
+                groupUser.setGroupId(savedGroup.getId());
+
+                groupUserService.save(groupUser);
+
+                GroupUserIdsDto groupUserIdsDto = new GroupUserIdsDto();
+
+                groupUserIdsDto.setGroupId(savedGroup.getId());
+                groupUserIdsDto.setUserId(user.getId());
+
+                userProducer.send(topicUserId, groupUserIdsDto);
+
+                LOG.info("Group {} has saved", groupDto.getGroupName());
+
+            }
+        }
     }
 
     @Override
@@ -86,18 +130,5 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public Group findByName(String name) {
         return groupRepository.findByName(name);
-    }
-
-    @Override
-    public List<Group> findAllByUsername(String username) {
-
-        var user = userProxyService.findUserByUsername(username);
-
-        if (user != null) {
-            return groupRepository.findAllByUserId(user.getId());
-        }
-
-        return Collections.EMPTY_LIST;
-
     }
 }

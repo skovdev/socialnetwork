@@ -1,6 +1,6 @@
 package local.socialnetwork.userservice.controller;
 
-import local.socialnetwork.userservice.model.user.CustomUser;
+import local.socialnetwork.userservice.model.entity.user.CustomUser;
 
 import local.socialnetwork.userservice.service.UserService;
 
