@@ -41,8 +41,8 @@ public class GroupServiceImpl implements GroupService {
     @Value("${sn.group.default.avatar.path}")
     private String pathDefaultGroupAvatar;
 
-    @Value("${sn.kafka.topic.user.id")
-    private String topicUserId;
+    @Value("sn.kafka.topic.group.relationship.user")
+    private String topicGroupRelationshipUser;
 
     private GroupRepository groupRepository;
 
@@ -114,7 +114,7 @@ public class GroupServiceImpl implements GroupService {
                 groupUserIdsDto.setGroupId(savedGroup.getId());
                 groupUserIdsDto.setUserId(user.getId());
 
-                userProducer.send(topicUserId, groupUserIdsDto);
+                userProducer.send(topicGroupRelationshipUser, groupUserIdsDto);
 
                 LOG.info("Group {} has saved", groupDto.getGroupName());
 
