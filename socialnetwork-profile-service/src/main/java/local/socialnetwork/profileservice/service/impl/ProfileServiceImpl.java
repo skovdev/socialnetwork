@@ -130,6 +130,7 @@ public class ProfileServiceImpl implements ProfileService {
 
     }
 
+    @Transactional
     @Override
     public Profile findProfileByUsername(String username) {
         var user = userProxyService.findUserByUsername(username);
