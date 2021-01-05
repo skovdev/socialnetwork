@@ -219,6 +219,7 @@ public class ProfileServiceImpl implements ProfileService {
 
     }
 
+    @Transactional
     @Override
     public void updateAvatarProfile(String username, MultipartFile multipartFile) throws IOException, ProfileServiceException {
 
