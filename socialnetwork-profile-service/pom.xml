@@ -24,6 +24,8 @@
         <spring.boot.data.jpa.version>2.3.3.RELEASE</spring.boot.data.jpa.version>
         <spring.cloud.config.starter.version>2.2.5.RELEASE</spring.cloud.config.starter.version>
         <spring.kafka.version>2.6.3</spring.kafka.version>
+        <swagger.annotations.version>2.1.6</swagger.annotations.version>
+        <springdoc.openapi.ui.version>1.5.2</springdoc.openapi.ui.version>
         <maven.compiler.source>14</maven.compiler.source>
         <maven.compiler.target>14</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -54,6 +56,16 @@
             <groupId>org.springframework.kafka</groupId>
             <artifactId>spring-kafka</artifactId>
             <version>${spring.kafka.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-annotations</artifactId>
+            <version>${swagger.annotations.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-ui</artifactId>
+            <version>${springdoc.openapi.ui.version}</version>
         </dependency>
     </dependencies>
     <build>
