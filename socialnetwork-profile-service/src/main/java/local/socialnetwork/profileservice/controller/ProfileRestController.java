@@ -1,5 +1,15 @@
 package local.socialnetwork.profileservice.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+
+import io.swagger.v3.oas.annotations.media.Content;
+
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import local.socialnetwork.kafka.model.dto.profile.EditProfileDto;
 
 import local.socialnetwork.profileservice.client.user.UserProxyService;
@@ -13,7 +23,6 @@ import local.socialnetwork.profileservice.model.entity.profile.Profile;
 
 import local.socialnetwork.profileservice.exception.ProfileServiceException;
 
-import local.socialnetwork.profileservice.model.http.ApiResponse;
 
 import local.socialnetwork.profileservice.service.ProfileService;
 
@@ -39,6 +48,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
+@Tag(name = "ProfileRestController")
 @RestController
 @RequestMapping("/profiles")
 public class ProfileRestController {
@@ -57,29 +67,43 @@ public class ProfileRestController {
         this.profileService = profileService;
     }
 
+    @Operation(summary = "Get all profiles")
+    @ApiResponse(description = "Found the profiles", content = { @Content(mediaType = "application/json") }, responseCode = "200")
     @GetMapping
     public List<ProfileDto> findAll() {
         return profileService.findAll();
     }
 
+    @Operation(summary = "Create a new profile")
+    @ApiResponses(value = {
+            @ApiResponse(description = "Profile has created", content = { @Content(mediaType = "application/json") }, responseCode = "200"),
+            @ApiResponse(description = "Profile not found", content = { @Content(mediaType = "application/json") }, responseCode = "404")
+    })
     @PostMapping
-    public ResponseEntity<ApiResponse> save(@RequestBody Profile profile) {
+    public ResponseEntity<String> save(@RequestBody @Parameter(description = "Object of profile for creating a new profile") Profile profile) {
 
         if (profile != null) {
             profileService.save(profile);
-            return new ResponseEntity<>(new ApiResponse("Profile has saved successfully"), HttpStatus.OK);
+            return new ResponseEntity<>("Profile has saved successfully", HttpStatus.OK);
         } else {
             return ResponseEntity.notFound().build();
         }
     }
 
+    @Operation(summary = "Get the profile by user id")
+    @ApiResponse(description = "Found the profile", content = { @Content(mediaType = "application/json") }, responseCode = "200")
     @GetMapping("/user")
-    public Profile   findByUserId(@RequestParam("userId") UUID userId) {
+    public Profile   findByUserId(@RequestParam("userId") @Parameter(description = "Id of user for getting of profile") UUID userId) {
         return profileService.findProfileByUserId(userId);
     }
 
+    @Operation(summary = "Get a profile by username")
+    @ApiResponses(value = {
+            @ApiResponse(description = "Found the profile", content = { @Content(mediaType = "application/json") }, responseCode = "200")
+
+    })
     @GetMapping("/user/{username}")
-    public ResponseEntity<ProfileDto> findProfileByUsername(@PathVariable("username") String username) {
+    public ResponseEntity<ProfileDto> findProfileByUsername(@PathVariable("username") @Parameter(description = "Username of user for finding of profile by username") String username) {
 
         var user = userProxyService.findUserByUsername(username);
 
@@ -126,8 +150,13 @@ public class ProfileRestController {
         }
     }
 
+    @Operation(summary = "Edit the profile by username")
+    @ApiResponses(value = {
+            @ApiResponse(description = "Profile has edited", content = { @Content(mediaType = "application/json") }, responseCode = "200"),
+            @ApiResponse(description = "Profile has not edited", content = { @Content(mediaType = "application/json") }, responseCode = "404")
+    })
     @GetMapping("/user/{username}/edit")
-    public ResponseEntity<EditProfileDto> editProfileByUsername(@PathVariable("username") String username) {
+    public ResponseEntity<EditProfileDto> editProfileByUsername(@PathVariable("username") @Parameter(description = "Username of user for editing of profile by username") String username) {
 
         try {
             return new ResponseEntity<>(profileService.editProfileByUsername(username), HttpStatus.OK);
@@ -136,19 +165,29 @@ public class ProfileRestController {
         }
     }
 
+    @Operation(summary = "Update the profile by id")
+    @ApiResponses(value = {
+            @ApiResponse(description = "Profile has updated successfully", content = { @Content(mediaType = "application/json") }, responseCode = "200"),
+            @ApiResponse(description = "Profile has not updated", content = { @Content(mediaType = "application/json") }, responseCode = "404")
+    })
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse> update(@PathVariable("id") UUID id, @RequestBody EditProfileDto editProfileDto) {
+    public ResponseEntity<String> update(@PathVariable("id") @Parameter(description = "Id of profile for updating of profile by id") UUID id, @RequestBody @Parameter(description = "DTO for updating of profile by id") EditProfileDto editProfileDto) {
 
         try {
             profileService.update(id, editProfileDto);
-            return new ResponseEntity<>(new ApiResponse("Profile with ID: " + id + " has updated successfully"), HttpStatus.OK);
+            return new ResponseEntity<>("Profile with ID: " + id + " has updated successfully", HttpStatus.OK);
         } catch (ProfileServiceException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
+    @Operation(summary = "Get the avatar of profile")
+    @ApiResponses(value = {
+            @ApiResponse(description = "Found the avatar of profile", content = { @Content(mediaType = "application/json") }, responseCode = "200"),
+            @ApiResponse(description = "Profile avatar has not found", content = { @Content(mediaType = "application/json") }, responseCode = "404")
+    })
     @GetMapping("/avatar")
-    public ResponseEntity<String> getAvatar(@RequestParam("username") String username) {
+    public ResponseEntity<String> getAvatar(@RequestParam("username") @Parameter(description = "Username of user for finding of avatar of profile by username") String username) {
 
         var user = profileService.findProfileByUsername(username);
 
@@ -159,19 +198,29 @@ public class ProfileRestController {
         }
     }
 
+    @Operation(summary = "Update the avatar of profile")
+    @ApiResponses(value = {
+            @ApiResponse(description = "Profile avatar has updated", content = { @Content(mediaType = "application/json") }, responseCode = "200"),
+            @ApiResponse(description = "Profile avatar has not updated", content = { @Content(mediaType = "application/json") }, responseCode = "404")
+    })
     @PutMapping("/avatar")
-    public ResponseEntity<ApiResponse> updateAvatar(@RequestParam("username") String username, @RequestParam("profileAvatar") MultipartFile multipartFile) {
+    public ResponseEntity<String> updateAvatar(@RequestParam("username") @Parameter(description = "Username of user for updating of avatar of profile by username") String username, @Parameter(description = "Param for getting of avatar by username") @RequestParam("profileAvatar") MultipartFile multipartFile) {
 
         try {
             profileService.updateAvatarProfile(username, multipartFile);
-            return new ResponseEntity<>(new ApiResponse("Avatar has updated successfully"), HttpStatus.OK);
+            return new ResponseEntity<>("Avatar has updated successfully", HttpStatus.OK);
         } catch (ProfileServiceException | IOException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
+    @Operation(summary = "Delete the avatar of profile")
+    @ApiResponses(value = {
+            @ApiResponse(description = "Profile avatar has deleted", content = { @Content(mediaType = "application/json") }, responseCode = "200"),
+            @ApiResponse(description = "Profile avatar has not deleted", content = { @Content(mediaType = "application/json") }, responseCode = "404")
+    })
     @DeleteMapping("/avatar")
-    public ResponseEntity<String> deleteAvatar(@RequestParam("username") String username) {
+    public ResponseEntity<String> deleteAvatar(@RequestParam("username") @Parameter(description = "Username of user for deleting of avatar by username") String username) {
         try {
             return new ResponseEntity<>(profileService.setDefaultAvatar(username), HttpStatus.OK);
         } catch (IOException | ProfileServiceException  e) {
@@ -179,11 +228,16 @@ public class ProfileRestController {
         }
     }
 
+    @Operation(summary = "Change the status of profile")
+    @ApiResponses(value = {
+            @ApiResponse(description = "Profile status has changed", content = { @Content(mediaType = "application/json") }, responseCode = "200"),
+            @ApiResponse(description = "Profile status has not changed", content = { @Content(mediaType = "application/json") }, responseCode = "404")
+    })
     @PutMapping
-    public ResponseEntity<ApiResponse> changeStatus(@RequestParam("username") String username, @RequestParam("isActive") boolean isActive) {
+    public ResponseEntity<String> changeStatus(@RequestParam("username") @Parameter(description = "Username of user for changing of profile status by username") String username, @Parameter(description = "Param for changing of status of profile") @RequestParam("isActive") boolean isActive) {
 
         if (profileService.changeStatus(username, isActive)) {
-            return new ResponseEntity<>(new ApiResponse("Status has changed successfully"), HttpStatus.OK);
+            return new ResponseEntity<>("Status has changed successfully", HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
