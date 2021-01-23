@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 
@@ -127,6 +128,7 @@ public class GroupServiceImpl implements GroupService {
         return groupRepository.findById(uuid);
     }
 
+    @Transactional
     @Override
     public Group findByName(String name) {
         return groupRepository.findByName(name);
