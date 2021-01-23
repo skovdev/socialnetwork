@@ -41,7 +41,7 @@ public class GroupServiceImpl implements GroupService {
     @Value("${sn.group.default.avatar.path}")
     private String pathDefaultGroupAvatar;
 
-    @Value("sn.kafka.topic.group.relationship.user")
+    @Value("${sn.kafka.topic.group.relationship.user}")
     private String topicGroupRelationshipUser;
 
     private GroupRepository groupRepository;
