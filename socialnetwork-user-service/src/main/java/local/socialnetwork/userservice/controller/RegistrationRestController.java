@@ -1,10 +1,14 @@
 package local.socialnetwork.userservice.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+
 import io.swagger.v3.oas.annotations.media.Content;
+
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
 import io.swagger.v3.oas.annotations.tags.Tag;
+
 import local.socialnetwork.userservice.model.dto.RegistrationDto;
 
 import local.socialnetwork.userservice.model.entity.user.CustomUser;
@@ -22,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+
 import java.util.Optional;
 
 @Tag(name = "")
