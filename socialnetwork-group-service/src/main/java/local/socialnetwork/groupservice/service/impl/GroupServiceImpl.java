@@ -31,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -132,5 +133,10 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public Group findByName(String name) {
         return groupRepository.findByName(name);
+    }
+
+    @Override
+    public List<Group> findAllByUsername(String username) {
+        return null;
     }
 }
