@@ -10,6 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.UUID;
+
 @Service
 public class GroupUserServiceImpl implements GroupUserService {
 
@@ -18,6 +21,11 @@ public class GroupUserServiceImpl implements GroupUserService {
     @Autowired
     public void setGroupUserRepository(GroupUserRepository groupUserRepository) {
         this.groupUserRepository = groupUserRepository;
+    }
+
+    @Override
+    public List<GroupUser> findAllGroupIdsByUserId(UUID userId) {
+        return groupUserRepository.findAllGroupIdsByUserId(userId);
     }
 
     @Override
