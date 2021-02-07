@@ -60,7 +60,7 @@ public class GroupRestController {
     @ApiResponse(description = "Found the group", content = { @Content(mediaType = MediaType.APPLICATION_JSON_VALUE) }, responseCode = "200")
     @GetMapping
     public List<Group> findAllByUsername(@RequestParam("username") @Parameter(description = "Username of group for finding of group") String username) {
-        return Collections.emptyList();
+        return groupService.findAllByUsername(username);
     }
 
     @Operation(summary = "Create a new group")
