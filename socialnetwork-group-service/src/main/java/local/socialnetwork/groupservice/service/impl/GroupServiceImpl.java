@@ -6,8 +6,9 @@ import local.socialnetwork.groupservice.kafka.producer.UserProducer;
 
 import local.socialnetwork.groupservice.model.dto.group.GroupDto;
 
-import local.socialnetwork.groupservice.model.entity.group.Group;
 import local.socialnetwork.groupservice.model.entity.GroupUser;
+
+import local.socialnetwork.groupservice.model.entity.group.Group;
 
 import local.socialnetwork.groupservice.repository.GroupRepository;
 
@@ -27,10 +28,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import org.springframework.stereotype.Service;
+
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -135,8 +139,28 @@ public class GroupServiceImpl implements GroupService {
         return groupRepository.findByName(name);
     }
 
+    @Transactional
     @Override
     public List<Group> findAllByUsername(String username) {
-        return null;
+
+        var user = userProxyService.findUserByUsername(username);
+
+        if (user != null) {
+
+            List<GroupUser> groupUsers = groupUserService.findAllGroupIdsByUserId(user.getId());
+
+            List<Group> returnedGroups = new ArrayList<>();
+
+            for (GroupUser groupUser : groupUsers) {
+                Group group = groupRepository.findGroupById(groupUser.getGroupId());
+                returnedGroups.add(group);
+            }
+
+            return returnedGroups;
+
+        }
+
+        return Collections.emptyList();
+
     }
 }
