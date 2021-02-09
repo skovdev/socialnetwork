@@ -2,10 +2,14 @@ package local.socialnetwork.groupservice.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+
 import io.swagger.v3.oas.annotations.media.Content;
+
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
 import io.swagger.v3.oas.annotations.tags.Tag;
+
 import local.socialnetwork.groupservice.model.dto.group.GroupDto;
 
 import local.socialnetwork.groupservice.model.entity.group.Group;
@@ -30,7 +34,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
-import java.util.Collections;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
