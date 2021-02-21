@@ -242,4 +242,9 @@ public class ProfileRestController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+
+
+    public ResponseEntity<String> changePassword(String oldPassword, String newPassword) {
+        return null;
+    }
 }
