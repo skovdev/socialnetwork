@@ -170,18 +170,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void changePassword(ChangePasswordDto changePasswordDto) {
-
-        var user = userRepository.findByUsername(changePasswordDto.getUsername());
-
-        user.ifPresent(u -> {
-            String newPassword = passwordEncoder.encode(changePasswordDto.getNewPassword());
-            u.setPassword(newPassword);
-            userRepository.save(u);
-        });
-    }
-
-    @Override
     public void deleteById(UUID id) {
         userRepository.deleteById(id);
     }
