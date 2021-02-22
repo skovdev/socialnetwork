@@ -244,6 +244,7 @@ public class ProfileRestController {
     }
 
 
+    @PutMapping("/password/change")
     public ResponseEntity<String> changePassword(String oldPassword, String newPassword) {
         return null;
     }
