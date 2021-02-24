@@ -164,12 +164,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean checkIfValidOldPassword(ChangePasswordDto changePasswordDto) {
-        var user = userRepository.findByUsername(changePasswordDto.getUsername());
-        return user.isPresent() && passwordEncoder.matches(changePasswordDto.getOldPassword(), user.get().getPassword());
-    }
-
-    @Override
     public void deleteById(UUID id) {
         userRepository.deleteById(id);
     }
