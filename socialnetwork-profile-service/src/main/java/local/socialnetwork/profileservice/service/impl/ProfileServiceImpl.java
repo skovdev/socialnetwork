@@ -311,4 +311,9 @@ public class ProfileServiceImpl implements ProfileService {
         var user = userProxyService.findUserByUsername(changePasswordDto.getUsername());
         return user != null && passwordEncoder.matches(changePasswordDto.getOldPassword(), user.getPassword());
     }
+
+    @Override
+    public void changePassword(String newPassword) {
+
+    }
 }

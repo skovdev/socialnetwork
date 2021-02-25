@@ -30,4 +30,5 @@ public interface ProfileService {
     boolean changeStatus(String username, boolean isActive);
     EditProfileDto editProfileByUsername(String username) throws ProfileServiceException;
     boolean checkIfValidOldPassword(ChangePasswordDto changePasswordDto);
+    void changePassword(String newPassword);
 }
