@@ -250,8 +250,9 @@ public class ProfileRestController {
 
         if (profileService.checkIfValidOldPassword(changePasswordDto)) {
             profileService.changePassword(changePasswordDto.getNewPassword());
+            return new ResponseEntity<>("Password has changed successfully", HttpStatus.OK);
         } else {
-            return new ResponseEntity<>("");
+            return new ResponseEntity<>("Old password is not matched", HttpStatus.NOT_FOUND);
         }
     }
 }
