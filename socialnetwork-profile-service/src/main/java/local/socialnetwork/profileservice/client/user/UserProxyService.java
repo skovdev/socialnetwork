@@ -26,4 +26,6 @@ public interface UserProxyService {
     @RequestMapping(value = "/users", method = RequestMethod.GET)
     List<UserDto> findUserByFirstName(@RequestParam("firstName") String username);
 
+    @RequestMapping(value = "/users/password", method = RequestMethod.POST)
+    void changePassword(@RequestParam("newPassword") String newPassword);
 }
