@@ -313,7 +313,7 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public void changePassword(String newPassword) {
+    public void changePassword(String username, String newPassword) {
 
     }
 }
