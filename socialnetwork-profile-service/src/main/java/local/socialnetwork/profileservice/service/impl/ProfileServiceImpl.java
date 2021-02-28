@@ -315,5 +315,11 @@ public class ProfileServiceImpl implements ProfileService {
     @Override
     public void changePassword(String username, String newPassword) {
 
+        var user = userProxyService.findUserByUsername(username);
+
+        if (user != null) {
+            String encodedPassword = passwordEncoder.encode(newPassword);
+            userProxyService.changePassword(encodedPassword);
+        }
     }
 }
