@@ -249,7 +249,7 @@ public class ProfileRestController {
     public ResponseEntity<String> changePassword(@RequestBody ChangePasswordDto changePasswordDto) {
 
         if (profileService.checkIfValidOldPassword(changePasswordDto)) {
-            profileService.changePassword(changePasswordDto.getNewPassword());
+            profileService.changePassword(changePasswordDto.getUsername(), changePasswordDto.getNewPassword());
             return new ResponseEntity<>("Password has changed successfully", HttpStatus.OK);
         } else {
             return new ResponseEntity<>("Old password is not matched", HttpStatus.NOT_FOUND);
