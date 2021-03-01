@@ -15,10 +15,12 @@ import local.socialnetwork.userservice.service.UserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -51,5 +53,11 @@ public class UserRestController {
     public ResponseEntity<CustomUser> findByUsername(@RequestParam("username") @Parameter(description = "Username of user for getting of user by username") String username) {
         CustomUser user = userService.findByUsername(username).orElseThrow(NullPointerException::new);
         return ResponseEntity.ok().body(user);
+    }
+
+    @PostMapping("/password")
+    public ResponseEntity<String> changePassword(@RequestParam("newPassword") String newPassword) {
+        userService.changePassword(newPassword);
+        return new ResponseEntity<>("Password has changed successfully", HttpStatus.OK);
     }
 }
