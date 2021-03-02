@@ -167,4 +167,9 @@ public class UserServiceImpl implements UserService {
     public void deleteById(UUID id) {
         userRepository.deleteById(id);
     }
+
+    @Override
+    public void changePassword(String newPassword) {
+
+    }
 }
