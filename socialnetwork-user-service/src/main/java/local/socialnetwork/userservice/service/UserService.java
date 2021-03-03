@@ -18,5 +18,5 @@ public interface UserService {
     void update(EditProfileDto editProfile);
     void registration(RegistrationDto registrationDTO) throws IOException;
     void deleteById(UUID id);
-    void changePassword(String newPassword);
+    void changePassword(String username, String newPassword);
 }

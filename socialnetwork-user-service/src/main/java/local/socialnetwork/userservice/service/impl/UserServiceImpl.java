@@ -169,7 +169,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void changePassword(String newPassword) {
+    public void changePassword(String username, String newPassword) {
 
     }
 }
