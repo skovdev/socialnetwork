@@ -171,5 +171,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public void changePassword(String username, String newPassword) {
 
+        userRepository.findByUsername(username).ifPresent(user -> {
+            user.setPassword(newPassword);
+            userRepository.save(user);
+        });
     }
 }
