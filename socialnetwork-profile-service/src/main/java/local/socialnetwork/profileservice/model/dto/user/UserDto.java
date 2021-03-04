@@ -11,6 +11,7 @@ public class UserDto {
     private String firstName;
     private String lastName;
     private String username;
+    private String password;
     private UserDetailsDto userDetails;
     private List<RoleDto> roles;
     private ProfileDto profile;
@@ -45,6 +46,14 @@ public class UserDto {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public UserDetailsDto getUserDetails() {

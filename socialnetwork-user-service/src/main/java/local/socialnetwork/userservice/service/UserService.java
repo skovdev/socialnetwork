@@ -17,7 +17,6 @@ public interface UserService {
     Optional<CustomUser> findByUsername(String username);
     void update(EditProfileDto editProfile);
     void registration(RegistrationDto registrationDTO) throws IOException;
-    boolean checkIfValidOldPassword(ChangePasswordDto changePasswordDto);
-    void changePassword(ChangePasswordDto changePasswordDto);
     void deleteById(UUID id);
+    void changePassword(String username, String newPassword);
 }

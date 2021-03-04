@@ -3,6 +3,7 @@ package local.socialnetwork.profileservice.service;
 import local.socialnetwork.kafka.model.dto.profile.EditProfileDto;
 
 import local.socialnetwork.profileservice.model.dto.profile.ProfileDto;
+import local.socialnetwork.profileservice.model.dto.profile.ChangePasswordDto;
 
 import local.socialnetwork.profileservice.model.entity.profile.Profile;
 
@@ -28,4 +29,6 @@ public interface ProfileService {
     void updateAvatarProfile(String username, MultipartFile multipartFile) throws IOException, ProfileServiceException;
     boolean changeStatus(String username, boolean isActive);
     EditProfileDto editProfileByUsername(String username) throws ProfileServiceException;
+    boolean checkIfValidOldPassword(ChangePasswordDto changePasswordDto);
+    void changePassword(String username, String newPassword);
 }

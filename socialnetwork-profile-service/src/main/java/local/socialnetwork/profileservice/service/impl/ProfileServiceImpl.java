@@ -5,6 +5,7 @@ import local.socialnetwork.profileservice.client.user.UserProxyService;
 import local.socialnetwork.profileservice.kafka.producer.user.UserProducer;
 
 import local.socialnetwork.profileservice.model.dto.profile.ProfileDto;
+import local.socialnetwork.profileservice.model.dto.profile.ChangePasswordDto;
 
 import local.socialnetwork.kafka.model.dto.profile.EditProfileDto;
 
@@ -27,6 +28,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.beans.factory.annotation.Value;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import org.springframework.stereotype.Service;
 
@@ -84,6 +87,13 @@ public class ProfileServiceImpl implements ProfileService {
     @Autowired
     public void setResourceUtil(ResourceUtil resourceUtil) {
         this.resourceUtil = resourceUtil;
+    }
+
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -294,5 +304,22 @@ public class ProfileServiceImpl implements ProfileService {
 
         return null;
 
+    }
+
+    @Override
+    public boolean checkIfValidOldPassword(ChangePasswordDto changePasswordDto) {
+        var user = userProxyService.findUserByUsername(changePasswordDto.getUsername());
+        return user != null && passwordEncoder.matches(changePasswordDto.getOldPassword(), user.getPassword());
+    }
+
+    @Override
+    public void changePassword(String username, String newPassword) {
+
+        var user = userProxyService.findUserByUsername(username);
+
+        if (user != null) {
+            String encodedPassword = passwordEncoder.encode(newPassword);
+            userProxyService.changePassword(encodedPassword);
+        }
     }
 }
