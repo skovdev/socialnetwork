@@ -14,6 +14,7 @@ import local.socialnetwork.kafka.model.dto.profile.EditProfileDto;
 
 import local.socialnetwork.profileservice.client.user.UserProxyService;
 
+import local.socialnetwork.profileservice.model.dto.profile.ChangePasswordDto;
 import local.socialnetwork.profileservice.model.dto.profile.ProfileDto;
 
 import local.socialnetwork.profileservice.model.dto.user.UserDetailsDto;
@@ -240,6 +241,18 @@ public class ProfileRestController {
             return new ResponseEntity<>("Status has changed successfully", HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+
+    @PutMapping("/password/change")
+    public ResponseEntity<String> changePassword(@RequestBody ChangePasswordDto changePasswordDto) {
+
+        if (profileService.checkIfValidOldPassword(changePasswordDto)) {
+            profileService.changePassword(changePasswordDto.getUsername(), changePasswordDto.getNewPassword());
+            return new ResponseEntity<>("Password has changed successfully", HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("Old password is not matched", HttpStatus.NOT_FOUND);
         }
     }
 }
