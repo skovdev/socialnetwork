@@ -319,7 +319,7 @@ public class ProfileServiceImpl implements ProfileService {
 
         if (user != null) {
             String encodedPassword = passwordEncoder.encode(newPassword);
-            userProxyService.changePassword(encodedPassword);
+            userProxyService.changePassword(user.getUsername(), encodedPassword);
         }
     }
 }
