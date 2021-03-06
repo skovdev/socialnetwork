@@ -56,8 +56,8 @@ public class UserRestController {
     }
 
     @PostMapping("/password")
-    public ResponseEntity<String> changePassword(@RequestParam("newPassword") String newPassword) {
-        userService.changePassword(newPassword);
+    public ResponseEntity<String> changePassword(@RequestParam("username") String username, @RequestParam("newPassword") String newPassword) {
+        userService.changePassword(username, newPassword);
         return new ResponseEntity<>("Password has changed successfully", HttpStatus.OK);
     }
 }
