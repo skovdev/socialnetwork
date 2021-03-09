@@ -55,8 +55,10 @@ public class UserRestController {
         return ResponseEntity.ok().body(user);
     }
 
+    @Operation(summary = "Change user password by username")
+    @ApiResponse(description = "Change user password by username", content = { @Content(mediaType = "application/json") }, responseCode = "200")
     @PostMapping("/password")
-    public ResponseEntity<String> changePassword(@RequestParam("username") String username, @RequestParam("newPassword") String newPassword) {
+    public ResponseEntity<String> changePassword(@RequestParam("username") @Parameter(description = "Username of user for changing password by username") String username, @RequestParam("newPassword") @Parameter(description = "New password of user for changing password by username") String newPassword) {
         userService.changePassword(username, newPassword);
         return new ResponseEntity<>("Password has changed successfully", HttpStatus.OK);
     }
