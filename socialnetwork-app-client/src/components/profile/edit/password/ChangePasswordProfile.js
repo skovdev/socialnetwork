@@ -23,7 +23,7 @@ const ChangePasswordProfile = () => {
 
     const handleChangePassword = () => {
 
-        const changePasswordEndpoint = AppConstants.API_HOST + "/user/change-password";
+        const changePasswordEndpoint = AppConstants.API_HOST + "/profiles/password/change";
 
         let data = {
             username: AuthService.getProfile().username,
