@@ -7,7 +7,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 @SpringBootApplication
 open class SpringBootRunSupportService {
 
-    fun main(args: Array<String>) {
-        SpringApplication.run(SpringBootRunSupportService::class.java, *args)
+    companion object {
+
+        @JvmStatic
+        fun main(args: Array<String>) {
+            SpringApplication.run(SpringBootRunSupportService::class.java, *args)
+        }
     }
 }
