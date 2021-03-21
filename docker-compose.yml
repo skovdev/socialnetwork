@@ -130,14 +130,14 @@ services:
       - SOCIALNETWORK_JDBC_PASSWORD=sn_support_service_password
     ports:
       - "8089:8089"
-      - "5009:5009"
+      - "5010:5010"
     depends_on:
       - socialnetwork-eureka-service-discovery
       - socialnetwork-config-server
       - socialnetwork-zuul-api-gateway
       - socialnetwork-database
       - kafka
-    entrypoint: ./wait-for-it.sh socialnetwork-config-server:8888 --timeout=15 -- java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5009 -jar socialnetwork-support-service-1.0.jar
+    entrypoint: ./wait-for-it.sh socialnetwork-config-server:8888 --timeout=15 -- java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5010 -jar socialnetwork-support-service-1.0.jar
 
   socialnetwork-app-client:
     image: socialnetwork-app-client
