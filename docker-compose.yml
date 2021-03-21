@@ -121,6 +121,24 @@ services:
     volumes:
       - /avatar/
 
+  socialnetwork-support-service:
+    image: socialnetwork-support-service-1.0
+    environment:
+      - SPRING_PROFILE_ACTIVE=local
+      - SOCIALNETWORK_JDBC_URL=jdbc:postgresql://socialnetwork-database:5432/sn_support_service_db
+      - SOCIALNETWORK_JDBC_USER=sn_support_service_user
+      - SOCIALNETWORK_JDBC_PASSWORD=sn_support_service_password
+    ports:
+      - "8089:8089"
+      - "5010:5010"
+    depends_on:
+      - socialnetwork-eureka-service-discovery
+      - socialnetwork-config-server
+      - socialnetwork-zuul-api-gateway
+      - socialnetwork-database
+      - kafka
+    entrypoint: ./wait-for-it.sh socialnetwork-config-server:8888 --timeout=15 -- java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5010 -jar socialnetwork-support-service-1.0.jar
+
   socialnetwork-app-client:
     image: socialnetwork-app-client
     ports:
