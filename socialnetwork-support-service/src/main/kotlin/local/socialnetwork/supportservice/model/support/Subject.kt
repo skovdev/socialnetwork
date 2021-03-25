@@ -13,10 +13,10 @@ import javax.persistence.Table
 class Subject : AbstractModel() {
 
     @Column(name = "title")
-    private lateinit var title: String;
+    private lateinit var title: String
 
     @Column(name = "description")
-    private lateinit var description: String;
+    private lateinit var description: String
 
     @ManyToOne
     @JoinColumn(name = "support_id")
