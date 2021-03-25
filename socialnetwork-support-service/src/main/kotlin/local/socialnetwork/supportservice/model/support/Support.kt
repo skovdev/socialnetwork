@@ -23,10 +23,5 @@ class Support : AbstractModel() {
     @OneToMany(mappedBy = "support", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     private lateinit var subjects : MutableList<Subject>
 
-    @OneToMany(mappedBy = "support", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
-    private lateinit var questions : MutableList<Question>
-
-    @OneToMany(mappedBy = "support", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
-    private lateinit var answers : MutableList<Answer>
 
 }
