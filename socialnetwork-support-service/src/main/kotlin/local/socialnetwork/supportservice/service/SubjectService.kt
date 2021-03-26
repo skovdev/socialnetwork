@@ -2,6 +2,6 @@ package local.socialnetwork.supportservice.service
 
 import local.socialnetwork.supportservice.model.support.Subject
 
-interface SupportService {
-    fun findAllSubjects() : MutableList<Subject>
+interface SubjectService {
+    fun findAll(): MutableList<Subject>
 }
