@@ -18,6 +18,9 @@ const Menu = () => {
                 <li>
                     <Link to={"/profile/" + AuthService.getProfile().username + "/groups"}>Groups</Link>
                 </li>
+                <li>
+                    <Link to={"/profile/support"}>Support</Link>
+                </li>
             </ul>
         </div>
 
