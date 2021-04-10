@@ -52,7 +52,7 @@ services:
   socialnetwork-auth-service:
     image: socialnetwork-auth-service-1.0
     environment:
-      - SPRING_PROFILE_ACTIVE=native
+      - SPRING_PROFILE_ACTIVE=local
     ports:
       - "8080:8080"
       - "5005:5005"
@@ -66,7 +66,7 @@ services:
   socialnetwork-user-service:
     image: socialnetwork-user-service-1.0
     environment:
-      - SPRING_PROFILE_ACTIVE=native
+      - SPRING_PROFILE_ACTIVE=local
       - SOCIALNETWORK_JDBC_URL=jdbc:postgresql://socialnetwork-database:5432/sn_user_service_db
       - SOCIALNETWORK_JDBC_USER=sn_user_service_user
       - SOCIALNETWORK_JDBC_PASSWORD=sn_user_service_password
@@ -84,7 +84,7 @@ services:
   socialnetwork-profile-service:
     image: socialnetwork-profile-service-1.0
     environment:
-      - SPRING_PROFILE_ACTIVE=native
+      - SPRING_PROFILE_ACTIVE=local
       - SOCIALNETWORK_JDBC_URL=jdbc:postgresql://socialnetwork-database:5432/sn_profile_service_db
       - SOCIALNETWORK_JDBC_USER=sn_profile_service_user
       - SOCIALNETWORK_JDBC_PASSWORD=sn_profile_service_password
@@ -104,7 +104,7 @@ services:
   socialnetwork-group-service:
     image: socialnetwork-group-service-1.0
     environment:
-      - SPRING_PROFILE_ACTIVE=native
+      - SPRING_PROFILE_ACTIVE=local
       - SOCIALNETWORK_JDBC_URL=jdbc:postgresql://socialnetwork-database:5432/sn_user_service_db
       - SOCIALNETWORK_JDBC_USER=sn_group_service_user
       - SOCIALNETWORK_JDBC_PASSWORD=sn_group_service_password
@@ -124,7 +124,7 @@ services:
   socialnetwork-support-service:
     image: socialnetwork-support-service-1.0
     environment:
-      - SPRING_PROFILE_ACTIVE=native
+      - SPRING_PROFILE_ACTIVE=local
       - SOCIALNETWORK_JDBC_URL=jdbc:postgresql://socialnetwork-database:5432/sn_support_service_db
       - SOCIALNETWORK_JDBC_USER=sn_support_service_user
       - SOCIALNETWORK_JDBC_PASSWORD=sn_support_service_password
