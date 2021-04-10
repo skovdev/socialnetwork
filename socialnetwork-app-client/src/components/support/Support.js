@@ -39,11 +39,12 @@ const Support = () => {
        return (
            <div class="support">
                {subjects.map(subject => {
-                   <div class="subject">
-                       <div>{subject.id}</div>
-                       <div>{subject.title}</div>
-                       <div>{subject.description}</div>
-                   </div>
+                   return (<div class="subject">
+                               <div>{subject.id}</div>
+                               <div>{subject.title}</div>
+                               <div>{subject.description}</div>
+                           </div>
+                   )
                })};
            </div>
        )
