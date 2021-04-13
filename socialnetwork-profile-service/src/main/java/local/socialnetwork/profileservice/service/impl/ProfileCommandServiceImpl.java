@@ -1,8 +1,11 @@
 package local.socialnetwork.profileservice.service.impl;
 
 import local.socialnetwork.profileservice.commands.CreateProfileCommand;
+
 import local.socialnetwork.profileservice.model.dto.profile.ProfileDto;
+
 import local.socialnetwork.profileservice.service.ProfileCommandService;
+
 import org.axonframework.commandhandling.gateway.CommandGateway;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +24,7 @@ public class ProfileCommandServiceImpl implements ProfileCommandService {
         this.commandGateway = commandGateway;
     }
 
+    @Override
     public CompletableFuture<String> createProfile(ProfileDto profileDto) {
 
         return this.commandGateway.send(new CreateProfileCommand(
