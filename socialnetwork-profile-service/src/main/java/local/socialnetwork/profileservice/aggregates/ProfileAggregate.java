@@ -1,8 +1,13 @@
 package local.socialnetwork.profileservice.aggregates;
 
+import local.socialnetwork.profileservice.commands.ChangePasswordCommand;
+import local.socialnetwork.profileservice.commands.ChangeStatusByUsernameCommand;
 import local.socialnetwork.profileservice.commands.CreateProfileCommand;
 
+import local.socialnetwork.profileservice.events.PasswordChangedEvent;
 import local.socialnetwork.profileservice.events.ProfileCreatedEvent;
+
+import local.socialnetwork.profileservice.events.StatusChangedEvent;
 
 import org.axonframework.commandhandling.CommandHandler;
 
@@ -23,6 +28,8 @@ public class ProfileAggregate {
     private boolean isActive;
     private String avatar;
     private UUID userId;
+    private String username;
+    private String newPassword;
 
     public ProfileAggregate() {
 
@@ -46,12 +53,42 @@ public class ProfileAggregate {
 
     }
 
+    @CommandHandler
+    public void handle(ChangeStatusByUsernameCommand command) {
+
+        AggregateLifecycle.apply(new ChangeStatusByUsernameCommand(
+                command.isActive(),
+                command.getUsername()
+        ));
+    }
+
+    @CommandHandler
+    public void handle(ChangePasswordCommand command) {
+
+        AggregateLifecycle.apply(new ChangePasswordCommand(
+                command.getUsername(),
+                command.getNewPassword())
+        );
+    }
+
     @EventSourcingHandler
     public void on(ProfileCreatedEvent profileCreatedEvent) {
         this.id = profileCreatedEvent.getId();
         this.isActive = profileCreatedEvent.isActive();
         this.avatar = profileCreatedEvent.getAvatar();
         this.userId = profileCreatedEvent.getUserId();
+    }
+
+    @EventSourcingHandler
+    public void on(StatusChangedEvent statusChangedEvent) {
+        this.isActive = statusChangedEvent.isActive();
+        this.username = statusChangedEvent.getUsername();
+    }
+
+    @EventSourcingHandler
+    public void on(PasswordChangedEvent passwordChangedEvent) {
+        this.username = passwordChangedEvent.getUsername();
+        this.newPassword = passwordChangedEvent.getNewPassword();
     }
 
     public UUID getId() {
@@ -68,5 +105,9 @@ public class ProfileAggregate {
 
     public UUID getUserId() {
         return userId;
+    }
+
+    public String getUsername() {
+        return username;
     }
 }
