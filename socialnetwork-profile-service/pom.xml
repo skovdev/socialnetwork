@@ -27,6 +27,7 @@
         <swagger.annotations.version>2.1.6</swagger.annotations.version>
         <springdoc.openapi.ui.version>1.5.2</springdoc.openapi.ui.version>
         <axon.framework.version>4.5</axon.framework.version>
+        <google.guava.version>30.1.1-jre</google.guava.version>
         <maven.compiler.source>14</maven.compiler.source>
         <maven.compiler.target>14</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -72,6 +73,11 @@
             <groupId>org.axonframework</groupId>
             <artifactId>axon-spring-boot-starter</artifactId>
             <version>${axon.framework.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${google.guava.version}</version>
         </dependency>
     </dependencies>
     <build>
