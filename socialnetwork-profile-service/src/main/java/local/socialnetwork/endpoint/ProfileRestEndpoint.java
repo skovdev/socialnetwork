@@ -4,6 +4,9 @@ import local.socialnetwork.profileservice.model.dto.profile.ProfileDto;
 
 import local.socialnetwork.profileservice.service.ProfileCommandService;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.http.HttpStatus;
@@ -17,6 +20,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/profiles")
 public class ProfileRestEndpoint {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProfileRestEndpoint.class);
 
     private ProfileCommandService profileCommandService;
 
