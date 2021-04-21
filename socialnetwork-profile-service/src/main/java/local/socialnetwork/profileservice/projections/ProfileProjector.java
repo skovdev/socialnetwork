@@ -8,10 +8,15 @@ import local.socialnetwork.profileservice.repository.ProfileRepository;
 
 import org.axonframework.eventhandling.EventHandler;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.springframework.stereotype.Component;
 
 @Component
 public class ProfileProjector {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProfileProjector.class);
 
     private final ProfileRepository profileRepository;
 
