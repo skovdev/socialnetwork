@@ -88,6 +88,7 @@ services:
       - SOCIALNETWORK_JDBC_URL=jdbc:postgresql://socialnetwork-database:5432/sn_profile_service_db
       - SOCIALNETWORK_JDBC_USER=sn_profile_service_user
       - SOCIALNETWORK_JDBC_PASSWORD=sn_profile_service_password
+      - AXONSERVER_HOST=axonserver
     ports:
       - "8081:8081"
       - "5007:5007"
@@ -96,7 +97,7 @@ services:
       - socialnetwork-config-server
       - socialnetwork-zuul-api-gateway
       - socialnetwork-database
-      - kafka
+      - axonserver
     entrypoint: ./wait-for-it.sh socialnetwork-config-server:8888 --timeout=15 -- java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5007 -jar socialnetwork-profile-service-1.0.jar
     volumes:
        - /avatar/
@@ -158,3 +159,37 @@ services:
       - socialnetwork-user-service
       - socialnetwork-profile-service
       - socialnetwork-group-service
+
+  axonserver:
+    image: axoniq/axonserver
+    hostname: axonserver
+    environment:
+      - AXONSERVER_HOSTNAME=axonserver
+    volumes:
+      - axonserver-data:/data
+      - axonserver-events:/eventdata
+      - axonserver-config:/config:ro
+    ports:
+      - "8024:8024"
+      - "8124:8124"
+      - "8224:8224"
+
+volumes:
+  axonserver-data:
+    driver: local
+    driver_opts:
+      type: none
+      device: data
+      o: bind
+  axonserver-events:
+    driver: local
+    driver_opts:
+      type: none
+      device: events
+      o: bind
+  axonserver-config:
+    driver: local
+    driver_opts:
+      type: none
+      device: config
+      o: bind
