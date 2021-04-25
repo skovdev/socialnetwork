@@ -1,6 +1,5 @@
 package local.socialnetwork.endpoint;
 
-import io.swagger.v3.oas.annotations.Parameter;
 import local.socialnetwork.profileservice.model.dto.profile.ProfileDto;
 
 import local.socialnetwork.profileservice.service.ProfileCommandService;
@@ -13,7 +12,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 
 @RestController
 @RequestMapping("/profiles")
@@ -41,11 +46,6 @@ public class ProfileRestEndpoint {
 
     @PutMapping
     public ResponseEntity<String> changeStatus(@RequestParam("username") String username, boolean isActive) {
-
-        if (profileCommandService.changeStatus(username, isActive)) {
-            return new ResponseEntity<>("Status has changed successfully", HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        return null;
     }
 }
