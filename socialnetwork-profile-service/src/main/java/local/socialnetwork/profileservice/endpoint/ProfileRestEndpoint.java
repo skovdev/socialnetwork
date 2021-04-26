@@ -1,4 +1,4 @@
-package local.socialnetwork.endpoint;
+package local.socialnetwork.profileservice.endpoint;
 
 import local.socialnetwork.profileservice.model.dto.profile.ProfileDto;
 
