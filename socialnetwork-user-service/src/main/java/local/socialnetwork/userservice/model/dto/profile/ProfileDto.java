@@ -4,9 +4,18 @@ import java.util.UUID;
 
 public class ProfileDto {
 
+    private UUID id;
     private String avatar;
     private boolean isActive;
     private UUID userId;
+
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
 
     public String getAvatar() {
         return avatar;
