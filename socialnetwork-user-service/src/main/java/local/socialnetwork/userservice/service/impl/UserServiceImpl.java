@@ -160,6 +160,7 @@ public class UserServiceImpl implements UserService {
 
         var encodedPhoto = resourceUtil.getEncodedResource(pathDefaultAvatar);
 
+        newProfile.setId(UUID.randomUUID());
         newProfile.setAvatar(encodedPhoto);
         newProfile.setActive(true);
         newProfile.setUserId(newUser.getId());
