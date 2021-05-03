@@ -10,4 +10,5 @@ import java.util.concurrent.ExecutionException;
 public interface ProfileQueryService {
     List<ProfileDto> findAll() throws ExecutionException, InterruptedException;
     ProfileDto findByUserId(UUID id) throws ExecutionException, InterruptedException;
+    ProfileDto findByUsername(String username) throws ExecutionException, InterruptedException;
 }

@@ -5,8 +5,9 @@ import local.socialnetwork.profileservice.model.dto.profile.ProfileDto;
 import local.socialnetwork.profileservice.model.entity.profile.Profile;
 
 import local.socialnetwork.profileservice.query.FindAllProfilesQuery;
-
 import local.socialnetwork.profileservice.query.FindProfileByUserIdQuery;
+import local.socialnetwork.profileservice.query.FindProfileByUsername;
+
 import local.socialnetwork.profileservice.service.ProfileQueryService;
 
 import org.axonframework.messaging.responsetypes.ResponseTypes;
@@ -56,6 +57,28 @@ public class ProfileQueryServiceImpl implements ProfileQueryService {
     public ProfileDto findByUserId(UUID id) throws ExecutionException, InterruptedException {
 
         Profile profile = queryGateway.query(new FindProfileByUserIdQuery(id), ResponseTypes.instanceOf(Profile.class)).get();
+
+        if (profile != null) {
+
+            ProfileDto profileDto = new ProfileDto();
+
+            profileDto.setId(profile.getId());
+            profileDto.setActive(profile.isActive());
+            profileDto.setAvatar(profile.getAvatar());
+            profileDto.setUserId(profile.getUserId());
+
+            return profileDto;
+
+        }
+
+        throw new NullPointerException();
+
+    }
+
+    @Override
+    public ProfileDto findByUsername(String username) throws ExecutionException, InterruptedException {
+
+        Profile profile = queryGateway.query(new FindProfileByUsername(username), ResponseTypes.instanceOf(Profile.class)).get();
 
         if (profile != null) {
 
