@@ -2,7 +2,8 @@ package local.socialnetwork.profileservice.constants;
 
 public final class ApplicationConstants {
 
-    public static final String HOST = "http://socialnetwork-zuul-api-gateway:8762";
+    public static final String HOST = "http://socialnetwork-zuul-api-gateway";
+    public static final String PORT = "8762";
 
     private ApplicationConstants() {
 
