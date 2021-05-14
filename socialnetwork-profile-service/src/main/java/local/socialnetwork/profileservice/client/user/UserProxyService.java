@@ -11,10 +11,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.List;
 import java.util.UUID;
 
-@FeignClient(name = "user-service", url = ApplicationConstants.HOST + "/" + ApplicationConstants.Services.USER_SERVICE_URL)
+@FeignClient(name = "user-service", url = ApplicationConstants.HOST + ":" + ApplicationConstants.PORT + "/" + ApplicationConstants.Services.USER_SERVICE_URL)
 public interface UserProxyService {
 
     @RequestMapping(value = "/users/{userId}", method = RequestMethod.GET)
@@ -22,9 +21,6 @@ public interface UserProxyService {
 
     @RequestMapping(value = "/users", method = RequestMethod.GET)
     UserDto findUserByUsername(@RequestParam("username") String username);
-
-    @RequestMapping(value = "/users", method = RequestMethod.GET)
-    List<UserDto> findUserByFirstName(@RequestParam("firstName") String username);
 
     @RequestMapping(value = "/users/password", method = RequestMethod.POST)
     void changePassword(@RequestParam("username") String username, @RequestParam("newPassword") String newPassword);
