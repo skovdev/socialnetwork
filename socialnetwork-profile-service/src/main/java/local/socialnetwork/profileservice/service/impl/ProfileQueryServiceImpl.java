@@ -1,12 +1,15 @@
 package local.socialnetwork.profileservice.service.impl;
 
+import local.socialnetwork.profileservice.model.dto.profile.EditProfileDto;
 import local.socialnetwork.profileservice.model.dto.profile.ProfileDto;
 
 import local.socialnetwork.profileservice.model.entity.profile.Profile;
 
+import local.socialnetwork.profileservice.query.EditProfileByUsernameQuery;
 import local.socialnetwork.profileservice.query.FindAllProfilesQuery;
+import local.socialnetwork.profileservice.query.FindAvatarByUsernameQuery;
 import local.socialnetwork.profileservice.query.FindProfileByUserIdQuery;
-import local.socialnetwork.profileservice.query.FindProfileByUsername;
+import local.socialnetwork.profileservice.query.FindProfileByUsernameQuery;
 
 import local.socialnetwork.profileservice.service.ProfileQueryService;
 
@@ -78,7 +81,7 @@ public class ProfileQueryServiceImpl implements ProfileQueryService {
     @Override
     public ProfileDto findByUsername(String username) throws ExecutionException, InterruptedException {
 
-        Profile profile = queryGateway.query(new FindProfileByUsername(username), ResponseTypes.instanceOf(Profile.class)).get();
+        Profile profile = queryGateway.query(new FindProfileByUsernameQuery(username), ResponseTypes.instanceOf(Profile.class)).get();
 
         if (profile != null) {
 
@@ -95,5 +98,15 @@ public class ProfileQueryServiceImpl implements ProfileQueryService {
 
         throw new NullPointerException();
 
+    }
+
+    @Override
+    public EditProfileDto findEditProfileByUsername(String username) throws ExecutionException, InterruptedException {
+        return queryGateway.query(new EditProfileByUsernameQuery(username), ResponseTypes.instanceOf(EditProfileDto.class)).get();
+    }
+
+    @Override
+    public String findAvatarByUsername(String username) throws ExecutionException, InterruptedException {
+        return queryGateway.query(new FindAvatarByUsernameQuery(username), ResponseTypes.instanceOf(String.class)).get();
     }
 }
