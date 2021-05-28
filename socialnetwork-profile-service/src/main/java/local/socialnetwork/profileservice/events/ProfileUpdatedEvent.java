@@ -1,10 +1,10 @@
-package local.socialnetwork.kafka.model.dto.profile;
+package local.socialnetwork.profileservice.events;
 
 import java.util.UUID;
 
-public class EditProfileDto {
+public class ProfileUpdatedEvent {
 
-    private UUID userId;
+    private UUID id;
     private String firstName;
     private String lastName;
     private String country;
@@ -14,12 +14,28 @@ public class EditProfileDto {
     private String birthday;
     private String familyStatus;
 
-    public UUID getUserId() {
-        return userId;
+    public ProfileUpdatedEvent() {
+
     }
 
-    public void setUserId(UUID userId) {
-        this.userId = userId;
+    public ProfileUpdatedEvent(UUID id, String firstName, String lastName, String country, String city, String address, String phone, String birthday, String familyStatus) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.country = country;
+        this.city = city;
+        this.address = address;
+        this.phone = phone;
+        this.birthday = birthday;
+        this.familyStatus = familyStatus;
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
     }
 
     public String getFirstName() {
