@@ -2,26 +2,30 @@ package local.socialnetwork.profileservice.projection;
 
 import local.socialnetwork.profileservice.client.user.UserProxyService;
 
+import local.socialnetwork.profileservice.events.AvatarDeletedEvent;
 import local.socialnetwork.profileservice.events.AvatarUpdatedEvent;
+import local.socialnetwork.profileservice.events.CheckValidatedOldPasswordEvent;
+import local.socialnetwork.profileservice.events.PasswordChangedEvent;
 import local.socialnetwork.profileservice.events.ProfileCreatedEvent;
 import local.socialnetwork.profileservice.events.ProfileUpdatedEvent;
+
+import local.socialnetwork.profileservice.events.StatusChangedEvent;
 
 import local.socialnetwork.profileservice.exception.ProfileServiceException;
 
 import local.socialnetwork.profileservice.kafka.producer.user.UserProducer;
 
-import local.socialnetwork.profileservice.model.dto.profile.ChangePasswordDto;
 import local.socialnetwork.profileservice.model.dto.profile.EditProfileDto;
 
 import local.socialnetwork.profileservice.model.dto.user.UserDto;
 
 import local.socialnetwork.profileservice.model.entity.profile.Profile;
 
-import local.socialnetwork.profileservice.query.EditProfileByUsername;
+import local.socialnetwork.profileservice.query.EditProfileByUsernameQuery;
 import local.socialnetwork.profileservice.query.FindAllProfilesQuery;
-import local.socialnetwork.profileservice.query.FindAvatarByUsername;
+import local.socialnetwork.profileservice.query.FindAvatarByUsernameQuery;
 import local.socialnetwork.profileservice.query.FindProfileByUserIdQuery;
-import local.socialnetwork.profileservice.query.FindProfileByUsername;
+import local.socialnetwork.profileservice.query.FindProfileByUsernameQuery;
 
 import local.socialnetwork.profileservice.repository.ProfileRepository;
 
@@ -159,9 +163,9 @@ public class ProfileProjector {
     }
 
     @EventHandler
-    public String on(String username) throws ProfileServiceException, IOException {
+    public String on(AvatarDeletedEvent avatarDeletedEvent) throws ProfileServiceException, IOException {
 
-        UserDto user = userProxyService.findUserByUsername(username);
+        UserDto user = userProxyService.findUserByUsername(avatarDeletedEvent.getUsername());
 
         if (user != null) {
 
@@ -187,9 +191,9 @@ public class ProfileProjector {
     }
 
     @EventHandler
-    public boolean on(String username, boolean isActive) {
+    public boolean on(StatusChangedEvent statusChangedEvent) {
 
-        UserDto user = userProxyService.findUserByUsername(username);
+        UserDto user = userProxyService.findUserByUsername(statusChangedEvent.getUsername());
 
         if (user != null) {
 
@@ -197,7 +201,7 @@ public class ProfileProjector {
 
             if (profile != null) {
 
-                profile.setActive(isActive);
+                profile.setActive(statusChangedEvent.isActive());
 
                 profileRepository.save(profile);
 
@@ -213,18 +217,18 @@ public class ProfileProjector {
     }
 
     @EventHandler
-    public boolean on(ChangePasswordDto changePasswordDto) {
-        var user = userProxyService.findUserByUsername(changePasswordDto.getUsername());
-        return user != null && passwordEncoder.matches(changePasswordDto.getOldPassword(), user.getPassword());
+    public boolean on(CheckValidatedOldPasswordEvent checkValidatedOldPasswordEvent) {
+        var user = userProxyService.findUserByUsername(checkValidatedOldPasswordEvent.getUsername());
+        return user != null && passwordEncoder.matches(checkValidatedOldPasswordEvent.getOldPassword(), user.getPassword());
     }
 
     @EventHandler
-    public void on(String username, String newPassword) {
+    public void on(PasswordChangedEvent passwordChangedEvent) {
 
-        var user = userProxyService.findUserByUsername(username);
+        var user = userProxyService.findUserByUsername(passwordChangedEvent.getUsername());
 
         if (user != null) {
-            String encodedPassword = passwordEncoder.encode(newPassword);
+            String encodedPassword = passwordEncoder.encode(passwordChangedEvent.getNewPassword());
             userProxyService.changePassword(user.getUsername(), encodedPassword);
         }
     }
@@ -240,9 +244,9 @@ public class ProfileProjector {
     }
 
     @QueryHandler
-    public Profile handle(FindProfileByUsername findProfileByUsername) {
+    public Profile handle(FindProfileByUsernameQuery findProfileByUsernameQuery) {
 
-        UserDto user = userProxyService.findUserByUsername(findProfileByUsername.getUsername());
+        UserDto user = userProxyService.findUserByUsername(findProfileByUsernameQuery.getUsername());
 
         if (user != null) {
             return profileRepository.findProfileByUserId(user.getId());
@@ -253,9 +257,9 @@ public class ProfileProjector {
     }
 
     @QueryHandler
-    public EditProfileDto handle(EditProfileByUsername editProfileByUsername) {
+    public EditProfileDto handle(EditProfileByUsernameQuery editProfileByUsernameQuery) {
 
-        UserDto user = userProxyService.findUserByUsername(editProfileByUsername.getUsername());
+        UserDto user = userProxyService.findUserByUsername(editProfileByUsernameQuery.getUsername());
 
         if (user != null) {
 
@@ -279,9 +283,9 @@ public class ProfileProjector {
     }
 
     @QueryHandler
-    public String handle(FindAvatarByUsername findAvatarByUsername) {
+    public String handle(FindAvatarByUsernameQuery findAvatarByUsernameQuery) {
 
-        UserDto user = userProxyService.findUserByUsername(findAvatarByUsername.getUsername());
+        UserDto user = userProxyService.findUserByUsername(findAvatarByUsernameQuery.getUsername());
 
         if (user != null) {
 
