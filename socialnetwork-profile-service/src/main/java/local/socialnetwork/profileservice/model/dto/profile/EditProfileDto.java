@@ -1,5 +1,7 @@
 package local.socialnetwork.profileservice.model.dto.profile;
 
+import java.util.UUID;
+
 public class EditProfileDto {
 
     private String firstName;
@@ -10,6 +12,7 @@ public class EditProfileDto {
     private String phone;
     private String birthday;
     private String familyStatus;
+    private UUID userId;
 
     public String getFirstName() {
         return firstName;
@@ -73,5 +76,13 @@ public class EditProfileDto {
 
     public void setFamilyStatus(String familyStatus) {
         this.familyStatus = familyStatus;
+    }
+
+    public UUID getUserId() {
+        return userId;
+    }
+
+    public void setUserId(UUID userId) {
+        this.userId = userId;
     }
 }
