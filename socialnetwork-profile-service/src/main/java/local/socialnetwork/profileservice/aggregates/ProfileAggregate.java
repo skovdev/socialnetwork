@@ -2,9 +2,11 @@ package local.socialnetwork.profileservice.aggregates;
 
 import local.socialnetwork.profileservice.commands.ChangePasswordCommand;
 import local.socialnetwork.profileservice.commands.ChangeStatusByUsernameCommand;
+import local.socialnetwork.profileservice.commands.CheckValidOldPasswordCommand;
 import local.socialnetwork.profileservice.commands.CreateProfileCommand;
 import local.socialnetwork.profileservice.commands.UpdateProfileCommand;
 
+import local.socialnetwork.profileservice.events.CheckValidatedOldPasswordEvent;
 import local.socialnetwork.profileservice.events.PasswordChangedEvent;
 import local.socialnetwork.profileservice.events.ProfileCreatedEvent;
 import local.socialnetwork.profileservice.events.ProfileUpdatedEvent;
@@ -30,6 +32,7 @@ public class ProfileAggregate {
     private String avatar;
     private UUID userId;
     private String username;
+    private String oldPassword;
     private String newPassword;
     private String firstName;
     private String lastName;
@@ -96,8 +99,8 @@ public class ProfileAggregate {
     public void handle(ChangeStatusByUsernameCommand command) {
 
         AggregateLifecycle.apply(new ChangeStatusByUsernameCommand(
-                command.isActive(),
-                command.getUsername()
+                command.getUsername(),
+                command.isActive()
         ));
     }
 
@@ -105,6 +108,23 @@ public class ProfileAggregate {
     public void on(StatusChangedEvent statusChangedEvent) {
         this.isActive = statusChangedEvent.isActive();
         this.username = statusChangedEvent.getUsername();
+    }
+
+    @CommandHandler
+    public void handle(CheckValidOldPasswordCommand checkValidOldPasswordCommand) {
+
+        AggregateLifecycle.apply(new CheckValidOldPasswordCommand(
+                checkValidOldPasswordCommand.getUsername(),
+                checkValidOldPasswordCommand.getOldPassword(),
+                checkValidOldPasswordCommand.getNewPassword()
+        ));
+    }
+
+    @EventSourcingHandler
+    public void on(CheckValidatedOldPasswordEvent checkValidatedOldPasswordEvent) {
+        this.username = checkValidatedOldPasswordEvent.getUsername();
+        this.oldPassword = checkValidatedOldPasswordEvent.getOldPassword();
+        this.newPassword = checkValidatedOldPasswordEvent.getNewPassword();
     }
 
     @CommandHandler
@@ -160,6 +180,14 @@ public class ProfileAggregate {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getOldPassword() {
+        return oldPassword;
+    }
+
+    public void setOldPassword(String oldPassword) {
+        this.oldPassword = oldPassword;
     }
 
     public String getNewPassword() {
