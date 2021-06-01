@@ -1,7 +1,11 @@
 package local.socialnetwork.profileservice.service.impl;
 
+import local.socialnetwork.profileservice.client.user.UserProxyService;
+
 import local.socialnetwork.profileservice.model.dto.profile.EditProfileDto;
 import local.socialnetwork.profileservice.model.dto.profile.ProfileDto;
+
+import local.socialnetwork.profileservice.model.dto.user.UserDto;
 
 import local.socialnetwork.profileservice.model.entity.profile.Profile;
 
@@ -38,6 +42,13 @@ public class ProfileQueryServiceImpl implements ProfileQueryService {
         this.queryGateway = queryGateway;
     }
 
+    private UserProxyService userProxyService;
+
+    @Autowired
+    public void setUserProxyService(UserProxyService userProxyService) {
+        this.userProxyService = userProxyService;
+    }
+
     @Override
     public List<ProfileDto> findAll() throws ExecutionException, InterruptedException {
 
@@ -50,7 +61,7 @@ public class ProfileQueryServiceImpl implements ProfileQueryService {
             profileDto.setId(p.getId());
             profileDto.setAvatar(p.getAvatar());
             profileDto.setAvatar(p.getAvatar());
-            profileDto.setUserId(p.getUserId());
+            profileDto.setUser(new UserDto());
 
             return profileDto;
         }).collect(Collectors.toList());
@@ -68,7 +79,6 @@ public class ProfileQueryServiceImpl implements ProfileQueryService {
             profileDto.setId(profile.getId());
             profileDto.setActive(profile.isActive());
             profileDto.setAvatar(profile.getAvatar());
-            profileDto.setUserId(profile.getUserId());
 
             return profileDto;
 
@@ -90,7 +100,12 @@ public class ProfileQueryServiceImpl implements ProfileQueryService {
             profileDto.setId(profile.getId());
             profileDto.setActive(profile.isActive());
             profileDto.setAvatar(profile.getAvatar());
-            profileDto.setUserId(profile.getUserId());
+
+            UserDto userDto = userProxyService.findUserByUsername(username);
+
+            if (userDto != null) {
+                profileDto.setUser(userDto);
+            }
 
             return profileDto;
 
