@@ -1,5 +1,7 @@
 package local.socialnetwork.profileservice.commands;
 
+import local.socialnetwork.profileservice.model.dto.user.UserDto;
+
 import org.axonframework.modelling.command.TargetAggregateIdentifier;
 
 import java.util.UUID;
@@ -10,17 +12,17 @@ public class CreateProfileCommand {
     private UUID id;
     private boolean isActive;
     private String avatar;
-    private UUID userId;
+    private UserDto user;
 
     public CreateProfileCommand() {
 
     }
 
-    public CreateProfileCommand(UUID id, boolean isActive, String avatar, UUID userId) {
+    public CreateProfileCommand(UUID id, boolean isActive, String avatar, UserDto user) {
         this.id = id;
         this.isActive = isActive;
         this.avatar = avatar;
-        this.userId = userId;
+        this.user = user;
     }
 
     public UUID getId() {
@@ -47,11 +49,11 @@ public class CreateProfileCommand {
         this.avatar = avatar;
     }
 
-    public UUID getUserId() {
-        return userId;
+    public UserDto getUser() {
+        return user;
     }
 
-    public void setUserId(UUID userId) {
-        this.userId = userId;
+    public void setUser(UserDto user) {
+        this.user = user;
     }
 }

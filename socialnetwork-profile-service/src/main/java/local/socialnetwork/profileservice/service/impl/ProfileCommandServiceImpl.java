@@ -49,7 +49,7 @@ public class ProfileCommandServiceImpl implements ProfileCommandService {
                 profileDto.getId(),
                 profileDto.isActive(),
                 profileDto.getAvatar(),
-                profileDto.getUserId()
+                profileDto.getUser()
         ));
     }
 

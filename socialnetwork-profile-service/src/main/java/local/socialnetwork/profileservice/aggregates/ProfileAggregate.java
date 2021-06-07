@@ -12,6 +12,8 @@ import local.socialnetwork.profileservice.events.ProfileCreatedEvent;
 import local.socialnetwork.profileservice.events.ProfileUpdatedEvent;
 import local.socialnetwork.profileservice.events.StatusChangedEvent;
 
+import local.socialnetwork.profileservice.model.dto.user.UserDto;
+
 import org.axonframework.commandhandling.CommandHandler;
 
 import org.axonframework.eventsourcing.EventSourcingHandler;
@@ -30,7 +32,7 @@ public class ProfileAggregate {
     private UUID id;
     private boolean isActive;
     private String avatar;
-    private UUID userId;
+    private UserDto user;
     private String username;
     private String oldPassword;
     private String newPassword;
@@ -54,7 +56,7 @@ public class ProfileAggregate {
                 createProfileCommand.getId(),
                 createProfileCommand.isActive(),
                 createProfileCommand.getAvatar(),
-                createProfileCommand.getUserId()));
+                createProfileCommand.getUser()));
 
     }
 
@@ -63,7 +65,7 @@ public class ProfileAggregate {
         this.id = profileCreatedEvent.getId();
         this.isActive = profileCreatedEvent.isActive();
         this.avatar = profileCreatedEvent.getAvatar();
-        this.userId = profileCreatedEvent.getUserId();
+        this.user = profileCreatedEvent.getUser();
     }
 
     @CommandHandler
@@ -166,12 +168,12 @@ public class ProfileAggregate {
         this.avatar = avatar;
     }
 
-    public UUID getUserId() {
-        return userId;
+    public UserDto getUser() {
+        return user;
     }
 
-    public void setUserId(UUID userId) {
-        this.userId = userId;
+    public void setUser(UserDto user) {
+        this.user = user;
     }
 
     public String getUsername() {
