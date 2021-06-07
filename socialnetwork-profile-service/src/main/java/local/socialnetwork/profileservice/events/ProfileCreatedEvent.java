@@ -1,5 +1,7 @@
 package local.socialnetwork.profileservice.events;
 
+import local.socialnetwork.profileservice.model.dto.user.UserDto;
+
 import java.util.UUID;
 
 public class ProfileCreatedEvent {
@@ -7,13 +9,14 @@ public class ProfileCreatedEvent {
     private UUID id;
     private boolean isActive;
     private String avatar;
-    private UUID userId;
+    private UserDto user;
 
-    public ProfileCreatedEvent(UUID id, boolean isActive, String avatar, UUID userId) {
+
+    public ProfileCreatedEvent(UUID id, boolean isActive, String avatar, UserDto user) {
         this.id = id;
         this.isActive = isActive;
         this.avatar = avatar;
-        this.userId = userId;
+        this.user = user;
     }
 
     public UUID getId() {
@@ -40,11 +43,11 @@ public class ProfileCreatedEvent {
         this.avatar = avatar;
     }
 
-    public UUID getUserId() {
-        return userId;
+    public UserDto getUser() {
+        return user;
     }
 
-    public void setUserId(UUID userId) {
-        this.userId = userId;
+    public void setUser(UserDto user) {
+        this.user = user;
     }
 }
