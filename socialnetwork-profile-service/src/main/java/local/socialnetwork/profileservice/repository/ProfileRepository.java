@@ -18,6 +18,7 @@ public interface ProfileRepository extends JpaRepository<Profile, UUID> {
     @Query(value = "from Profile p where p.id = :id")
     Profile findProfileById(@Param("id") UUID id);
 
-    Profile findProfileByUserId(UUID userId);
+    @Query(value = "from Profile p where p.userId = :userId")
+    Profile findProfileByUserId(@Param("userId") UUID userId);
 
 }
