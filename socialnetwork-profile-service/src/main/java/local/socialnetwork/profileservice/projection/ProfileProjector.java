@@ -105,7 +105,7 @@ public class ProfileProjector {
         profile.setId(profileCreatedEvent.getId());
         profile.setActive(profileCreatedEvent.isActive());
         profile.setAvatar(profileCreatedEvent.getAvatar());
-        profile.setUserId(profileCreatedEvent.getUserId());
+        profile.setUserId(profileCreatedEvent.getUser().getId());
 
         profileRepository.save(profile);
 
