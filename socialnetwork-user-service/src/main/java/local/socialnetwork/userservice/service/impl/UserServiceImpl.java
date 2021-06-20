@@ -2,6 +2,8 @@ package local.socialnetwork.userservice.service.impl;
 
 import local.socialnetwork.kafka.model.dto.profile.EditProfileDto;
 
+import local.socialnetwork.userservice.mapping.MappingObject;
+
 import local.socialnetwork.userservice.client.ProfileProxyService;
 
 import local.socialnetwork.userservice.kafka.producer.user.UserProducer;
@@ -9,6 +11,7 @@ import local.socialnetwork.userservice.kafka.producer.user.UserProducer;
 import local.socialnetwork.userservice.model.dto.RegistrationDto;
 
 import local.socialnetwork.userservice.model.dto.profile.ProfileDto;
+
 import local.socialnetwork.userservice.model.entity.user.CustomRole;
 import local.socialnetwork.userservice.model.entity.user.CustomUser;
 import local.socialnetwork.userservice.model.entity.user.CustomUserDetails;
@@ -91,6 +94,13 @@ public class UserServiceImpl implements UserService {
         this.profileProxyService = profileProxyService;
     }
 
+    private MappingObject mappingObject;
+
+    @Autowired
+    public void setMappingObject(MappingObject mappingObject) {
+        this.mappingObject = mappingObject;
+    }
+
     @Override
     public Optional<CustomUser> findById(UUID id) {
         return userRepository.findById(id);
@@ -163,7 +173,7 @@ public class UserServiceImpl implements UserService {
         newProfile.setId(UUID.randomUUID());
         newProfile.setAvatar(encodedPhoto);
         newProfile.setActive(true);
-        newProfile.setUserId(newUser.getId());
+        newProfile.setUser(mappingObject.convertUserToUserDto(newUser));
 
         userRepository.save(newUser);
         roleRepository.save(newRole);

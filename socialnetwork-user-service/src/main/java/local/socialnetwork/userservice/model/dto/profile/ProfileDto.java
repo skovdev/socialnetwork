@@ -35,11 +35,11 @@ public class ProfileDto {
         isActive = active;
     }
 
-    public UUID getUser() {
+    public UserDto getUser() {
         return user;
     }
 
-    public void setUser(UUID user) {
+    public void setUser(UserDto user) {
         this.user = user;
     }
 }

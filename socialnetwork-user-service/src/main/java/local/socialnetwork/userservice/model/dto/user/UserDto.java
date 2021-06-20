@@ -1,6 +1,6 @@
 package local.socialnetwork.userservice.model.dto.user;
 
-import local.socialnetwork.profileservice.model.dto.profile.ProfileDto;
+import local.socialnetwork.userservice.model.dto.profile.ProfileDto;
 
 import java.util.List;
 import java.util.UUID;
