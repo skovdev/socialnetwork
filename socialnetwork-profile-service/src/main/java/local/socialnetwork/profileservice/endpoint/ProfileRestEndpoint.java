@@ -1,7 +1,5 @@
 package local.socialnetwork.profileservice.endpoint;
 
-import local.socialnetwork.profileservice.exception.ProfileServiceException;
-
 import local.socialnetwork.profileservice.model.dto.profile.ChangePasswordDto;
 import local.socialnetwork.profileservice.model.dto.profile.EditProfileDto;
 import local.socialnetwork.profileservice.model.dto.profile.ProfileDto;
