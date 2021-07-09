@@ -7,8 +7,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
-import io.swagger.v3.oas.annotations.tags.Tag;
-
 import local.socialnetwork.userservice.model.dto.RegistrationDto;
 
 import local.socialnetwork.userservice.model.entity.user.CustomUser;
@@ -29,7 +27,6 @@ import java.io.IOException;
 
 import java.util.Optional;
 
-@Tag(name = "")
 @RestController
 @RequestMapping("/registration")
 public class RegistrationRestController {
