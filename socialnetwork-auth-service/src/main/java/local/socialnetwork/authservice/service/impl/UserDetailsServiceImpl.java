@@ -3,11 +3,15 @@ package local.socialnetwork.authservice.service.impl;
 import local.socialnetwork.authservice.client.UserProxyService;
 
 import local.socialnetwork.authservice.model.dto.UserDto;
+
 import local.socialnetwork.authservice.model.springsecurity.UserPrincipal;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.security.core.GrantedAuthority;
+
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
