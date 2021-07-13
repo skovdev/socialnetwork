@@ -1,5 +1,7 @@
 package local.socialnetwork.supportservice.controller
 
+import local.socialnetwork.supportservice.const.ApiConstants
+
 import local.socialnetwork.supportservice.model.support.Subject
 
 import local.socialnetwork.supportservice.service.SupportService
@@ -9,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/api/v1/supports")
+@RequestMapping("/api/" + ApiConstants.API_VERSION +  "/supports")
 class SupportController(
         private val supportService: SupportService
 ) {
