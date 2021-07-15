@@ -35,6 +35,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -165,6 +166,8 @@ public class UserServiceImpl implements UserService {
 
         newRole.setAuthority(defaultUserRole);
         newRole.setUser(newUser);
+
+        newUser.setRoles(List.of(newRole));
 
         ProfileDto newProfile = new ProfileDto();
 
