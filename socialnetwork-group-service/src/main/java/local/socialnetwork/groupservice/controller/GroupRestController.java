@@ -16,8 +16,7 @@ import local.socialnetwork.groupservice.model.entity.group.Group;
 
 import local.socialnetwork.groupservice.service.GroupService;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -39,12 +38,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@Slf4j
 @Tag(name = "GroupRestController")
 @RestController
 @RequestMapping(value = "/groups")
 public class GroupRestController {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(GroupRestController.class);
 
     private GroupService groupService;
 
@@ -78,11 +76,11 @@ public class GroupRestController {
         var group = groupService.findByName(groupDto.getGroupName());
 
         if (group != null) {
-            LOGGER.info("Group {} is exist", groupDto.getGroupName());
+            log.info("Group {} is exist", groupDto.getGroupName());
             return new ResponseEntity<>(groupDto.getGroupName() + " is exist", HttpStatus.CONFLICT);
         } else {
             groupService.createGroup(username, groupDto);
-            LOGGER.info("Group {} has created successfully", groupDto.getGroupName());
+            log.info("Group {} has created successfully", groupDto.getGroupName());
             return new ResponseEntity<>(groupDto.getGroupName() + " has created successfully", HttpStatus.CREATED);
         }
     }
