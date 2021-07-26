@@ -2,11 +2,8 @@ package local.socialnetwork.userservice.util;
 
 import local.socialnetwork.userservice.type.MimeType;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
 
 import org.springframework.stereotype.Component;
 
@@ -14,12 +11,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import java.util.Base64;
-import java.util.Objects;
 import java.util.UUID;
 
 @Component
