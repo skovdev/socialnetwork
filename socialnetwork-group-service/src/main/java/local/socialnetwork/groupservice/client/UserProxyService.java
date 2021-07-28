@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.UUID;
 
-@FeignClient(name = "user-service", url = ApplicationConstants.HOST + "/" + ApplicationConstants.Services.USER_SERVICE_URL)
+@FeignClient(name = "user-service", url = ApplicationConstants.HOST + ":" + ApplicationConstants.PORT + "/" + ApplicationConstants.Services.USER_SERVICE_URL)
 public interface UserProxyService {
 
     @RequestMapping(value = "/users/{id}", method = RequestMethod.GET)
