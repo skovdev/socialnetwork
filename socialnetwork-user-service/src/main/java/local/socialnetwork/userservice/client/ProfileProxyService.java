@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 @FeignClient(
         name = "profile-service",
-        url = ApplicationConstants.HOST + "/" + ApplicationConstants.Services.PROFILE_SERVICE_URL,
+        url = ApplicationConstants.HOST + ":" + ApplicationConstants.PORT + "/" + ApplicationConstants.Services.PROFILE_SERVICE_URL,
         configuration = FromUrlEncodedClientConfiguration.class
 )
 public interface ProfileProxyService {
