@@ -1,6 +1,8 @@
 package local.socialnetwork.userservice.client;
 
-import local.socialnetwork.userservice.configuration.FromUrlEncodedClientConfiguration;
+import feign.Headers;
+
+import local.socialnetwork.userservice.configuration.FormUrlEncodedClientConfiguration;
 
 import local.socialnetwork.userservice.constants.ApplicationConstants;
 
@@ -15,10 +17,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @FeignClient(
         name = "profile-service",
         url = ApplicationConstants.HOST + ":" + ApplicationConstants.PORT + "/" + ApplicationConstants.Services.PROFILE_SERVICE_URL,
-        configuration = FromUrlEncodedClientConfiguration.class
+        configuration = FormUrlEncodedClientConfiguration.class
 )
 public interface ProfileProxyService {
 
+    @Headers("Content-Type: application/x-www-form-urlencoded")
     @RequestMapping(value = "/profiles", method = RequestMethod.POST)
     void save(@RequestBody ProfileDto profile);
 
