@@ -6,11 +6,13 @@ import feign.form.FormEncoder;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
 
 @Configuration
-public class FromUrlEncodedClientConfiguration {
+public class FormUrlEncodedClientConfiguration {
 
     @Bean
+    @Scope("prototype")
     public Encoder encoder() {
         return new FormEncoder();
     }
