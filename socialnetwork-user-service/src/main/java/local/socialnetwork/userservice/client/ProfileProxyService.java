@@ -2,8 +2,6 @@ package local.socialnetwork.userservice.client;
 
 import feign.Headers;
 
-import local.socialnetwork.userservice.configuration.FormUrlEncodedClientConfiguration;
-
 import local.socialnetwork.userservice.constants.ApplicationConstants;
 
 import local.socialnetwork.userservice.model.dto.profile.ProfileDto;
@@ -16,9 +14,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 @FeignClient(
         name = "profile-service",
-        url = ApplicationConstants.HOST + ":" + ApplicationConstants.PORT + "/" + ApplicationConstants.Services.PROFILE_SERVICE_URL,
-        configuration = FormUrlEncodedClientConfiguration.class
-)
+        url = ApplicationConstants.HOST + ":" + ApplicationConstants.PORT + "/" + ApplicationConstants.Services.PROFILE_SERVICE_URL
+       )
 public interface ProfileProxyService {
 
     @Headers("Content-Type: application/x-www-form-urlencoded")
