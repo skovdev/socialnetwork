@@ -13,8 +13,7 @@ import local.socialnetwork.userservice.model.entity.user.CustomUser;
 
 import local.socialnetwork.userservice.service.UserService;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -27,11 +26,10 @@ import java.io.IOException;
 
 import java.util.Optional;
 
+@Slf4j
 @RestController
 @RequestMapping("/registration")
 public class RegistrationRestController {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(RegistrationRestController.class);
 
     private UserService userService;
 
@@ -51,11 +49,11 @@ public class RegistrationRestController {
         Optional<CustomUser> user = userService.findByUsername(registrationDTO.getUsername());
 
         if (user.isPresent() && user.get().getUsername().equalsIgnoreCase(registrationDTO.getUsername())) {
-            LOGGER.info("This is user with such of username already exist in database");
+            log.info("This is user with such of username already exist in database");
             return false;
         } else {
             userService.registration(registrationDTO);
-            LOGGER.info("New user has successfully registered");
+            log.info("New user has successfully registered");
             return true;
         }
     }
