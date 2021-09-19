@@ -5,6 +5,7 @@ public enum MimeType {
     APPLICATION_JSON("application/json", "json"),
     APPLICATION_PDF("application/pdf", "pdf"),
     APPLICATION_XML("application/xml", "xml"),
+    APPLICATION_ZIP("application/zip", "zip"),
     IMAGE_GIF("image/gif", "gif"),
     IMAGE_JPEG("image/jpeg", "jpg"),
     IMAGE_PNG("image/png", "png"),
