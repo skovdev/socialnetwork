@@ -13,9 +13,11 @@ import local.socialnetwork.userservice.model.entity.user.CustomUser;
 
 import local.socialnetwork.userservice.service.UserService;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,14 +31,11 @@ import java.util.Optional;
 @Slf4j
 @RestController
 @RequestMapping("/registration")
+@FieldDefaults(level = AccessLevel.PRIVATE)
+@AllArgsConstructor
 public class RegistrationRestController {
 
-    private UserService userService;
-
-    @Autowired
-    public void setUserService(UserService userService) {
-        this.userService = userService;
-    }
+    UserService userService;
 
     @Operation(summary = "Create a new user")
     @ApiResponses(value = {

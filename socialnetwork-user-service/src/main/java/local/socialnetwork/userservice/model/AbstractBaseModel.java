@@ -1,7 +1,10 @@
 package local.socialnetwork.userservice.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
 
+import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.Id;
@@ -9,23 +12,17 @@ import javax.persistence.MappedSuperclass;
 
 import java.util.UUID;
 
+@Getter
+@Setter
+@FieldDefaults(level = AccessLevel.PRIVATE)
 @MappedSuperclass
 public class AbstractBaseModel {
 
     @Id
     @Type(type = "pg-uuid")
-    private UUID id;
+    UUID id;
 
     public AbstractBaseModel() {
         this.id = UUID.randomUUID();
-    }
-
-    @JsonProperty(value = "id")
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
     }
 }

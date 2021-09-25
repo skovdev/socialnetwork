@@ -6,19 +6,21 @@ import local.socialnetwork.userservice.repository.UserGroupRepository;
 
 import local.socialnetwork.userservice.service.UserGroupService;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
+
+import lombok.experimental.FieldDefaults;
 
 import org.springframework.stereotype.Service;
 
 @Service
+@Getter
+@Setter
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserGroupServiceImpl implements UserGroupService {
 
-    private UserGroupRepository userGroupRepository;
-
-    @Autowired
-    public void setUserGroupRepository(UserGroupRepository userGroupRepository) {
-        this.userGroupRepository = userGroupRepository;
-    }
+    UserGroupRepository userGroupRepository;
 
     @Override
     public void save(UserGroup userGroup) {

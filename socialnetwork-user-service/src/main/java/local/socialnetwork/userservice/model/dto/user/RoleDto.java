@@ -1,34 +1,18 @@
 package local.socialnetwork.userservice.model.dto.user;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
+
+import lombok.experimental.FieldDefaults;
+
 import java.util.UUID;
 
+@Getter
+@Setter
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class RoleDto {
-
-    private UUID id;
-    private String authority;
-    private UserDto user;
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public String getAuthority() {
-        return authority;
-    }
-
-    public void setAuthority(String authority) {
-        this.authority = authority;
-    }
-
-    public UserDto getUser() {
-        return user;
-    }
-
-    public void setUser(UserDto user) {
-        this.user = user;
-    }
+    UUID id;
+    String authority;
+    UserDto user;
 }
