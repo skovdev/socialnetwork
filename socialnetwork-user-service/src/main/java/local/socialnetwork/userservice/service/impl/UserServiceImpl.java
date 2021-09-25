@@ -23,10 +23,13 @@ import local.socialnetwork.userservice.service.UserService;
 
 import local.socialnetwork.userservice.util.ResourceUtil;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
+
+import lombok.experimental.FieldDefaults;
+
 import org.springframework.beans.factory.annotation.Value;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -41,67 +44,27 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@Getter
+@Setter
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserServiceImpl implements UserService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
-
     @Value("${sn.user.default.role}")
-    private String defaultUserRole;
+    String defaultUserRole;
 
     @Value("${sn.kafka.topic.profile.new}")
-    private String topicProfileNew;
+    String topicProfileNew;
 
     @Value("${sn.profile.default.avatar.path}")
-    private String pathDefaultAvatar;
+    String pathDefaultAvatar;
 
-    private UserProducer userProducer;
-
-    @Autowired
-    public void setUserProducer(UserProducer userProducer) {
-        this.userProducer = userProducer;
-    }
-
-    private UserRepository userRepository;
-
-    @Autowired
-    public void setUserRepository(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
-    private RoleRepository roleRepository;
-
-    @Autowired
-    public void setRoleRepository(RoleRepository roleRepository) {
-        this.roleRepository = roleRepository;
-    }
-
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
-        this.passwordEncoder = passwordEncoder;
-    }
-
-    private ResourceUtil resourceUtil;
-
-    @Autowired
-    public void setResourceUtil(ResourceUtil resourceUtil) {
-        this.resourceUtil = resourceUtil;
-    }
-
-    private ProfileProxyService profileProxyService;
-
-    @Autowired
-    public void setProfileProxyService(ProfileProxyService profileProxyService) {
-        this.profileProxyService = profileProxyService;
-    }
-
-    private MappingObject mappingObject;
-
-    @Autowired
-    public void setMappingObject(MappingObject mappingObject) {
-        this.mappingObject = mappingObject;
-    }
+    UserProducer userProducer;
+    UserRepository userRepository;
+    RoleRepository roleRepository;
+    PasswordEncoder passwordEncoder;
+    ResourceUtil resourceUtil;
+    ProfileProxyService profileProxyService;
+    MappingObject mappingObject;
 
     @Override
     public Optional<CustomUser> findById(UUID id) {

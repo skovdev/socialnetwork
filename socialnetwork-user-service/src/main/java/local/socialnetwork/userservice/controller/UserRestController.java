@@ -13,8 +13,10 @@ import local.socialnetwork.userservice.model.entity.user.CustomUser;
 
 import local.socialnetwork.userservice.service.UserService;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 
+import lombok.experimental.FieldDefaults;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -30,14 +32,11 @@ import java.util.UUID;
 @Tag(name = "UserRestController")
 @RestController
 @RequestMapping("/users")
+@FieldDefaults(level = AccessLevel.PRIVATE)
+@AllArgsConstructor
 public class UserRestController {
 
-    private UserService userService;
-
-    @Autowired
-    public void setUserService(UserService userService) {
-        this.userService = userService;
-    }
+    UserService userService;
 
     @Operation(summary = "Get the user by id")
     @ApiResponse(description = "Found the user by id", content = { @Content(mediaType = "application/json") }, responseCode = "200")
