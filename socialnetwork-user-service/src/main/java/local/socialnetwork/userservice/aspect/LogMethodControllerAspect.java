@@ -13,6 +13,7 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
+import java.time.LocalDateTime;
 
 @Slf4j
 @Aspect
@@ -26,8 +27,11 @@ public class LogMethodControllerAspect {
 
         Method method = methodSignature.getMethod();
 
-        if (method.isAnnotationPresent(LogMethodController.class)) {
+        String methodName = joinPoint.getSignature().getName();
+        LocalDateTime logDateTime = LocalDateTime.now();
 
+        if (method.isAnnotationPresent(LogMethodController.class)) {
+            log.info(String.format("Start logging method of controller: %s - Date and time: %s", methodName, logDateTime));
         }
 
         return joinPoint.proceed();
