@@ -7,6 +7,8 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
+import local.socialnetwork.userservice.aspect.annotation.LogMethodController;
+
 import local.socialnetwork.userservice.model.dto.RegistrationDto;
 
 import local.socialnetwork.userservice.model.entity.user.CustomUser;
@@ -37,6 +39,7 @@ public class RegistrationRestController {
 
     UserService userService;
 
+    @LogMethodController
     @Operation(summary = "Create a new user")
     @ApiResponses(value = {
             @ApiResponse(description = "User has created successfully", content = { @Content(mediaType = "application/json") }),

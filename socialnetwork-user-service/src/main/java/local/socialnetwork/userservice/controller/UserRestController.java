@@ -9,6 +9,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import local.socialnetwork.userservice.aspect.annotation.LogMethodController;
+
 import local.socialnetwork.userservice.model.entity.user.CustomUser;
 
 import local.socialnetwork.userservice.service.UserService;
@@ -38,6 +40,7 @@ public class UserRestController {
 
     UserService userService;
 
+    @LogMethodController
     @Operation(summary = "Get the user by id")
     @ApiResponse(description = "Found the user by id", content = { @Content(mediaType = "application/json") }, responseCode = "200")
     @GetMapping("/{id}")
@@ -46,6 +49,7 @@ public class UserRestController {
         return ResponseEntity.ok().body(user);
     }
 
+    @LogMethodController
     @Operation(summary = "Get the user by username")
     @ApiResponse(description = "Found the user by username", content = { @Content(mediaType = "application/json") }, responseCode = "200")
     @GetMapping
@@ -54,6 +58,7 @@ public class UserRestController {
         return ResponseEntity.ok().body(user);
     }
 
+    @LogMethodController
     @Operation(summary = "Change user password by username")
     @ApiResponse(description = "Change user password by username", content = { @Content(mediaType = "application/json") }, responseCode = "200")
     @PostMapping("/password")
