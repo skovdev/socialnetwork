@@ -7,8 +7,7 @@ import local.socialnetwork.profileservice.model.dto.profile.ProfileDto;
 import local.socialnetwork.profileservice.service.ProfileCommandService;
 import local.socialnetwork.profileservice.service.ProfileQueryService;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import local.socialnetwork.profileservice.util.ResourceUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -27,16 +26,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 import java.util.UUID;
+
 import java.util.concurrent.ExecutionException;
 
 @RestController
 @RequestMapping("/profiles")
 public class ProfileRestEndpoint {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProfileRestEndpoint.class);
 
     private ProfileCommandService profileCommandService;
 
@@ -50,6 +49,13 @@ public class ProfileRestEndpoint {
     @Autowired
     public void setProfileQueryService(ProfileQueryService profileQueryService) {
         this.profileQueryService = profileQueryService;
+    }
+
+    private ResourceUtil resourceUtil;
+
+    @Autowired
+    public void setResourceUtil(ResourceUtil resourceUtil) {
+        this.resourceUtil = resourceUtil;
     }
 
     @GetMapping
@@ -78,9 +84,11 @@ public class ProfileRestEndpoint {
     }
 
     @PostMapping
-    public ResponseEntity<String> save(@RequestBody ProfileDto profileDto) {
+    public ResponseEntity<String> save(@RequestBody String encodedProfile) throws IOException, ClassNotFoundException {
 
-        if (profileDto != null) {
+        if (encodedProfile != null) {
+
+            ProfileDto profileDto = (ProfileDto) resourceUtil.convertFromString(encodedProfile);
             profileCommandService.createProfile(profileDto);
             return new ResponseEntity<>("Profile has saved successfully", HttpStatus.OK);
         } else {
