@@ -6,8 +6,6 @@ import local.socialnetwork.userservice.mapping.MappingObject;
 
 import local.socialnetwork.userservice.client.ProfileProxyService;
 
-import local.socialnetwork.userservice.kafka.producer.user.UserProducer;
-
 import local.socialnetwork.userservice.model.dto.RegistrationDto;
 
 import local.socialnetwork.userservice.model.dto.profile.ProfileDto;
@@ -23,10 +21,8 @@ import local.socialnetwork.userservice.service.UserService;
 
 import local.socialnetwork.userservice.util.ResourceUtil;
 
-
 import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
 
 import lombok.experimental.FieldDefaults;
 
@@ -38,12 +34,15 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 
-import java.util.*;
+import java.util.List;
+import java.util.UUID;
+import java.util.ArrayList;
+import java.util.Optional;
+
 
 @Service
-@Getter
-@Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@AllArgsConstructor
 public class UserServiceImpl implements UserService {
 
     @Value("${sn.user.default.role}")
@@ -55,7 +54,6 @@ public class UserServiceImpl implements UserService {
     @Value("${sn.profile.default.avatar.path}")
     String pathDefaultAvatar;
 
-    UserProducer userProducer;
     UserRepository userRepository;
     RoleRepository roleRepository;
     PasswordEncoder passwordEncoder;
