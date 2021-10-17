@@ -4,8 +4,6 @@ import feign.Headers;
 
 import local.socialnetwork.userservice.constants.ApplicationConstants;
 
-import local.socialnetwork.userservice.model.dto.profile.ProfileDto;
-
 import org.springframework.cloud.openfeign.FeignClient;
 
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,8 +16,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
        )
 public interface ProfileProxyService {
 
-    @Headers("Content-Type: application/x-www-form-urlencoded")
     @RequestMapping(value = "/profiles", method = RequestMethod.POST)
-    void save(@RequestBody ProfileDto profile);
+    void save(@RequestBody String encodedProfile);
 
 }
