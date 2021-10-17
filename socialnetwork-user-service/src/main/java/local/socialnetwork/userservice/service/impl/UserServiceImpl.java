@@ -38,10 +38,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @Getter
@@ -149,7 +146,7 @@ public class UserServiceImpl implements UserService {
         userRepository.save(newUser);
         roleRepository.save(newRole);
 
-        profileProxyService.save(newProfile);
+        profileProxyService.save(resourceUtil.convertToString(newProfile));
 
     }
 

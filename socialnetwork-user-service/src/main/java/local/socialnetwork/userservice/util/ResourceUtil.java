@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
+import java.io.*;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -48,5 +48,21 @@ public class ResourceUtil {
 
     public String generateRandomFilename() {
         return UUID.randomUUID().toString().replaceAll("-", "");
+    }
+
+    public Object convertFromString(String value) throws IOException, ClassNotFoundException {
+        byte[] data = Base64.getDecoder().decode(value);
+        ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(data));
+        Object o = ois.readObject();
+        ois.close();
+        return o;
+    }
+
+    public String convertToString(Serializable object) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(baos);
+        oos.writeObject(object);
+        oos.close();
+        return Base64.getEncoder().encodeToString(baos.toByteArray());
     }
 }
