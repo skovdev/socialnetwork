@@ -2,6 +2,9 @@ package local.socialnetwork.userservice.service.impl;
 
 import local.socialnetwork.kafka.model.dto.profile.EditProfileDto;
 
+import local.socialnetwork.userservice.aspect.annotation.IdentifyNewUser;
+import local.socialnetwork.userservice.aspect.annotation.IdentifyNewUser;
+
 import local.socialnetwork.userservice.mapping.MappingObject;
 
 import local.socialnetwork.userservice.client.ProfileProxyService;
@@ -98,7 +101,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void registration(RegistrationDto registration) throws IOException {
+    public void registration(@IdentifyNewUser RegistrationDto registration) throws IOException {
 
         CustomUser newUser = new CustomUser();
 
