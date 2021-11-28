@@ -26,6 +26,7 @@ import lombok.AllArgsConstructor;
 
 import lombok.experimental.FieldDefaults;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -39,10 +40,8 @@ import java.util.UUID;
 import java.util.ArrayList;
 import java.util.Optional;
 
-
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@AllArgsConstructor
 public class UserServiceImpl implements UserService {
 
     @Value("${sn.user.default.role}")
@@ -55,11 +54,46 @@ public class UserServiceImpl implements UserService {
     String pathDefaultAvatar;
 
     UserRepository userRepository;
+
+    @Autowired
+    public void setUserRepository(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
     RoleRepository roleRepository;
+
+    @Autowired
+    public void setRoleRepository(RoleRepository roleRepository) {
+        this.roleRepository = roleRepository;
+    }
+
     PasswordEncoder passwordEncoder;
+
+    @Autowired
+    public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
+    }
+
     ResourceUtil resourceUtil;
+
+    @Autowired
+    public void setResourceUtil(ResourceUtil resourceUtil) {
+        this.resourceUtil = resourceUtil;
+    }
+
     ProfileProxyService profileProxyService;
+
+    @Autowired
+    public void setProfileProxyService(ProfileProxyService profileProxyService) {
+        this.profileProxyService = profileProxyService;
+    }
+
     MappingObject mappingObject;
+
+    @Autowired
+    public void setMappingObject(MappingObject mappingObject) {
+        this.mappingObject = mappingObject;
+    }
 
     @Override
     public Optional<CustomUser> findById(UUID id) {
