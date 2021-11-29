@@ -47,9 +47,6 @@ public class UserServiceImpl implements UserService {
     @Value("${sn.user.default.role}")
     String defaultUserRole;
 
-    @Value("${sn.kafka.topic.profile.new}")
-    String topicProfileNew;
-
     @Value("${sn.profile.default.avatar.path}")
     String pathDefaultAvatar;
 
