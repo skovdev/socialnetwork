@@ -2,6 +2,10 @@ package local.socialnetwork.userservice.aspect;
 
 import local.socialnetwork.userservice.aspect.annotation.IdentifyNewUser;
 
+import lombok.AccessLevel;
+
+import lombok.experimental.FieldDefaults;
+
 import lombok.extern.slf4j.Slf4j;
 
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -19,6 +23,7 @@ import java.lang.reflect.Parameter;
 @Slf4j
 @Aspect
 @Component
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class IdentifyNewUserAspect {
 
     @Around("@annotation(local.socialnetwork.userservice.aspect.annotation.IdentifyNewUser)")
