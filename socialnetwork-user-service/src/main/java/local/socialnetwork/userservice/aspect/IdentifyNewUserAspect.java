@@ -2,6 +2,9 @@ package local.socialnetwork.userservice.aspect;
 
 import local.socialnetwork.userservice.aspect.annotation.IdentifyNewUser;
 
+import local.socialnetwork.userservice.model.dto.RegistrationDto;
+
+import local.socialnetwork.userservice.service.UserService;
 import lombok.AccessLevel;
 
 import lombok.experimental.FieldDefaults;
@@ -15,10 +18,8 @@ import org.aspectj.lang.annotation.Aspect;
 
 import org.aspectj.lang.reflect.MethodSignature;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
 
 @Slf4j
 @Aspect
@@ -26,20 +27,26 @@ import java.lang.reflect.Parameter;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class IdentifyNewUserAspect {
 
+    UserService userService;
+
+    @Autowired
+    public void setUserService(UserService userService) {
+        this.userService = userService;
+    }
+
     @Around("@annotation(local.socialnetwork.userservice.aspect.annotation.IdentifyNewUser)")
     public Object identify(ProceedingJoinPoint joinPoint) throws Throwable {
 
         MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
 
-        Method method = methodSignature.getMethod();
+        RegistrationDto registrationDto = (RegistrationDto) joinPoint.getArgs()[0];
 
-        Parameter[] parameters = method.getParameters();
+        if (methodSignature.getMethod().isAnnotationPresent(IdentifyNewUser.class)) {
+            log.info(String.format("Starting identify user - Time: {}", System.currentTimeMillis()));
 
-        Parameter parameter = parameters[0];
-
-        if (parameter.isAnnotationPresent(IdentifyNewUser.class)) {
-            log.info(String.format("Starting identify user: {} - Time: {}", System.currentTimeMillis()));
-
+            if (registrationDto != null && registrationDto.getUsername() != null) {
+                //TODO
+            }
         }
 
         return joinPoint.proceed();
