@@ -9,8 +9,6 @@ import AdminDashboard from "./components/admin/dashboard/AdminDashboard";
 import Support from "./components/support/Support";
 import Profile from "./components/profile/Profile";
 import EditProfile from "./components/profile/edit/EditProfile";
-import Group from "./components/profile/group/Group";
-import GroupList from "./components/profile/group/list/GroupList";
 
 import "./App.css";
 
@@ -26,8 +24,6 @@ const App = () => {
                     <AuthenticationRoute path="/profile/support" component={Support} />
                     <AuthenticationRoute path="/profile/:username" exact component={Profile} />
                     <AuthenticationRoute path="/profile/:username/edit" component={EditProfile} />
-                    <AuthenticationRoute path="/profile/:username/groups" component={GroupList} />
-                    <AuthenticationRoute path="/group/:id" component={Group} />
                 </Switch>
             </div>
         </Router>

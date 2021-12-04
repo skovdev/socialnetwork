@@ -7,7 +7,6 @@
 /socialnetwork-auth-service/
 /socialnetwork-user-service/
 /socialnetwork-profile-service/
-/socialnetwork-group-service/
 /socialnetwork-integration-testing/
 /socialnetwork-unit-testing/
 /socialnetwork-service-discovery/target
@@ -16,6 +15,5 @@
 /socialnetwork-auth-service/target
 /socialnetwork-profile-service/target
 /socialnetwork-user-service/target
-/socialnetwork-group-service/target
 /socialnetwork-integration-testing/target
 /socialnetwork-unit-testing/target
