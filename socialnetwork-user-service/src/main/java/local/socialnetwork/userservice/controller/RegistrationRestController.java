@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
+import local.socialnetwork.userservice.aspect.annotation.IdentifyNewUser;
 import local.socialnetwork.userservice.aspect.annotation.LogMethodController;
 
 import local.socialnetwork.userservice.model.dto.RegistrationDto;
@@ -46,7 +47,7 @@ public class RegistrationRestController {
             @ApiResponse(description = "User has not created")
     })
     @PostMapping
-    public boolean registration(@RequestBody RegistrationDto registrationDTO) throws IOException {
+    public boolean registration(@RequestBody @IdentifyNewUser RegistrationDto registrationDTO) throws IOException {
 
         Optional<CustomUser> user = userService.findByUsername(registrationDTO.getUsername());
 
