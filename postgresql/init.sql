@@ -9,7 +9,3 @@ GRANT ALL PRIVILEGES ON DATABASE sn_profile_service_db to sn_profile_service_use
 CREATE USER sn_group_service_user WITH PASSWORD 'sn_group_service_password';
 CREATE DATABASE sn_group_service_db;
 GRANT ALL PRIVILEGES ON DATABASE sn_group_service_db to sn_group_service_user;
-
-CREATE USER sn_support_service_user WITH PASSWORD 'sn_support_service_password';
-CREATE DATABASE sn_support_service_db;
-GRANT ALL PRIVILEGES ON DATABASE sn_support_service_db to sn_support_service_user;

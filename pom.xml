@@ -18,7 +18,6 @@
         <module>socialnetwork-api-gateway</module>
         <module>socialnetwork-service-discovery</module>
         <module>socialnetwork-user-service</module>
-        <module>socialnetwork-support-service</module>
         <module>socialnetwork-unit-testing</module>
         <module>socialnetwork-integration-testing</module>
     </modules>
