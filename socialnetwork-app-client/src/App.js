@@ -6,7 +6,6 @@ import AuthenticationRoute from "./components/route/auth/AuthenticationRoute";
 
 import Main from "./components/main/Main";
 import AdminDashboard from "./components/admin/dashboard/AdminDashboard";
-import Support from "./components/support/Support";
 import Profile from "./components/profile/Profile";
 import EditProfile from "./components/profile/edit/EditProfile";
 
@@ -21,7 +20,6 @@ const App = () => {
                 <Switch>
                     <Route exact path="/" component={Main} />
                     <AuthenticationRoute path="/admin/dashboard" component={AdminDashboard} />
-                    <AuthenticationRoute path="/profile/support" component={Support} />
                     <AuthenticationRoute path="/profile/:username" exact component={Profile} />
                     <AuthenticationRoute path="/profile/:username/edit" component={EditProfile} />
                 </Switch>
