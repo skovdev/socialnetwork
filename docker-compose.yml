@@ -140,17 +140,17 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      device: axon/data
+      device: data
       o: bind
   axonserver-events:
     driver: local
     driver_opts:
       type: none
-      device: axon/events
+      device: events
       o: bind
   axonserver-config:
     driver: local
     driver_opts:
       type: none
-      device: axon/config
+      device: config
       o: bind
