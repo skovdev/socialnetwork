@@ -1,4 +1,4 @@
-package local.socialnetwork.kafka.model.dto.profile;
+package local.socialnetwork.kafka.common.model.dto.profile;
 
 import java.util.UUID;
 
