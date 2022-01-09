@@ -13,7 +13,7 @@ import local.socialnetwork.profileservice.events.StatusChangedEvent;
 
 import local.socialnetwork.profileservice.exception.ProfileServiceException;
 
-import local.socialnetwork.profileservice.kafka.producer.user.UserProducer;
+import local.socialnetwork.profileservice.service.kafka.producer.user.UserProducerService;
 
 import local.socialnetwork.profileservice.model.dto.profile.EditProfileDto;
 
@@ -76,11 +76,11 @@ public class ProfileProjector {
         this.userProxyService = userProxyService;
     }
 
-    public UserProducer userProducer;
+    public UserProducerService userProducerService;
 
     @Autowired
-    public void setUserProducer(UserProducer userProducer) {
-        this.userProducer = userProducer;
+    public void setUserProducer(UserProducerService userProducerService) {
+        this.userProducerService = userProducerService;
     }
 
     private ResourceUtil resourceUtil;
@@ -130,7 +130,7 @@ public class ProfileProjector {
             editProfileDto.setFamilyStatus(profileUpdatedEvent.getFamilyStatus());
             editProfileDto.setUserId(user.getId());
 
-            userProducer.send(topicUserUpdate, editProfileDto);
+            userProducerService.send(topicUserUpdate, editProfileDto);
 
         } else {
             throw new ProfileServiceException("Profile has not updated");
