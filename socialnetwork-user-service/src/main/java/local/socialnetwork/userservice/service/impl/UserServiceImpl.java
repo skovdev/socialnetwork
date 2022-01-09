@@ -1,6 +1,6 @@
 package local.socialnetwork.userservice.service.impl;
 
-import local.socialnetwork.kafka.model.dto.profile.EditProfileDto;
+import local.socialnetwork.kafka.common.model.dto.profile.EditProfileDto;
 
 import local.socialnetwork.userservice.mapping.MappingObject;
 
