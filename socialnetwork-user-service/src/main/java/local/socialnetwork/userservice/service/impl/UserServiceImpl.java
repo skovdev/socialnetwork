@@ -4,8 +4,6 @@ import local.socialnetwork.kafka.common.model.dto.profile.EditProfileDto;
 
 import local.socialnetwork.userservice.mapping.MappingObject;
 
-import local.socialnetwork.userservice.client.ProfileProxyService;
-
 import local.socialnetwork.userservice.model.dto.RegistrationDto;
 
 import local.socialnetwork.userservice.model.dto.profile.ProfileDto;
@@ -19,10 +17,11 @@ import local.socialnetwork.userservice.repository.UserRepository;
 
 import local.socialnetwork.userservice.service.UserService;
 
+import local.socialnetwork.userservice.service.kafka.producer.profile.ProfileProducerService;
+
 import local.socialnetwork.userservice.util.ResourceUtil;
 
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 
 import lombok.experimental.FieldDefaults;
 
@@ -44,6 +43,9 @@ import java.util.Optional;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserServiceImpl implements UserService {
 
+    @Value("${sn.kafka.producer.topic.profile.new")
+    String topicProfileNew;
+
     @Value("${sn.user.default.role}")
     String defaultUserRole;
 
@@ -64,6 +66,13 @@ public class UserServiceImpl implements UserService {
         this.roleRepository = roleRepository;
     }
 
+    ProfileProducerService profileProducerService;
+
+    @Autowired
+    public void setUserProducerService(ProfileProducerService profileProducerService) {
+        this.profileProducerService = profileProducerService;
+    }
+
     PasswordEncoder passwordEncoder;
 
     @Autowired
@@ -76,13 +85,6 @@ public class UserServiceImpl implements UserService {
     @Autowired
     public void setResourceUtil(ResourceUtil resourceUtil) {
         this.resourceUtil = resourceUtil;
-    }
-
-    ProfileProxyService profileProxyService;
-
-    @Autowired
-    public void setProfileProxyService(ProfileProxyService profileProxyService) {
-        this.profileProxyService = profileProxyService;
     }
 
     MappingObject mappingObject;
@@ -175,7 +177,7 @@ public class UserServiceImpl implements UserService {
         userRepository.save(newUser);
         roleRepository.save(newRole);
 
-        profileProxyService.save(resourceUtil.convertToString(newProfile));
+        profileProducerService.sendProfileAndSave(topicProfileNew, newProfile);
 
     }
 

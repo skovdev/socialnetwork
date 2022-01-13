@@ -1,4 +1,4 @@
-package local.socialnetwork.userservice.service.kafka.producer.user;
+package local.socialnetwork.userservice.service.kafka.producer.profile;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -15,12 +15,12 @@ import org.springframework.stereotype.Service;
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
-public class UserProducerService {
+public class ProfileProducerService {
 
     private KafkaTemplate<String, Object> kafkaTemplate;
 
-    public void send(String topic, Object value) {
-        log.info(String.format("### -> Producing topic %s and object -> %s", topic, value));
+    public void sendProfileAndSave(String topic, Object value) {
+        log.info(String.format("### -> Producing topic %s and object -> %s for saving of profile", topic, value));
         this.kafkaTemplate.send(topic, value);
     }
 }
