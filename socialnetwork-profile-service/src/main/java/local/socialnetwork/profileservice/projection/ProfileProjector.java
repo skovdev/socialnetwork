@@ -130,7 +130,7 @@ public class ProfileProjector {
             editProfileDto.setFamilyStatus(profileUpdatedEvent.getFamilyStatus());
             editProfileDto.setUserId(user.getId());
 
-            userProducerService.send(topicUserUpdate, editProfileDto);
+            userProducerService.sendUserForUpdate(topicUserUpdate, editProfileDto);
 
         } else {
             throw new ProfileServiceException("Profile has not updated");
