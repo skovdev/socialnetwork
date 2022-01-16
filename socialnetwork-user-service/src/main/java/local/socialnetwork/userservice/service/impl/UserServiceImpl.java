@@ -43,7 +43,7 @@ import java.util.Optional;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserServiceImpl implements UserService {
 
-    @Value("${sn.kafka.producer.topic.profile.new")
+    @Value("${sn.kafka.producer.topic.profile.new}")
     String topicProfileNew;
 
     @Value("${sn.user.default.role}")
