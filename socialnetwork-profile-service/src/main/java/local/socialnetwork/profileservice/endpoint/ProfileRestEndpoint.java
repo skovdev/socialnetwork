@@ -9,7 +9,10 @@ import local.socialnetwork.profileservice.service.ProfileQueryService;
 
 import local.socialnetwork.profileservice.util.ResourceUtil;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+
+import lombok.experimental.FieldDefaults;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,28 +38,13 @@ import java.util.concurrent.ExecutionException;
 
 @RestController
 @RequestMapping("/profiles")
+@FieldDefaults(level = AccessLevel.PRIVATE)
+@AllArgsConstructor
 public class ProfileRestEndpoint {
 
-    private ProfileCommandService profileCommandService;
-
-    @Autowired
-    public void setProfileCommandService(ProfileCommandService profileCommandService) {
-        this.profileCommandService = profileCommandService;
-    }
-
-    private ProfileQueryService profileQueryService;
-
-    @Autowired
-    public void setProfileQueryService(ProfileQueryService profileQueryService) {
-        this.profileQueryService = profileQueryService;
-    }
-
-    private ResourceUtil resourceUtil;
-
-    @Autowired
-    public void setResourceUtil(ResourceUtil resourceUtil) {
-        this.resourceUtil = resourceUtil;
-    }
+    ProfileCommandService profileCommandService;
+    ProfileQueryService profileQueryService;
+    ResourceUtil resourceUtil;
 
     @GetMapping
     public List<ProfileDto> findAll() throws ExecutionException, InterruptedException {
