@@ -1,6 +1,6 @@
 package local.socialnetwork.profileservice.client.user;
 
-import local.socialnetwork.profileservice.constants.ApplicationConstants;
+import local.socialnetwork.profileservice.constants.AppConstants;
 
 import local.socialnetwork.profileservice.model.dto.user.UserDto;
 
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.UUID;
 
-@FeignClient(name = "user-service", url = ApplicationConstants.HOST + ":" + ApplicationConstants.PORT + "/" + ApplicationConstants.Services.USER_SERVICE_URL)
+@FeignClient(name = "user-service", url = AppConstants.HOST + ":" + AppConstants.PORT + "/" + AppConstants.Services.USER_SERVICE_URL)
 public interface UserProxyService {
 
     @RequestMapping(value = "/users/{userId}", method = RequestMethod.GET)

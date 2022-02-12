@@ -1,11 +1,12 @@
-package local.socialnetwork.profileservice.endpoint;
+package local.socialnetwork.profileservice.controller;
+
+import local.socialnetwork.profileservice.exception.ProfileServiceException;
 
 import local.socialnetwork.profileservice.model.dto.profile.ChangePasswordDto;
 import local.socialnetwork.profileservice.model.dto.profile.EditProfileDto;
 import local.socialnetwork.profileservice.model.dto.profile.ProfileDto;
 
-import local.socialnetwork.profileservice.service.ProfileCommandService;
-import local.socialnetwork.profileservice.service.ProfileQueryService;
+import local.socialnetwork.profileservice.service.ProfileService;
 
 import local.socialnetwork.profileservice.util.ResourceUtil;
 
@@ -30,45 +31,42 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+
 import java.util.List;
-
 import java.util.UUID;
-
-import java.util.concurrent.ExecutionException;
 
 @RestController
 @RequestMapping("/profiles")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
-public class ProfileRestEndpoint {
+public class ProfileRestController {
 
-    ProfileCommandService profileCommandService;
-    ProfileQueryService profileQueryService;
+    ProfileService profileService;
     ResourceUtil resourceUtil;
 
     @GetMapping
-    public List<ProfileDto> findAll() throws ExecutionException, InterruptedException {
-        return profileQueryService.findAll();
+    public List<ProfileDto> findAll() {
+        return profileService.findAll();
     }
 
     @GetMapping("/user")
-    public ProfileDto findByUserId(@RequestParam("userId") UUID id) throws ExecutionException, InterruptedException {
-        return profileQueryService.findByUserId(id);
+    public ProfileDto findByUserId(@RequestParam("userId") UUID id) {
+        return profileService.findByUserId(id);
     }
 
     @GetMapping("/user/{username}")
-    public ProfileDto findByUsername(@PathVariable("username") String username) throws ExecutionException, InterruptedException {
-        return profileQueryService.findByUsername(username);
+    public ProfileDto findByUsername(@PathVariable("username") String username) {
+        return profileService.findByUsername(username);
     }
 
     @GetMapping("/user/{username}/edit")
-    public EditProfileDto findEditProfileByUsername(@PathVariable("username") String username) throws ExecutionException, InterruptedException {
-        return profileQueryService.findEditProfileByUsername(username);
+    public EditProfileDto findEditProfileByUsername(@PathVariable("username") String username) {
+        return profileService.findEditProfileByUsername(username);
     }
 
     @GetMapping("/avatar")
-    public String findAvatarByUsername(@RequestParam("username") String username) throws ExecutionException, InterruptedException {
-        return profileQueryService.findAvatarByUsername(username);
+    public String findAvatarByUsername(@RequestParam("username") String username) {
+        return profileService.findAvatarByUsername(username);
     }
 
     @PostMapping
@@ -77,7 +75,7 @@ public class ProfileRestEndpoint {
         if (encodedProfile != null) {
 
             ProfileDto profileDto = (ProfileDto) resourceUtil.convertFromString(encodedProfile);
-            profileCommandService.createProfile(profileDto);
+            profileService.createProfile(profileDto);
             return new ResponseEntity<>("Profile has saved successfully", HttpStatus.OK);
         } else {
             return ResponseEntity.notFound().build();
@@ -85,26 +83,26 @@ public class ProfileRestEndpoint {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<String> update(@PathVariable("id") UUID id, @RequestBody EditProfileDto editProfileDto) {
-        profileCommandService.updateProfile(id, editProfileDto);
+    public ResponseEntity<String> update(@PathVariable("id") UUID id, @RequestBody EditProfileDto editProfileDto) throws ProfileServiceException {
+        profileService.updateProfile(id, editProfileDto);
         return new ResponseEntity<>("Profile with ID: " + id + " has updated successfully", HttpStatus.OK);
     }
 
     @PutMapping("/avatar")
-    public ResponseEntity<String> updateAvatar(@RequestParam("username") String username,  @RequestParam("profileAvatar") MultipartFile multipartFile) {
-        profileCommandService.updateAvatarProfile(username, multipartFile);
+    public ResponseEntity<String> updateAvatar(@RequestParam("username") String username,  @RequestParam("profileAvatar") MultipartFile multipartFile) throws ProfileServiceException, IOException {
+        profileService.updateAvatarProfile(username, multipartFile);
         return new ResponseEntity<>("Avatar has updated successfully", HttpStatus.OK);
     }
 
     @DeleteMapping("/avatar")
-    public ResponseEntity<String> deleteAvatar(@RequestParam("username") String username) {
-        return new ResponseEntity<>(profileCommandService.setDefaultAvatar(username), HttpStatus.OK);
+    public ResponseEntity<String> deleteAvatar(@RequestParam("username") String username) throws ProfileServiceException, IOException {
+        return new ResponseEntity<>(profileService.setDefaultAvatar(username), HttpStatus.OK);
     }
 
     @PutMapping
     public ResponseEntity<String> changeStatus(@RequestParam("username") String username, boolean isActive) {
 
-        if (profileCommandService.changeStatus(username, isActive)) {
+        if (profileService.changeStatus(username, isActive)) {
             return new ResponseEntity<>("Status has changed successfully", HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -114,8 +112,8 @@ public class ProfileRestEndpoint {
     @PutMapping("/password/change")
     public ResponseEntity<String> changePassword(@RequestBody ChangePasswordDto changePasswordDto) {
 
-        if (profileCommandService.checkIfValidOldPassword(changePasswordDto)) {
-            profileCommandService.changePassword(changePasswordDto.getUsername(), changePasswordDto.getNewPassword());
+        if (profileService.checkIfValidOldPassword(changePasswordDto)) {
+            profileService.changePassword(changePasswordDto.getUsername(), changePasswordDto.getNewPassword());
             return new ResponseEntity<>("Password has changed successfully", HttpStatus.OK);
         } else {
             return new ResponseEntity<>("Old password is not matched", HttpStatus.NOT_FOUND);

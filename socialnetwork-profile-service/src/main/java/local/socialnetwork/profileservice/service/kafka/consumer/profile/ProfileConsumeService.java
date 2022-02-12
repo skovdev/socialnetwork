@@ -1,7 +1,8 @@
 package local.socialnetwork.profileservice.service.kafka.consumer.profile;
 
 import local.socialnetwork.profileservice.model.dto.profile.ProfileDto;
-import local.socialnetwork.profileservice.service.ProfileCommandService;
+
+import local.socialnetwork.profileservice.service.ProfileService;
 
 import lombok.AccessLevel;
 
@@ -24,12 +25,12 @@ public class ProfileConsumeService {
     static final String PROFILE_GROUP_ID = "default-group-id";
     static final String TOPIC_PROFILE_NEW = "topic.profile.new";
 
-    ProfileCommandService profileCommandService;
+    ProfileService profileService;
 
     @KafkaListener(topics = TOPIC_PROFILE_NEW, groupId = PROFILE_GROUP_ID)
     public void consumeProfileForSaving(Object object) {
         log.info(String.format("### -> Received new profile for saving: %s", object));
         ProfileDto profileDto = (ProfileDto) object;
-        profileCommandService.createProfile(profileDto);
+        profileService.createProfile(profileDto);
     }
 }
