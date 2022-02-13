@@ -26,7 +26,7 @@
         <spring.kafka.version>2.6.3</spring.kafka.version>
         <swagger.annotations.version>2.1.6</swagger.annotations.version>
         <springdoc.openapi.ui.version>1.5.2</springdoc.openapi.ui.version>
-        <axon.framework.version>4.5</axon.framework.version>
+        <google.guava.version>30.1.1-jre</google.guava.version>
         <google.guava.version>30.1.1-jre</google.guava.version>
         <projectlombok.version>RELEASE</projectlombok.version>
         <maven.compiler.source>14</maven.compiler.source>
@@ -69,11 +69,6 @@
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-ui</artifactId>
             <version>${springdoc.openapi.ui.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.axonframework</groupId>
-            <artifactId>axon-spring-boot-starter</artifactId>
-            <version>${axon.framework.version}</version>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
