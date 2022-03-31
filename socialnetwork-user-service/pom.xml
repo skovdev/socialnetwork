@@ -20,7 +20,7 @@
     <properties>
         <java.version>14</java.version>
         <spring.boot.version>2.3.3.RELEASE</spring.boot.version>
-        <spring.boot.web.version>2.3.3.RELEASE</spring.boot.web.version>
+        <spring.boot.web.version>2.5.12</spring.boot.web.version>
         <spring.boot.data.jpa.version>2.3.3.RELEASE</spring.boot.data.jpa.version>
         <spring.cloud.config.starter.version>2.2.5.RELEASE</spring.cloud.config.starter.version>
         <spring.kafka.version>2.6.3</spring.kafka.version>
