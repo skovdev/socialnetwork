@@ -24,7 +24,7 @@
         <spring.boot.data.jpa.version>2.3.3.RELEASE</spring.boot.data.jpa.version>
         <spring.cloud.config.starter.version>2.2.5.RELEASE</spring.cloud.config.starter.version>
         <spring.kafka.version>2.6.3</spring.kafka.version>
-        <jackson.version>2.11.3</jackson.version>
+        <jackson.version>2.12.6.1</jackson.version>
         <swagger.annotations.version>2.1.6</swagger.annotations.version>
         <springdoc.openapi.ui.version>1.5.2</springdoc.openapi.ui.version>
         <projectlombok.version>RELEASE</projectlombok.version>
