@@ -1,16 +1,20 @@
 package local.socialnetwork.profileservice.service.kafka.consumer.profile;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import local.socialnetwork.profileservice.model.dto.profile.ProfileDto;
 
 import local.socialnetwork.profileservice.service.ProfileService;
 
 import lombok.AccessLevel;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 import lombok.experimental.FieldDefaults;
 
 import lombok.extern.slf4j.Slf4j;
+
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 
 import org.springframework.kafka.annotation.KafkaListener;
 
@@ -19,18 +23,28 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ProfileConsumeService {
 
     static final String PROFILE_GROUP_ID = "default-group-id";
     static final String TOPIC_PROFILE_NEW = "topic.profile.new";
 
-    ProfileService profileService;
+    final ProfileService profileService;
+    final ObjectMapper objectMapper;
 
     @KafkaListener(topics = TOPIC_PROFILE_NEW, groupId = PROFILE_GROUP_ID)
-    public void consumeProfileForSaving(Object object) {
-        log.info(String.format("### -> Received new profile for saving: %s", object));
-        ProfileDto profileDto = (ProfileDto) object;
+    public void consumeProfileForSaving(ConsumerRecord<String, String> consumerRecord) {
+        log.info("### -> Received new profile for saving <- ###");
+        ProfileDto profileDto = getProfile(consumerRecord.value());
         profileService.createProfile(profileDto);
+    }
+
+    private ProfileDto getProfile(String jsonProfile) {
+        try {
+            return objectMapper.readValue(jsonProfile, ProfileDto.class);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return null;
+        }
     }
 }

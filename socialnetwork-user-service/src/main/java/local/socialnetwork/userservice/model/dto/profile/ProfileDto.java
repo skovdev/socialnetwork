@@ -1,7 +1,5 @@
 package local.socialnetwork.userservice.model.dto.profile;
 
-import local.socialnetwork.userservice.model.dto.user.UserDto;
-
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,6 +22,6 @@ public class ProfileDto implements Serializable {
     UUID id;
     String avatar;
     boolean isActive;
-    UserDto user;
+    private UUID userId;
 
 }

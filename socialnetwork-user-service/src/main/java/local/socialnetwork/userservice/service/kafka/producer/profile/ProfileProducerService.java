@@ -1,7 +1,14 @@
 package local.socialnetwork.userservice.service.kafka.producer.profile;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import local.socialnetwork.userservice.model.dto.profile.ProfileDto;
+
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
+
+import lombok.RequiredArgsConstructor;
 
 import lombok.experimental.FieldDefaults;
 
@@ -14,13 +21,18 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ProfileProducerService {
 
-    private KafkaTemplate<String, Object> kafkaTemplate;
+    final KafkaTemplate<String, String> kafkaTemplate;
+    final ObjectMapper objectMapper;
 
-    public void sendProfileAndSave(String topic, Object value) {
-        log.info(String.format("### -> Producing topic %s and object -> %s for saving of profile", topic, value));
-        this.kafkaTemplate.send(topic, value);
+    public void sendProfileAndSave(String topic, ProfileDto profileDto) {
+        try {
+            log.info(String.format("### -> Producing topic %s and object -> [%s] for saving of profile", topic, profileDto.toString()));
+            this.kafkaTemplate.send(topic, objectMapper.writeValueAsString(profileDto));
+        } catch (JsonProcessingException e) {
+            log.error(e.getMessage());
+        }
     }
 }
