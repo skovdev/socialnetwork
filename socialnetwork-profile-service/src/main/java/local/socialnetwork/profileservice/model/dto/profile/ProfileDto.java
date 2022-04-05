@@ -1,7 +1,5 @@
 package local.socialnetwork.profileservice.model.dto.profile;
 
-import local.socialnetwork.profileservice.model.dto.user.UserDto;
-
 import java.util.UUID;
 
 public class ProfileDto {
@@ -9,7 +7,7 @@ public class ProfileDto {
     private UUID id;
     private boolean isActive;
     private String avatar;
-    private UserDto user;
+    private UUID userId;
 
     public UUID getId() {
         return id;
@@ -35,11 +33,11 @@ public class ProfileDto {
         this.avatar = avatar;
     }
 
-    public UserDto getUser() {
-        return user;
+    public UUID getUserId() {
+        return userId;
     }
 
-    public void setUser(UserDto user) {
-        this.user = user;
+    public void setUserId(UUID userId) {
+        this.userId = userId;
     }
 }

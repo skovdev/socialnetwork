@@ -2,8 +2,6 @@ package local.socialnetwork.userservice.service.impl;
 
 import local.socialnetwork.kafka.common.model.dto.profile.EditProfileDto;
 
-import local.socialnetwork.userservice.mapping.MappingObject;
-
 import local.socialnetwork.userservice.model.dto.RegistrationDto;
 
 import local.socialnetwork.userservice.model.dto.profile.ProfileDto;
@@ -23,14 +21,17 @@ import local.socialnetwork.userservice.util.ResourceUtil;
 
 import lombok.AccessLevel;
 
+import lombok.RequiredArgsConstructor;
+
 import lombok.experimental.FieldDefaults;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import org.springframework.stereotype.Service;
+
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 
@@ -40,7 +41,9 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 @Service
+@Transactional
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     @Value("${sn.kafka.producer.topic.profile.new}")
@@ -52,47 +55,11 @@ public class UserServiceImpl implements UserService {
     @Value("${sn.profile.default.avatar.path}")
     String pathDefaultAvatar;
 
-    UserRepository userRepository;
-
-    @Autowired
-    public void setUserRepository(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
-    RoleRepository roleRepository;
-
-    @Autowired
-    public void setRoleRepository(RoleRepository roleRepository) {
-        this.roleRepository = roleRepository;
-    }
-
-    ProfileProducerService profileProducerService;
-
-    @Autowired
-    public void setUserProducerService(ProfileProducerService profileProducerService) {
-        this.profileProducerService = profileProducerService;
-    }
-
-    PasswordEncoder passwordEncoder;
-
-    @Autowired
-    public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
-        this.passwordEncoder = passwordEncoder;
-    }
-
-    ResourceUtil resourceUtil;
-
-    @Autowired
-    public void setResourceUtil(ResourceUtil resourceUtil) {
-        this.resourceUtil = resourceUtil;
-    }
-
-    MappingObject mappingObject;
-
-    @Autowired
-    public void setMappingObject(MappingObject mappingObject) {
-        this.mappingObject = mappingObject;
-    }
+    final UserRepository userRepository;
+    final RoleRepository roleRepository;
+    final ProfileProducerService profileProducerService;
+    final PasswordEncoder passwordEncoder;
+    final ResourceUtil resourceUtil;
 
     @Override
     public Optional<CustomUser> findById(UUID id) {
@@ -165,6 +132,8 @@ public class UserServiceImpl implements UserService {
 
         newUser.setRoles(roles);
 
+        userRepository.save(newUser);
+
         ProfileDto newProfile = new ProfileDto();
 
         var encodedPhoto = resourceUtil.getEncodedResource(pathDefaultAvatar);
@@ -172,9 +141,8 @@ public class UserServiceImpl implements UserService {
         newProfile.setId(UUID.randomUUID());
         newProfile.setAvatar(encodedPhoto);
         newProfile.setActive(true);
-        newProfile.setUser(mappingObject.convertUserToUserDto(newUser));
+        newProfile.setUserId(newUser.getId());
 
-        userRepository.save(newUser);
         roleRepository.save(newRole);
 
         profileProducerService.sendProfileAndSave(topicProfileNew, newProfile);

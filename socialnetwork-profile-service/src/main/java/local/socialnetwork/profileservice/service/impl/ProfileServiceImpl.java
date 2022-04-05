@@ -21,7 +21,7 @@ import local.socialnetwork.profileservice.service.kafka.producer.user.UserProduc
 import local.socialnetwork.profileservice.util.ResourceUtil;
 
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 import lombok.experimental.FieldDefaults;
 
@@ -30,6 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
+
 import org.springframework.stereotype.Service;
 
 import org.springframework.web.multipart.MultipartFile;
@@ -43,7 +44,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ProfileServiceImpl implements ProfileService {
 
     @Value("${sn.profile.upload.avatar.dir.path}")
@@ -55,11 +56,11 @@ public class ProfileServiceImpl implements ProfileService {
     @Value("${sn.kafka.topic.user.update}")
     String topicUserUpdate;
 
-    ProfileRepository profileRepository;
-    UserProxyService userProxyService;
-    UserProducerService userProducerService;
-    ResourceUtil resourceUtil;
-    PasswordEncoder passwordEncoder;
+    final ProfileRepository profileRepository;
+    final UserProxyService userProxyService;
+    final UserProducerService userProducerService;
+    final ResourceUtil resourceUtil;
+    final PasswordEncoder passwordEncoder;
 
     @Override
     public List<ProfileDto> findAll() {
@@ -67,9 +68,9 @@ public class ProfileServiceImpl implements ProfileService {
         return profile.stream().map(p -> {
             ProfileDto profileDto = new ProfileDto();
             profileDto.setId(p.getId());
+            profileDto.setActive(p.isActive());
             profileDto.setAvatar(p.getAvatar());
-            profileDto.setAvatar(p.getAvatar());
-            profileDto.setUser(new UserDto());
+            profileDto.setUserId(p.getUserId());
             return profileDto;
         }).collect(Collectors.toList());
     }
@@ -82,6 +83,7 @@ public class ProfileServiceImpl implements ProfileService {
             profileDto.setId(profile.getId());
             profileDto.setActive(profile.isActive());
             profileDto.setAvatar(profile.getAvatar());
+            profileDto.setUserId(profile.getUserId());
             return profileDto;
         }
         throw new NullPointerException();
@@ -97,6 +99,7 @@ public class ProfileServiceImpl implements ProfileService {
                 profileDto.setId(profile.getId());
                 profileDto.setActive(profile.isActive());
                 profileDto.setAvatar(profile.getAvatar());
+                profileDto.setUserId(profile.getUserId());
                 return profileDto;
             }
         }
@@ -140,7 +143,7 @@ public class ProfileServiceImpl implements ProfileService {
             profile.setId(profileDto.getId());
             profile.setActive(profileDto.isActive());
             profile.setAvatar(profileDto.getAvatar());
-            profile.setUserId(profileDto.getUser().getId());
+            profile.setUserId(profileDto.getUserId());
             profileRepository.save(profile);
         }
     }
