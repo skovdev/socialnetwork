@@ -1,9 +1,8 @@
 package local.socialnetwork.userservice.service.impl;
 
-import local.socialnetwork.kafka.common.model.dto.profile.EditProfileDto;
-
 import local.socialnetwork.userservice.model.dto.RegistrationDto;
 
+import local.socialnetwork.userservice.model.dto.profile.EditProfileDto;
 import local.socialnetwork.userservice.model.dto.profile.ProfileDto;
 
 import local.socialnetwork.userservice.model.entity.user.CustomRole;
