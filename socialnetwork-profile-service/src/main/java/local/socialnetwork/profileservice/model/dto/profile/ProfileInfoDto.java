@@ -1,4 +1,4 @@
-package local.socialnetwork.userservice.model.dto.profile;
+package local.socialnetwork.profileservice.model.dto.profile;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -6,19 +6,18 @@ import lombok.Setter;
 
 import lombok.experimental.FieldDefaults;
 
-import java.util.UUID;
-
-@Getter
 @Setter
+@Getter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class EditProfileDto {
-    UUID userId;
+public class ProfileInfoDto {
+    boolean isActive;
+    String avatar;
     String firstName;
     String lastName;
+    String birthDay;
     String country;
     String city;
-    String address;
-    String phone;
-    String birthday;
     String familyStatus;
+    String phone;
+    String address;
 }

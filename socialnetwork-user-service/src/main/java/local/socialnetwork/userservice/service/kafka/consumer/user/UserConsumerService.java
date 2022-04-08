@@ -1,6 +1,7 @@
 package local.socialnetwork.userservice.service.kafka.consumer.user;
 
-import local.socialnetwork.kafka.common.model.dto.profile.EditProfileDto;
+import local.socialnetwork.userservice.model.dto.profile.EditProfileDto;
+
 import local.socialnetwork.userservice.service.UserService;
 
 import lombok.AccessLevel;

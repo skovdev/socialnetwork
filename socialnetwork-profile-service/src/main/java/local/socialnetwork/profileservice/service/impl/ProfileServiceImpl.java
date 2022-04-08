@@ -8,6 +8,7 @@ import local.socialnetwork.profileservice.model.dto.profile.ChangePasswordDto;
 import local.socialnetwork.profileservice.model.dto.profile.EditProfileDto;
 import local.socialnetwork.profileservice.model.dto.profile.ProfileDto;
 
+import local.socialnetwork.profileservice.model.dto.profile.ProfileInfoDto;
 import local.socialnetwork.profileservice.model.dto.user.UserDto;
 
 import local.socialnetwork.profileservice.model.entity.profile.Profile;
@@ -33,6 +34,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import org.springframework.stereotype.Service;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -44,6 +47,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@Transactional
 @RequiredArgsConstructor
 public class ProfileServiceImpl implements ProfileService {
 
@@ -90,17 +94,23 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public ProfileDto findByUsername(String username) {
+    public ProfileInfoDto findByUsername(String username) {
         UserDto userDto = userProxyService.findUserByUsername(username);
         if (userDto != null) {
-            Profile profile = profileRepository.findProfileById(userDto.getProfile().getId());
+            Profile profile = profileRepository.findProfileByUserId(userDto.getId());
             if (profile != null) {
-                ProfileDto profileDto = new ProfileDto();
-                profileDto.setId(profile.getId());
-                profileDto.setActive(profile.isActive());
-                profileDto.setAvatar(profile.getAvatar());
-                profileDto.setUserId(profile.getUserId());
-                return profileDto;
+                ProfileInfoDto profileInfoDto = new ProfileInfoDto();
+                profileInfoDto.setActive(profile.isActive());
+                profileInfoDto.setAvatar(profile.getAvatar());
+                profileInfoDto.setFirstName(userDto.getFirstName());
+                profileInfoDto.setLastName(userDto.getLastName());
+                profileInfoDto.setBirthDay(userDto.getUserDetails().getBirthday());
+                profileInfoDto.setCountry(userDto.getUserDetails().getCountry());
+                profileInfoDto.setCity(userDto.getUserDetails().getCity());
+                profileInfoDto.setFamilyStatus(userDto.getUserDetails().getFamilyStatus());
+                profileInfoDto.setPhone(userDto.getUserDetails().getFamilyStatus());
+                profileInfoDto.setAddress(userDto.getUserDetails().getAddress());
+                return profileInfoDto;
             }
         }
         throw new NullPointerException();
@@ -128,7 +138,7 @@ public class ProfileServiceImpl implements ProfileService {
     public String findAvatarByUsername(String username) {
         UserDto userDto = userProxyService.findUserByUsername(username);
         if (userDto != null) {
-            Profile profile = profileRepository.findProfileById(userDto.getProfile().getId());
+            Profile profile = profileRepository.findProfileByUserId(userDto.getId());
             if (profile != null) {
                 return profile.getAvatar();
             }

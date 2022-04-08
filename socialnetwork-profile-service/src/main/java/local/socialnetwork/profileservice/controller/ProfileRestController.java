@@ -6,6 +6,7 @@ import local.socialnetwork.profileservice.model.dto.profile.ChangePasswordDto;
 import local.socialnetwork.profileservice.model.dto.profile.EditProfileDto;
 import local.socialnetwork.profileservice.model.dto.profile.ProfileDto;
 
+import local.socialnetwork.profileservice.model.dto.profile.ProfileInfoDto;
 import local.socialnetwork.profileservice.service.ProfileService;
 
 import local.socialnetwork.profileservice.util.ResourceUtil;
@@ -55,7 +56,7 @@ public class ProfileRestController {
     }
 
     @GetMapping("/user/{username}")
-    public ProfileDto findByUsername(@PathVariable("username") String username) {
+    public ProfileInfoDto findByUsername(@PathVariable("username") String username) {
         return profileService.findByUsername(username);
     }
 
