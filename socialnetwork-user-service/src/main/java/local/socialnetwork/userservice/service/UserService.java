@@ -1,9 +1,8 @@
 package local.socialnetwork.userservice.service;
 
-import local.socialnetwork.kafka.common.model.dto.profile.EditProfileDto;
-
 import local.socialnetwork.userservice.model.dto.RegistrationDto;
 
+import local.socialnetwork.userservice.model.dto.profile.EditProfileDto;
 import local.socialnetwork.userservice.model.entity.user.CustomUser;
 
 import java.io.IOException;

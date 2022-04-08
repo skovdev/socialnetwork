@@ -6,10 +6,13 @@ import lombok.Setter;
 
 import lombok.experimental.FieldDefaults;
 
+import java.util.UUID;
+
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class EditProfileDto {
+    UUID userId;
     String firstName;
     String lastName;
     String country;
