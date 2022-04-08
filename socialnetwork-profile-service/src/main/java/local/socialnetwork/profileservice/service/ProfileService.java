@@ -5,6 +5,7 @@ import local.socialnetwork.profileservice.exception.ProfileServiceException;
 import local.socialnetwork.profileservice.model.dto.profile.ChangePasswordDto;
 import local.socialnetwork.profileservice.model.dto.profile.EditProfileDto;
 import local.socialnetwork.profileservice.model.dto.profile.ProfileDto;
+import local.socialnetwork.profileservice.model.dto.profile.ProfileInfoDto;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -16,7 +17,7 @@ import java.util.UUID;
 public interface ProfileService {
     List<ProfileDto> findAll();
     ProfileDto findByUserId(UUID id);
-    ProfileDto findByUsername(String username) ;
+    ProfileInfoDto findByUsername(String username) ;
     EditProfileDto findEditProfileByUsername(String username);
     String findAvatarByUsername(String username);
     void createProfile(ProfileDto profileDto);
