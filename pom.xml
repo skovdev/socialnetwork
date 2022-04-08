@@ -20,7 +20,6 @@
         <module>socialnetwork-user-service</module>
         <module>socialnetwork-unit-testing</module>
         <module>socialnetwork-integration-testing</module>
-        <module>socialnetwork-kafka-common</module>
     </modules>
 
     <properties>
