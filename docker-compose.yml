@@ -23,7 +23,7 @@ services:
     depends_on:
       - socialnetwork-eureka-service-discovery
 
-  socialnetwork-zuul-api-gateway:
+  socialnetwork-api-gateway:
     image: socialnetwork-api-gateway-1.0
     ports:
       - "8762:8762"
@@ -59,7 +59,7 @@ services:
     depends_on:
       - socialnetwork-eureka-service-discovery
       - socialnetwork-config-server
-      - socialnetwork-zuul-api-gateway
+      - socialnetwork-api-gateway
       - kafka
     entrypoint: ./wait-for-it.sh socialnetwork-config-server:8888 --timeout=20 -- java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar socialnetwork-auth-service-1.0.jar
 
@@ -76,7 +76,7 @@ services:
     depends_on:
       - socialnetwork-eureka-service-discovery
       - socialnetwork-config-server
-      - socialnetwork-zuul-api-gateway
+      - socialnetwork-api-gateway
       - socialnetwork-database
       - kafka
     entrypoint: ./wait-for-it.sh socialnetwork-config-server:8888 --timeout=20 -- java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5006 -jar socialnetwork-user-service-1.0.jar
@@ -94,7 +94,7 @@ services:
     depends_on:
       - socialnetwork-eureka-service-discovery
       - socialnetwork-config-server
-      - socialnetwork-zuul-api-gateway
+      - socialnetwork-api-gateway
       - socialnetwork-database
     entrypoint: ./wait-for-it.sh socialnetwork-config-server:8888 --timeout=20 -- java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5007 -jar socialnetwork-profile-service-1.0.jar
     volumes:
