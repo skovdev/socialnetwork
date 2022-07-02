@@ -15,6 +15,7 @@ services:
     image: socialnetwork-service-discovery-1.0
     ports:
       - "8761:8761"
+    entrypoint: ./wait-for-it.sh socialnetwork-config-server:8888 --timeout=20 -- java -jar socialnetwork-service-discovery-1.0.jar
 
   socialnetwork-config-server:
     image: socialnetwork-config-server-1.0
@@ -108,18 +109,18 @@ services:
       - /app/node_modules
       - ./:/app
 
-  socialnetwork-unit-testing:
-    image: socialnetwork-unit-testing-1.0
-    environment:
-      - SPRING_PROFILE_ACTIVE=local
-    ports:
-      - "8087:8087"
-      - "5009:5009"
-
-  socialnetwork-integration-testing:
-    image: socialnetwork-integration-testing-1.0
-    environment:
-      - SPRING_PROFILE_ACTIVE=local
-    ports:
-      - "8088:8088"
-      - "5010:5010"
+#  socialnetwork-unit-testing:
+#    image: socialnetwork-unit-testing-1.0
+#    environment:
+#      - SPRING_PROFILE_ACTIVE=local
+#    ports:
+#      - "8087:8087"
+#      - "5009:5009"
+#
+#  socialnetwork-integration-testing:
+#    image: socialnetwork-integration-testing-1.0
+#    environment:
+#      - SPRING_PROFILE_ACTIVE=local
+#    ports:
+#      - "8088:8088"
+#      - "5010:5010"
