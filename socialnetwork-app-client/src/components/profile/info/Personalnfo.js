@@ -10,7 +10,7 @@ import AppConstants from "../../../constants/AppConstants";
 
 const PersonalInfo = () => {
 
-    const [profile, setProfile] = useState({})
+    const [profileInfo, setProfileInfo] = useState({})
     const [isLoaded, setIsLoaded] = useState(false)
     const [error, serError] = useState(false)
     const [errorMessage, setErrorMessage] = useState("") 
@@ -41,7 +41,7 @@ const PersonalInfo = () => {
             return response.json()
 
         }).then(data => {
-            setProfile(data)
+            setProfileInfo(data)
             setIsLoaded(true)
         }).catch(error => {
             serError(true)
@@ -60,26 +60,26 @@ const PersonalInfo = () => {
 
                 <div className="personal-info">
                      <div className="full-name">
-                        <h4>{profile.user.firstName} {profile.user.lastName}</h4>
+                        <h4>{profileInfo.firstName} {profileInfo.lastName}</h4>
                     </div>
                     <div className="additional-info">
                         <div className="biirthday">
-                            <h5>Birthday: {profile.user.userDetails.birthday}</h5>
+                            <h5>Birthday: {profileInfo.birthday}</h5>
                         </div>
                         <div className="country">
-                            <h5>Country: {profile.user.userDetails.country}</h5>
+                            <h5>Country: {profileInfo.country}</h5>
                         </div>
                         <div className="city">
-                            <h5>City: {profile.user.userDetails.city}</h5>
+                            <h5>City: {profileInfo.city}</h5>
                         </div>
                         <div className="family-status">
-                            <h5>Family status: {profile.user.userDetails.familyStatus}</h5>
+                            <h5>Family status: {profileInfo.familyStatus}</h5>
                         </div>
                         <div className="phone">
-                            <h5>Phone: {profile.user.userDetails.phone}</h5>
+                            <h5>Phone: {profileInfo.phone}</h5>
                         </div>
                         <div className="address">
-                            <h5>Address: {profile.user.userDetails.address}</h5>
+                            <h5>Address: {profileInfo.address}</h5>
                          </div>
                     </div>
                 </div>
