@@ -21,8 +21,6 @@ services:
     image: socialnetwork-config-server-1.0
     ports:
       - "8888:8888"
-    depends_on:
-      - socialnetwork-eureka-service-discovery
 
   socialnetwork-api-gateway:
     image: socialnetwork-api-gateway-1.0
