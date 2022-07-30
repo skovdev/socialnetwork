@@ -15,7 +15,6 @@ services:
     image: socialnetwork-service-discovery-1.0
     ports:
       - "8761:8761"
-    entrypoint: ./wait-for-it.sh socialnetwork-config-server:8888 --timeout=20 -- java -jar socialnetwork-service-discovery-1.0.jar
 
   socialnetwork-config-server:
     image: socialnetwork-config-server-1.0
