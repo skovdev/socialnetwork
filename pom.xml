@@ -18,6 +18,7 @@
         <module>socialnetwork-api-gateway</module>
         <module>socialnetwork-service-discovery</module>
         <module>socialnetwork-user-service</module>
+        <module>socialnetwork-rest-api</module>
     </modules>
 
     <properties>
