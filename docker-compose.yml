@@ -98,6 +98,19 @@ services:
     volumes:
        - /avatar/
 
+  socialnetwork-rest-api:
+    image: socialnetwork-auth-service-1.0
+    environment:
+      - SPRING_PROFILE_ACTIVE=local
+    ports:
+      - "8083:8083"
+      - "5008:5008"
+    depends_on:
+      - socialnetwork-eureka-service-discovery
+      - socialnetwork-config-server
+      - kafka
+    entrypoint: ./wait-for-it.sh socialnetwork-config-server:8888 --timeout=20 -- java -jar socialnetwork-rest-api-1.0.jar
+
   socialnetwork-app-client:
     image: socialnetwork-app-client
     ports:
