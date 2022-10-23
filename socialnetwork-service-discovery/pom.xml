@@ -22,7 +22,7 @@
         <spring.boot.version>2.7.3</spring.boot.version>
         <spring.cloud.netflix.eureka.server.version>3.1.4</spring.cloud.netflix.eureka.server.version>
         <spring.cloud.starter.config.version>3.1.4</spring.cloud.starter.config.version>
-        <jackson.version>2.13.4</jackson.version>
+        <jackson.version>2.13.4.1</jackson.version>
         <gson.version>2.9.0</gson.version>
         <maven.compiler.source>14</maven.compiler.source>
         <maven.compiler.target>14</maven.compiler.target>
