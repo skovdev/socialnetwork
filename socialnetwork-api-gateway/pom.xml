@@ -25,7 +25,7 @@
         <spring.cloud.gateway.version>3.1.4</spring.cloud.gateway.version>
         <spring.cloud.loadbalancer.version>3.1.4</spring.cloud.loadbalancer.version>
         <spring.cloud.starter.config.version>3.1.4</spring.cloud.starter.config.version>
-        <jackson.version>2.13.4</jackson.version>
+        <jackson.version>2.13.4.1</jackson.version>
         <gson.version>2.9.0</gson.version>
         <maven.compiler.source>14</maven.compiler.source>
         <maven.compiler.target>14</maven.compiler.target>
