@@ -7,6 +7,7 @@ import local.socialnetwork.profileservice.model.dto.profile.EditProfileDto;
 import local.socialnetwork.profileservice.model.dto.profile.ProfileDto;
 
 import local.socialnetwork.profileservice.model.dto.profile.ProfileInfoDto;
+
 import local.socialnetwork.profileservice.service.ProfileService;
 
 import local.socialnetwork.profileservice.util.ResourceUtil;
@@ -48,6 +49,11 @@ public class ProfileRestController {
     @GetMapping
     public List<ProfileDto> findAll() {
         return profileService.findAll();
+    }
+
+    @GetMapping("/{profileId}")
+    public ProfileDto findByProfileId(@PathVariable("profileId") UUID profileId) {
+        return profileService.findByProfileId(profileId);
     }
 
     @GetMapping("/user")
