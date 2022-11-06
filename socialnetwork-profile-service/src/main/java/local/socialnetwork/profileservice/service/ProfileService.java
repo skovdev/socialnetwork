@@ -16,6 +16,7 @@ import java.util.UUID;
 
 public interface ProfileService {
     List<ProfileDto> findAll();
+    ProfileDto findByProfileId(UUID profileId);
     ProfileDto findByUserId(UUID id);
     ProfileInfoDto findByUsername(String username) ;
     EditProfileDto findEditProfileByUsername(String username);
