@@ -80,8 +80,22 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
+    public ProfileDto findByProfileId(UUID profileId) {
+        Profile profile = profileRepository.findProfileById(profileId);
+        if (profile != null) {
+            ProfileDto profileDto = new ProfileDto();
+            profileDto.setId(profile.getId());
+            profileDto.setActive(profile.isActive());
+            profileDto.setAvatar(profile.getAvatar());
+            profileDto.setUserId(profile.getUserId());
+            return profileDto;
+        }
+        throw new NullPointerException();
+    }
+
+    @Override
     public ProfileDto findByUserId(UUID id) {
-        Profile profile = profileRepository.findProfileById(id);
+        Profile profile = profileRepository.findProfileByUserId(id);
         if (profile != null) {
             ProfileDto profileDto = new ProfileDto();
             profileDto.setId(profile.getId());
