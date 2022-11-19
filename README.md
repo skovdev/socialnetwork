@@ -1,2 +1,1 @@
-## Pet-project
-* [General info](#general-info)
+# Pet-project
