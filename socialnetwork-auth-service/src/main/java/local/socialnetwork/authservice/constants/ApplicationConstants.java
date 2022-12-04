@@ -2,7 +2,7 @@ package local.socialnetwork.authservice.constants;
 
 public final class ApplicationConstants {
 
-    public static final String HOST = "http://socialnetwork-zuul-api-gateway:8762";
+    public static final String HOST = "http://socialnetwork-api-gateway:8762";
 
     private ApplicationConstants() {
 
