@@ -13,6 +13,8 @@ public class ApiGatewayConfig {
     @Bean
     public RouteLocator configureRoute(RouteLocatorBuilder builder) {
         return builder.routes()
-                .route(r -> r.path("/auth/**").uri("http://localhost:8080")).build();
+                .route("auth-service", r -> r.path("/auth/**").uri("http://socialnetwork-auth-service:8080"))
+                .route("user-service", r -> r.path("/users/**").uri("http://socialnetwork-user-service:8084"))
+                .build();
     }
 }
