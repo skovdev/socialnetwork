@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-@FeignClient(name = "user-service", url = ApplicationConstants.HOST + "/" + ApplicationConstants.Services.USER_SERVICE_URL)
+@FeignClient(name = "user-service", url = ApplicationConstants.HOST)
 public interface UserProxyService {
 
     @RequestMapping(value = "/users", method = RequestMethod.GET)
