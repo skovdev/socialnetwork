@@ -1,25 +1,43 @@
 package local.socialnetwork.authservice.config.jwt;
 
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+
+import io.jsonwebtoken.security.Keys;
 import local.socialnetwork.authservice.exception.InvalidJwtAuthenticationException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+
 import org.springframework.security.core.Authentication;
+
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+
 import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+
+import java.security.Key;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @Component
 public class JwtTokenProvider {
 
-    @Value("${security.jwt.token.secret-key}")
-    private String secretKey;
+//    @Value("${security.jwt.token.secret-key}")
+//    private String secretKey;
+
+    private Key key;
 
     @Value("${security.jwt.token.expire-length}")
     private long validityInMilliseconds;
@@ -33,7 +51,7 @@ public class JwtTokenProvider {
 
     @PostConstruct
     protected void init() {
-        secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
+        key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
     }
 
     public String createToken(UUID id, String username, List<String> roles) {
@@ -52,7 +70,7 @@ public class JwtTokenProvider {
                    .setClaims(claims)
                    .setIssuedAt(now)
                    .setExpiration(validity)
-                   .signWith(SignatureAlgorithm.HS256, secretKey)
+                   .signWith(key)
                    .compact();
 
     }
@@ -68,7 +86,12 @@ public class JwtTokenProvider {
 
     private String getUsername(String token) {
 
-        for (Map.Entry<String, Object> entry : Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().entrySet()) {
+        for (Map.Entry<String, Object> entry : Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .entrySet()) {
 
             if (entry.getKey().equals("username")) {
                 return String.valueOf(entry.getValue());
@@ -95,7 +118,10 @@ public class JwtTokenProvider {
 
         try {
 
-            Jws<Claims> claimsJws = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
+            Jws<Claims> claimsJws = Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token);
 
             if (claimsJws.getBody().getExpiration().before(new Date())) {
                 return false;
