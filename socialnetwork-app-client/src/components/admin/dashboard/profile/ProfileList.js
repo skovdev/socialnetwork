@@ -19,7 +19,7 @@ const ProfileList = () => {
 
     const loadUserProfiles = () => {
 
-        const urlFindAllProfile = AppConstants.API_HOST + "/profile-service/profiles"
+        const urlFindAllProfile = AppConstants.API_HOST + "/profiles"
         const token = AuthService.getToken();
 
         fetch(urlFindAllProfile, {
@@ -51,7 +51,7 @@ const ProfileList = () => {
 
         const token = AuthService.getToken()
 
-        const urlChangeStatusProfile = AppConstants.API_HOST + `/profile-service/profiles?username=${username}&isActive=${status}`
+        const urlChangeStatusProfile = AppConstants.API_HOST + `/profiles?username=${username}&isActive=${status}`
 
         fetch(urlChangeStatusProfile, {
             method: "PUT",

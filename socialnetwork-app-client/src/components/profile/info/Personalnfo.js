@@ -23,7 +23,7 @@ const PersonalInfo = () => {
 
         let username = AuthService.getProfile().username;
 
-        const urlGetProfileDetails = AppConstants.API_HOST + "/profile-service/profiles/user/" + username;
+        const urlGetProfileDetails = AppConstants.API_HOST + "/profiles/user/" + username;
         const token = AuthService.getToken();
 
         fetch(urlGetProfileDetails, {

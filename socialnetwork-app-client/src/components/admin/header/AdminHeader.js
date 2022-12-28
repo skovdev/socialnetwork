@@ -25,7 +25,7 @@ const AdminHeader = () => {
 
         const decodedToken = DecodeJwtToken.decode(token);
 
-        const urlLoadUserProfile = AppConstants.API_HOST + "/profile-service/profiles/user/" + decodedToken.username;
+        const urlLoadUserProfile = AppConstants.API_HOST + "/profiles/user/" + decodedToken.username;
 
         fetch(urlLoadUserProfile, {
             method: "GET",
