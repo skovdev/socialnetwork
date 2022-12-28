@@ -22,7 +22,7 @@ const Login = () => {
 
         event.preventDefault();
 
-        const loginUrl = AppConstants.API_HOST + "/auth-service/auth/signin";
+        const loginUrl = AppConstants.API_HOST + "/auth/signin";
 
         let data = {
             username: username,

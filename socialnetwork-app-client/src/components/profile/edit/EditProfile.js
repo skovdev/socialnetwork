@@ -40,7 +40,7 @@ const EditProfile = (props) => {
 
     const loadProfileAvatar = () => {
 
-        const urlGetProfileAvatar = AppConstants.API_HOST + "/profile-service/profiles/avatar?username=" + AuthService.getProfile().username;
+        const urlGetProfileAvatar = AppConstants.API_HOST + "/profiles/avatar?username=" + AuthService.getProfile().username;
 
         fetch(urlGetProfileAvatar, {
             method: "GET",
@@ -66,7 +66,7 @@ const EditProfile = (props) => {
 
     const loadProfileInformationByUsername = () => {
 
-        const urlGetProfileByUsername = AppConstants.API_HOST + "/profile-service/profiles/user/" + props.match.params.username + "/edit";
+        const urlGetProfileByUsername = AppConstants.API_HOST + "/profiles/user/" + props.match.params.username + "/edit";
 
         fetch(urlGetProfileByUsername, {
             method: "GET",
@@ -97,7 +97,7 @@ const EditProfile = (props) => {
 
         const profileId = AuthService.getProfile().sub;
 
-        const urlUpdateProfile = AppConstants.API_HOST + "/profile-service/profiles/" + profileId;
+        const urlUpdateProfile = AppConstants.API_HOST + "/profiles/" + profileId;
 
         let updatedProfile = {
             firstName: firstName ? firstName : profile.firstName,
