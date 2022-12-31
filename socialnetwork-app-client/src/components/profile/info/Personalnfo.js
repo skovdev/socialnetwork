@@ -64,7 +64,7 @@ const PersonalInfo = () => {
                     </div>
                     <div className="additional-info">
                         <div className="biirthday">
-                            <h5>Birthday: {profileInfo.birthday}</h5>
+                            <h5>Birthday: {profileInfo.birthDay}</h5>
                         </div>
                         <div className="country">
                             <h5>Country: {profileInfo.country}</h5>
