@@ -44,7 +44,7 @@ const ChangePasswordProfile = () => {
                 throw new Error("Failed change password of user");
             }
 
-            return response.json();
+            return response;
 
         }).then(() => {
             handleCloseChangePasswordModalSuccess(false);
