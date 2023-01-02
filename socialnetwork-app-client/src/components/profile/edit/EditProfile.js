@@ -123,7 +123,7 @@ const EditProfile = (props) => {
                 throw new Error("Failed update information of profile");
             }
 
-            return response.json();
+            return response;
 
         }).then(data => {
             setIsLoaded(true);
