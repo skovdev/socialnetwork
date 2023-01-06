@@ -14,7 +14,7 @@ public class ApiGatewayConfig {
     public RouteLocator configureRoute(RouteLocatorBuilder builder) {
         return builder.routes()
                 .route("auth-service", r -> r.path("/auth/**").uri("http://socialnetwork-auth-service:8080"))
-                .route("user-service", r -> r.path("/users/**").uri("http://socialnetwork-user-service:8084"))
+                .route("user-service", r -> r.path("/registration/**", "/users/**").uri("http://socialnetwork-user-service:8084"))
                 .route("profile-service", r -> r.path("/profiles/**").uri("http://socialnetwork-profile-service:8081"))
                 .build();
     }
