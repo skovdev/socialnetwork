@@ -89,7 +89,7 @@ public class ProfileRestController {
         }
     }
 
-    @GetMapping("/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<String> update(@PathVariable("id") UUID id, @RequestBody EditProfileDto editProfileDto) throws ProfileServiceException {
         profileService.updateProfile(id, editProfileDto);
         return new ResponseEntity<>("Profile with ID: " + id + " has updated successfully", HttpStatus.OK);
