@@ -136,10 +136,11 @@ public class ProfileServiceImpl implements ProfileService {
         if (userDto != null) {
             EditProfileDto editProfileDto = new EditProfileDto();
             editProfileDto.setFirstName(userDto.getFirstName());
-            editProfileDto.setFirstName(userDto.getFirstName());
+            editProfileDto.setLastName(userDto.getLastName());
             editProfileDto.setCountry(userDto.getUserDetails().getCountry());
             editProfileDto.setCity(userDto.getUserDetails().getCity());
             editProfileDto.setAddress(userDto.getUserDetails().getAddress());
+            editProfileDto.setPhone(userDto.getUserDetails().getPhone());
             editProfileDto.setBirthday(userDto.getUserDetails().getBirthday());
             editProfileDto.setFamilyStatus(userDto.getUserDetails().getFamilyStatus());
             editProfileDto.setUserId(userDto.getId());
