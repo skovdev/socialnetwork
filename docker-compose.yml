@@ -48,8 +48,8 @@ services:
     depends_on:
       - zookeeper
 
-  socialnetwork-auth-service:
-    image: socialnetwork-auth-service-1.0
+  socialnetwork-auth-server:
+    image: socialnetwork-auth-server-1.0
     environment:
       - SPRING_PROFILE_ACTIVE=local
     ports:
@@ -60,7 +60,7 @@ services:
       - socialnetwork-config-server
       - socialnetwork-api-gateway
       - kafka
-    entrypoint: ./wait-for-it.sh socialnetwork-config-server:8888 --timeout=20 -- java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar socialnetwork-auth-service-1.0.jar
+    entrypoint: ./wait-for-it.sh socialnetwork-config-server:8888 --timeout=20 -- java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar socialnetwork-auth-server-1.0.jar
 
   socialnetwork-user-service:
     image: socialnetwork-user-service-1.0
