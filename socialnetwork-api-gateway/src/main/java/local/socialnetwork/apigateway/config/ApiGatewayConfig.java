@@ -24,11 +24,6 @@ public class ApiGatewayConfig {
     @Bean
     public RouteLocator configureRoute(RouteLocatorBuilder builder) {
         return builder.routes()
-                .route("auth-service", r -> r.path("/auth/**")
-                        .uri("http://socialnetwork-auth-service:8080"))
-                .route("user-service", r -> r.path("/registration/**", "/users/**")
-                        .filters(filter -> filter.filter(validationAuthHeaderGatewayPreFilter))
-                        .uri("http://socialnetwork-user-service:8084"))
                 .route("profile-service", r -> r.path("/profiles/**")
                         .filters(filter -> filter.filter(validationAuthHeaderGatewayPreFilter))
                         .uri("http://socialnetwork-profile-service:8081"))

@@ -4,7 +4,7 @@
 /socialnetwork-service-discovery/
 /socialnetwork-api-gateway/
 /socialnetwork-config-server/
-/socialnetwork-auth-service/
+/socialnetwork-auth-server/
 /socialnetwork-user-service/
 /socialnetwork-profile-service/
 /socialnetwork-integration-testing/
@@ -12,7 +12,7 @@
 /socialnetwork-service-discovery/target
 /socialnetwork-api-gateway/target
 /socialnetwork-config-server/target
-/socialnetwork-auth-service/target
+/socialnetwork-auth-server/target
 /socialnetwork-profile-service/target
 /socialnetwork-user-service/target
 /socialnetwork-integration-testing/target
