@@ -4,6 +4,6 @@ node {
     }
 
     stage("Compilation") {
-       sh "/.mvnw clean install -DskipTests"
+       sh "/.mvn clean install -DskipTests"
     }
 }
