@@ -11,7 +11,7 @@ pipeline {
         }
         stage("Compilation") {
             steps {
-                withMaven(maven: 'mvn') {
+                withMaven(jdk: 'openjdk-14', maven: 'mvn') {
                     sh "mvn clean install -DskipTests"
                 }
             }
