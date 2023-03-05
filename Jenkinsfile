@@ -1,8 +1,5 @@
 pipeline {
     agent any
-    environment {
-      JAVA_HOME = "/var/jenkins_home/tools/hudson.model.JDK/openjdk-14"
-    }
     tools {
         jdk 'openjdk-14'
     }
@@ -15,6 +12,7 @@ pipeline {
         stage("Compilation") {
             steps {
                 withMaven(jdk: 'openjdk-14', maven: 'mvn') {
+                    sh "echo JAVA_HOME=$JAVA_HOME"
                     sh "mvn clean install -DskipTests"
                 }
             }
