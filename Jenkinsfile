@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        JAVA_HOME = $JAVA_HOME
+        JAVA_HOME = '$JAVA_HOME'
     }
     tools {
         jdk 'openjdk-14'
