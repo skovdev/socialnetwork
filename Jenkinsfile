@@ -1,5 +1,8 @@
 pipeline {
     agent any
+    environment {
+      JAVA_HOME = "/var/jenkins_home/tools/hudson.model.JDK/openjdk-14"
+    }
     tools {
         jdk 'openjdk-14'
     }
