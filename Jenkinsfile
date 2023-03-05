@@ -4,7 +4,8 @@ node {
     }
 
     stage("Compilation") {
-       withMaven(maven: 'mvn')
-       sh "mvn clean install -DskipTests"
+        withMaven(maven: 'mvn') {
+           sh "mvn clean install -DskipTests"
+        }
     }
 }
