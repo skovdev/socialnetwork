@@ -1,7 +1,7 @@
 pipeline {
     agent any
     tools {
-        jdk: 'openjdk-14'
+        jdk 'openjdk-14'
     }
     stages {
         stage("Clone the project from GitHub") {
