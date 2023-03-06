@@ -10,11 +10,6 @@ pipeline {
             }
         }
         stage("Compilation") {
-            agent {
-                docker {
-                    image: 'adoptopenjdk/openjdk14'
-                }
-            }
             steps {
                 withMaven(jdk: 'jdk14', maven: 'mvn') {
                     sh "echo JAVA_HOME=$JAVA_HOME"
