@@ -13,7 +13,7 @@ pipeline {
             steps {
                 withMaven(jdk: 'jdk14', maven: 'mvn') {
                     sh "echo JAVA_HOME=$JAVA_HOME"
-                    sh "java --version"
+                    sh "java -version"
                     sh "mvn clean install -DskipTests"
                 }
             }
