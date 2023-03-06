@@ -1,7 +1,7 @@
 pipeline {
     agent any
     tools {
-        jdk 'openjdk-14'
+        jdk 'jdk14'
     }
     stages {
         stage("Clone the project from GitHub") {
@@ -11,7 +11,7 @@ pipeline {
         }
         stage("Compilation") {
             steps {
-                withMaven(jdk: 'openjdk-14', maven: 'mvn') {
+                withMaven(jdk: 'jdk14', maven: 'mvn') {
                     sh "echo JAVA_HOME=$JAVA_HOME"
                     sh "mvn clean install -DskipTests"
                 }
