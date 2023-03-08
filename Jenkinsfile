@@ -11,7 +11,7 @@ pipeline {
         }
         stage("Compilation") {
             steps {
-                withMaven(jdk: 'jdk14', maven: 'mvn') {
+                withMaven(jdk: 'jdk14', maven: 'mvn3') {
                     sh "echo JAVA_HOME=$JAVA_HOME"
                     sh "java -version"
                     sh "mvn clean install -DskipTests"
