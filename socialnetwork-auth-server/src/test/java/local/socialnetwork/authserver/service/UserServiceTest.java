@@ -1,5 +1,6 @@
 package local.socialnetwork.authserver.service;
 
+import local.socialnetwork.authserver.dto.RegistrationDTO;
 import local.socialnetwork.authserver.model.entity.Role;
 import local.socialnetwork.authserver.model.entity.User;
 
@@ -26,6 +27,9 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -58,6 +62,22 @@ public class UserServiceTest {
         assertNotNull(user);
         assertTrue(user.isPresent());
         assertEquals(user.get().getUsername(), "Test");
+    }
+
+    @Test
+    public void testRegisterNewUser() {
+
+        RegistrationDTO registrationDTO = new RegistrationDTO();
+        registrationDTO.setId(UUID.randomUUID());
+        registrationDTO.setUsername("regnewuser");
+        registrationDTO.setPassword("regnewuserpassword");
+
+        userService.registration(registrationDTO);
+
+        verify(passwordEncoder, times(1)).encode(any());
+        verify(userRepository, times(1)).save(any());
+        verify(roleRepository, times(1)).save(any());
+
     }
 
     private User createUser(String name) {
