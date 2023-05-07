@@ -13,18 +13,18 @@ import lombok.Setter;
 
 import lombok.experimental.FieldDefaults;
 
-@Table(name = "sn_roles")
+@Table(name = "sn_auth_role")
 @Entity
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Role extends AbstractBaseModel {
+public class AuthRole extends AbstractBaseModel {
 
     @Column(name = "authority", nullable = false)
     String authority;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", nullable = false)
-    User user;
+    AuthUser authUser;
 
 }
