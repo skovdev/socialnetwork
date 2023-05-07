@@ -1,10 +1,10 @@
 package local.socialnetwork.authserver.service.impl;
 
-import local.socialnetwork.authserver.model.entity.User;
+import local.socialnetwork.authserver.model.entity.AuthUser;
 
 import local.socialnetwork.authserver.model.springsecurity.UserPrincipal;
 
-import local.socialnetwork.authserver.repository.UserRepository;
+import local.socialnetwork.authserver.repository.AuthUserRepository;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -29,14 +29,14 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
 
-    final UserRepository userRepository;
+    final AuthUserRepository authUserRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username)
+        AuthUser authUser = authUserRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException(username + " is not found"));
         List<GrantedAuthority> roles = new ArrayList<>();
-        user.getRoles().forEach(r -> roles.add(new SimpleGrantedAuthority("ROLE_" + r.getAuthority())));
-        return new UserPrincipal(user.getId(), user.getUsername(), user.getPassword(), roles);
+        authUser.getAuthRoles().forEach(r -> roles.add(new SimpleGrantedAuthority("ROLE_" + r.getAuthority())));
+        return new UserPrincipal(authUser.getId(), authUser.getUsername(), authUser.getPassword(), roles);
     }
 }
