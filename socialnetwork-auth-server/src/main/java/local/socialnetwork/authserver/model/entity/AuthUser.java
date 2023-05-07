@@ -7,8 +7,6 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
-import local.socialnetwork.authserver.model.entity.AbstractBaseModel;
-import local.socialnetwork.authserver.model.entity.Role;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,12 +15,12 @@ import lombok.experimental.FieldDefaults;
 
 import java.util.List;
 
-@Table(name = "sn_users")
+@Table(name = "sn_auth_user")
 @Entity
 @Setter
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class User extends AbstractBaseModel {
+public class AuthUser extends AbstractBaseModel {
 
     @Column(name = "username", nullable = false)
     String username;
@@ -30,7 +28,7 @@ public class User extends AbstractBaseModel {
     @Column(name = "password", nullable = false)
     String password;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    List<Role> roles;
+    @OneToMany(mappedBy = "authUser", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    List<AuthRole> authRoles;
 
 }

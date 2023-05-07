@@ -46,7 +46,8 @@ public class SecurityConfig {
             .and()
             .securityMatcher("/auth/**")
             .authorizeHttpRequests(authorizeRequests ->
-                    authorizeRequests.requestMatchers(HttpMethod.POST, "/registration").permitAll()
+                    authorizeRequests
+                            .requestMatchers(HttpMethod.POST, "/signup").permitAll()
                             .requestMatchers(HttpMethod.POST, "/signin").permitAll()
                             .anyRequest().authenticated())
             .apply(new JwtConfigurer(jwtTokenProvider));
