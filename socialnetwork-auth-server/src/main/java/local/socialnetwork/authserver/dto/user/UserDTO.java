@@ -18,7 +18,7 @@ public class UserDTO {
     String city;
     String address;
     String phone;
-    String birthday;
+    String birthDay;
     String familyStatus;
     UUID authUserId;
 }

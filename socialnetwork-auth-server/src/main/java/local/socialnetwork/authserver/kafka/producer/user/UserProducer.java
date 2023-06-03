@@ -46,7 +46,7 @@ public class UserProducer {
         userDTO.setCity(signUpDTO.getCity());
         userDTO.setAddress(signUpDTO.getAddress());
         userDTO.setPhone(signUpDTO.getPhone());
-        userDTO.setBirthday(signUpDTO.getBirthDay());
+        userDTO.setBirthDay(signUpDTO.getBirthDay());
         userDTO.setFamilyStatus(signUpDTO.getFamilyStatus());
         userDTO.setAuthUserId(authUserId);
         return userDTO;
