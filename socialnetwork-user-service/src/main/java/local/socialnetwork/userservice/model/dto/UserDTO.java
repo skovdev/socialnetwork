@@ -1,22 +1,20 @@
 package local.socialnetwork.userservice.model.dto;
 
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.experimental.FieldDefaults;
+import lombok.ToString;
 
-@Getter
 @Setter
-@FieldDefaults(level = AccessLevel.PRIVATE)
-public class RegistrationDto {
+@Getter
+@ToString
+public class UserDTO {
     String firstName;
     String lastName;
-    String username;
-    String password;
     String country;
     String city;
     String address;
     String phone;
-    String birthday;
+    String birthDay;
     String familyStatus;
+    String authUserId;
 }

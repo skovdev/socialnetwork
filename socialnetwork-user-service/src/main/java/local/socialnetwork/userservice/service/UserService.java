@@ -1,20 +1,12 @@
 package local.socialnetwork.userservice.service;
 
-import local.socialnetwork.userservice.model.dto.RegistrationDto;
-
-import local.socialnetwork.userservice.model.dto.profile.EditProfileDto;
-import local.socialnetwork.userservice.model.entity.user.CustomUser;
-
-import java.io.IOException;
+import local.socialnetwork.userservice.model.entity.User;
 
 import java.util.Optional;
 import java.util.UUID;
 
 public interface UserService {
-    Optional<CustomUser> findById(UUID id);
-    Optional<CustomUser> findByUsername(String username);
-    void update(EditProfileDto editProfile);
-    void registration(RegistrationDto registrationDTO) throws IOException;
+    Optional<User> findById(UUID id);
+    void save(User user);
     void deleteById(UUID id);
-    void changePassword(String username, String newPassword);
 }
