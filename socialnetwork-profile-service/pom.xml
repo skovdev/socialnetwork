@@ -29,7 +29,7 @@
         <jackson.version>2.13.4.2</jackson.version>
         <swagger.annotations.version>2.2.0</swagger.annotations.version>
         <springdoc.openapi.ui.version>1.6.9</springdoc.openapi.ui.version>
-        <google.guava.version>31.1-jre</google.guava.version>
+        <google.guava.version>32.0.0-jre</google.guava.version>
         <projectlombok.version>1.18.24</projectlombok.version>
         <maven.compiler.source>14</maven.compiler.source>
         <maven.compiler.target>14</maven.compiler.target>
