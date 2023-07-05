@@ -1,4 +1,4 @@
-package local.socialnetwork.userservice.model.dto;
+package local.socialnetwork.userservice.model.dto.user;
 
 import lombok.Getter;
 import lombok.Setter;

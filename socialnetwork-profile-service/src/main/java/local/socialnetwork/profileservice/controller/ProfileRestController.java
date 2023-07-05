@@ -2,11 +2,7 @@ package local.socialnetwork.profileservice.controller;
 
 import local.socialnetwork.profileservice.exception.ProfileServiceException;
 
-import local.socialnetwork.profileservice.model.dto.profile.ChangePasswordDto;
-import local.socialnetwork.profileservice.model.dto.profile.EditProfileDto;
 import local.socialnetwork.profileservice.model.dto.profile.ProfileDto;
-
-import local.socialnetwork.profileservice.model.dto.profile.ProfileInfoDto;
 
 import local.socialnetwork.profileservice.service.ProfileService;
 
@@ -57,30 +53,18 @@ public class ProfileRestController {
     }
 
     @GetMapping("/user")
-    public ProfileDto findByUserId(@RequestParam("userId") UUID id) {
-        return profileService.findByUserId(id);
-    }
-
-    @GetMapping("/user/{username}")
-    public ProfileInfoDto findByUsername(@PathVariable("username") String username) {
-        return profileService.findByUsername(username);
-    }
-
-    @GetMapping("/user/{username}/edit")
-    public EditProfileDto findEditProfileByUsername(@PathVariable("username") String username) {
-        return profileService.findEditProfileByUsername(username);
+    public ProfileDto findByUserId(@RequestParam("userId") UUID userId) {
+        return profileService.findByUserId(userId);
     }
 
     @GetMapping("/avatar")
-    public String findAvatarByUsername(@RequestParam("username") String username) {
-        return profileService.findAvatarByUsername(username);
+    public String findAvatarByUserId(@RequestParam("userId") UUID userId) {
+        return profileService.findAvatarByUserId(userId);
     }
 
     @PostMapping
     public ResponseEntity<String> save(@RequestBody String encodedProfile) throws IOException, ClassNotFoundException {
-
         if (encodedProfile != null) {
-
             ProfileDto profileDto = (ProfileDto) resourceUtil.convertFromString(encodedProfile);
             profileService.createProfile(profileDto);
             return new ResponseEntity<>("Profile has saved successfully", HttpStatus.OK);
@@ -89,41 +73,23 @@ public class ProfileRestController {
         }
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<String> update(@PathVariable("id") UUID id, @RequestBody EditProfileDto editProfileDto) throws ProfileServiceException {
-        profileService.updateProfile(id, editProfileDto);
-        return new ResponseEntity<>("Profile with ID: " + id + " has updated successfully", HttpStatus.OK);
-    }
-
     @PutMapping("/avatar")
-    public ResponseEntity<String> updateAvatar(@RequestParam("username") String username,  @RequestParam("profileAvatar") MultipartFile multipartFile) throws ProfileServiceException, IOException {
-        profileService.updateAvatarProfile(username, multipartFile);
+    public ResponseEntity<String> updateAvatar(@RequestParam("userId") UUID userId,  @RequestParam("profileAvatar") MultipartFile multipartFile) throws ProfileServiceException, IOException {
+        profileService.updateAvatarProfile(userId, multipartFile);
         return new ResponseEntity<>("Avatar has updated successfully", HttpStatus.OK);
     }
 
     @DeleteMapping("/avatar")
-    public ResponseEntity<String> deleteAvatar(@RequestParam("username") String username) throws ProfileServiceException, IOException {
-        return new ResponseEntity<>(profileService.setDefaultAvatar(username), HttpStatus.OK);
+    public ResponseEntity<String> deleteAvatar(@RequestParam("userId") UUID userId) throws ProfileServiceException, IOException {
+        return new ResponseEntity<>(profileService.setDefaultAvatar(userId), HttpStatus.OK);
     }
 
     @PutMapping
-    public ResponseEntity<String> changeStatus(@RequestParam("username") String username, boolean isActive) {
-
-        if (profileService.changeStatus(username, isActive)) {
+    public ResponseEntity<String> changeStatus(@RequestParam("userId") UUID userId, boolean isActive) {
+        if (profileService.changeStatus(userId, isActive)) {
             return new ResponseEntity<>("Status has changed successfully", HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
-
-    @PutMapping("/password/change")
-    public ResponseEntity<String> changePassword(@RequestBody ChangePasswordDto changePasswordDto) {
-
-        if (profileService.checkIfValidOldPassword(changePasswordDto)) {
-            profileService.changePassword(changePasswordDto.getUsername(), changePasswordDto.getNewPassword());
-            return new ResponseEntity<>("Password has changed successfully", HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>("Old password is not matched", HttpStatus.NOT_FOUND);
         }
     }
 }
