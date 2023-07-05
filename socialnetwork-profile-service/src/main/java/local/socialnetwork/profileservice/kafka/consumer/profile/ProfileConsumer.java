@@ -1,4 +1,4 @@
-package local.socialnetwork.profileservice.service.kafka.consumer.profile;
+package local.socialnetwork.profileservice.kafka.consumer.profile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -24,7 +24,7 @@ import org.springframework.stereotype.Service;
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @RequiredArgsConstructor
-public class ProfileConsumeService {
+public class ProfileConsumer {
 
     static final String PROFILE_GROUP_ID = "default-group-id";
     static final String TOPIC_PROFILE_NEW = "topic.profile.new";
@@ -33,8 +33,8 @@ public class ProfileConsumeService {
     final ObjectMapper objectMapper;
 
     @KafkaListener(topics = TOPIC_PROFILE_NEW, groupId = PROFILE_GROUP_ID)
-    public void consumeProfileForSaving(ConsumerRecord<String, String> consumerRecord) {
-        log.info("### -> Received new profile for saving <- ###");
+    public void consumeProfileToSave(ConsumerRecord<String, String> consumerRecord) {
+        log.info("### -> Received new profile to save <- ###");
         ProfileDto profileDto = getProfile(consumerRecord.value());
         profileService.createProfile(profileDto);
     }

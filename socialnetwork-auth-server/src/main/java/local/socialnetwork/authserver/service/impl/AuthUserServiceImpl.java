@@ -2,8 +2,6 @@ package local.socialnetwork.authserver.service.impl;
 
 import local.socialnetwork.authserver.dto.SignUpDTO;
 
-import local.socialnetwork.authserver.kafka.producer.profile.ProfileProducer;
-
 import local.socialnetwork.authserver.kafka.producer.user.UserProducer;
 
 import local.socialnetwork.authserver.model.entity.AuthRole;
@@ -41,13 +39,9 @@ public class AuthUserServiceImpl implements AuthUserService {
     @Value("${sn.kafka.topic.user.new}")
     String kafkaTopicNewUser;
 
-    @Value("${sn.kafka.topic.profile.new}")
-    String kafkaTopicNewProfile;
-
     final AuthUserRepository authUserRepository;
     final AuthRoleRepository authRoleRepository;
     final UserProducer userProducer;
-    final ProfileProducer profileProducer;
     final PasswordEncoder passwordEncoder;
 
     @Transactional
@@ -74,7 +68,6 @@ public class AuthUserServiceImpl implements AuthUserService {
         authRoleRepository.save(authRole);
 
         userProducer.sendUserAndSave(kafkaTopicNewUser, signUpDTO, authUser.getId());
-        profileProducer.sendProfileAndSave(kafkaTopicNewProfile, authUser.getId());
 
     }
 }
