@@ -2,7 +2,7 @@ package local.socialnetwork.userservice.kafka.consumer.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import local.socialnetwork.userservice.model.dto.UserDTO;
+import local.socialnetwork.userservice.model.dto.user.UserDTO;
 
 import local.socialnetwork.userservice.model.entity.User;
 import local.socialnetwork.userservice.service.UserService;
@@ -18,13 +18,13 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 
 import org.springframework.kafka.annotation.KafkaListener;
 
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 @Slf4j
-@Service
+@Component
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @RequiredArgsConstructor
-public class UserConsumerService {
+public class UserConsumer {
 
     static final String USER_DEFAULT_GROUP_ID = "user-default-group-id";
     static final String TOPIC_USER_NEW = "topic.user.new";

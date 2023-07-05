@@ -1,23 +1,14 @@
 package local.socialnetwork.profileservice.service.impl;
 
-import local.socialnetwork.profileservice.client.user.UserProxyService;
-
 import local.socialnetwork.profileservice.exception.ProfileServiceException;
 
-import local.socialnetwork.profileservice.model.dto.profile.ChangePasswordDto;
-import local.socialnetwork.profileservice.model.dto.profile.EditProfileDto;
 import local.socialnetwork.profileservice.model.dto.profile.ProfileDto;
-
-import local.socialnetwork.profileservice.model.dto.profile.ProfileInfoDto;
-import local.socialnetwork.profileservice.model.dto.user.UserDto;
 
 import local.socialnetwork.profileservice.model.entity.profile.Profile;
 
 import local.socialnetwork.profileservice.repository.ProfileRepository;
 
 import local.socialnetwork.profileservice.service.ProfileService;
-
-import local.socialnetwork.profileservice.service.kafka.producer.user.UserProducerService;
 
 import local.socialnetwork.profileservice.util.ResourceUtil;
 
@@ -29,8 +20,6 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Value;
-
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import org.springframework.stereotype.Service;
 
@@ -57,14 +46,8 @@ public class ProfileServiceImpl implements ProfileService {
     @Value("${sn.profile.default.avatar.path}")
     String pathDefaultAvatar;
 
-    @Value("${sn.kafka.topic.user.update}")
-    String topicUserUpdate;
-
     final ProfileRepository profileRepository;
-    final UserProxyService userProxyService;
-    final UserProducerService userProducerService;
     final ResourceUtil resourceUtil;
-    final PasswordEncoder passwordEncoder;
 
     @Override
     public List<ProfileDto> findAll() {
@@ -94,8 +77,8 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public ProfileDto findByUserId(UUID id) {
-        Profile profile = profileRepository.findProfileByUserId(id);
+    public ProfileDto findByUserId(UUID userId) {
+        Profile profile = profileRepository.findProfileByUserId(userId);
         if (profile != null) {
             ProfileDto profileDto = new ProfileDto();
             profileDto.setId(profile.getId());
@@ -108,55 +91,10 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public ProfileInfoDto findByUsername(String username) {
-        UserDto userDto = userProxyService.findUserByUsername(username);
-        if (userDto != null) {
-            Profile profile = profileRepository.findProfileByUserId(userDto.getId());
-            if (profile != null) {
-                ProfileInfoDto profileInfoDto = new ProfileInfoDto();
-                profileInfoDto.setActive(profile.isActive());
-                profileInfoDto.setAvatar(profile.getAvatar());
-                profileInfoDto.setFirstName(userDto.getFirstName());
-                profileInfoDto.setLastName(userDto.getLastName());
-                profileInfoDto.setBirthDay(userDto.getUserDetails().getBirthday());
-                profileInfoDto.setCountry(userDto.getUserDetails().getCountry());
-                profileInfoDto.setCity(userDto.getUserDetails().getCity());
-                profileInfoDto.setFamilyStatus(userDto.getUserDetails().getFamilyStatus());
-                profileInfoDto.setPhone(userDto.getUserDetails().getFamilyStatus());
-                profileInfoDto.setAddress(userDto.getUserDetails().getAddress());
-                return profileInfoDto;
-            }
-        }
-        throw new NullPointerException();
-    }
-
-    @Override
-    public EditProfileDto findEditProfileByUsername(String username) {
-        UserDto userDto = userProxyService.findUserByUsername(username);
-        if (userDto != null) {
-            EditProfileDto editProfileDto = new EditProfileDto();
-            editProfileDto.setFirstName(userDto.getFirstName());
-            editProfileDto.setLastName(userDto.getLastName());
-            editProfileDto.setCountry(userDto.getUserDetails().getCountry());
-            editProfileDto.setCity(userDto.getUserDetails().getCity());
-            editProfileDto.setAddress(userDto.getUserDetails().getAddress());
-            editProfileDto.setPhone(userDto.getUserDetails().getPhone());
-            editProfileDto.setBirthday(userDto.getUserDetails().getBirthday());
-            editProfileDto.setFamilyStatus(userDto.getUserDetails().getFamilyStatus());
-            editProfileDto.setUserId(userDto.getId());
-            return editProfileDto;
-        }
-        throw new NullPointerException();
-    }
-
-    @Override
-    public String findAvatarByUsername(String username) {
-        UserDto userDto = userProxyService.findUserByUsername(username);
-        if (userDto != null) {
-            Profile profile = profileRepository.findProfileByUserId(userDto.getId());
-            if (profile != null) {
-                return profile.getAvatar();
-            }
+    public String findAvatarByUserId(UUID userId) {
+        Profile profile = profileRepository.findProfileByUserId(userId);
+        if (profile != null) {
+            return profile.getAvatar();
         }
         throw new NullPointerException();
     }
@@ -174,76 +112,40 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public void updateProfile(UUID id, EditProfileDto editProfileDto) throws ProfileServiceException {
-        var user = userProxyService.findUserByUserId(id);
-        if (user != null) {
-            editProfileDto.setUserId(user.getId());
-            userProducerService.sendUserForUpdate(topicUserUpdate, editProfileDto);
+    public void updateAvatarProfile(UUID userId, MultipartFile multipartFile) throws ProfileServiceException, IOException {
+        Profile profile = profileRepository.findProfileByUserId(userId);
+        if (profile != null) {
+            var encodedAvatar = resourceUtil.writeResource(multipartFile, pathUploadAvatar);
+            profile.setAvatar(encodedAvatar);
+            profileRepository.save(profile);
+            log.info("Profile with ID: {} has updated avatar", profile.getId());
         } else {
-            throw new ProfileServiceException("Profile has not updated");
+            throw new ProfileServiceException("Avatar for profile has not updated");
         }
     }
 
     @Override
-    public void updateAvatarProfile(String username, MultipartFile multipartFile) throws ProfileServiceException, IOException {
-        UserDto user = userProxyService.findUserByUsername(username);
-        if (user != null) {
-            Profile profile = profileRepository.findProfileByUserId(user.getId());
-            if (profile != null) {
-                var encodedAvatar = resourceUtil.writeResource(multipartFile, pathUploadAvatar);
-                profile.setAvatar(encodedAvatar);
-                profileRepository.save(profile);
-                log.info("Profile with ID: {} has updated avatar", profile.getId());
-            } else {
-                throw new ProfileServiceException("Avatar for profile has not updated");
-            }
+    public String setDefaultAvatar(UUID userId) throws ProfileServiceException, IOException {
+        Profile profile = profileRepository.findProfileByUserId(userId);
+        if (profile != null) {
+            String encodedDefaultAvatar = resourceUtil.getEncodedResource(pathDefaultAvatar);
+            profile.setAvatar(encodedDefaultAvatar);
+            log.info("Profile with ID: {} has deleted current avatar and set default avatar", profile.getId());
+            return encodedDefaultAvatar;
+        } else {
+            throw new ProfileServiceException("Could not set default avatar for profile");
         }
     }
 
     @Override
-    public String setDefaultAvatar(String username) throws ProfileServiceException, IOException {
-        UserDto user = userProxyService.findUserByUsername(username);
-        if (user != null) {
-            Profile profile = profileRepository.findProfileByUserId(user.getId());
-            if (profile.getUserId().equals(user.getId())) {
-                String encodedDefaultAvatar = resourceUtil.getEncodedResource(pathDefaultAvatar);
-                profile.setAvatar(encodedDefaultAvatar);
-                log.info("Profile with ID: {} has deleted current avatar and set default avatar", profile.getId());
-                return encodedDefaultAvatar;
-            } else {
-                throw new ProfileServiceException("Could not set default avatar for profile");
-            }
-        }
-        throw new NullPointerException();
-    }
-
-    @Override
-    public boolean changeStatus(String username, boolean isActive) {
-        UserDto user = userProxyService.findUserByUsername(username);
-        if (user != null) {
-            Profile profile = profileRepository.findProfileByUserId(user.getId());
-            if (profile != null) {
-                profile.setActive(isActive);
-                profileRepository.save(profile);
-                log.info("Profile with ID: {} has changed status", profile.getId());
-                return true;
-            }
+    public boolean changeStatus(UUID userId, boolean isActive) {
+        Profile profile = profileRepository.findProfileByUserId(userId);
+        if (profile != null) {
+            profile.setActive(isActive);
+            profileRepository.save(profile);
+            log.info("Profile with ID: {} has changed status", profile.getId());
+            return true;
         }
         return false;
-    }
-
-    @Override
-    public boolean checkIfValidOldPassword(ChangePasswordDto changePasswordDto) {
-        var user = userProxyService.findUserByUsername(changePasswordDto.getUsername());
-        return user != null && passwordEncoder.matches(changePasswordDto.getOldPassword(), user.getPassword());
-    }
-
-    @Override
-    public void changePassword(String username, String newPassword) {
-        var user = userProxyService.findUserByUsername(username);
-        if (user != null) {
-            String encodedPassword = passwordEncoder.encode(newPassword);
-            userProxyService.changePassword(user.getUsername(), encodedPassword);
-        }
     }
 }
