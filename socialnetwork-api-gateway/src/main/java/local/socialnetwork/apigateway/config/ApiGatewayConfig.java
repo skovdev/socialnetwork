@@ -24,9 +24,12 @@ public class ApiGatewayConfig {
     @Bean
     public RouteLocator configureRoute(RouteLocatorBuilder builder) {
         return builder.routes()
+                .route("user-service", r -> r.path("/users/**")
+                        .filters(filter -> filter.filter(validationAuthHeaderGatewayPreFilter))
+                        .uri("http://localhost:8084"))
                 .route("profile-service", r -> r.path("/profiles/**")
                         .filters(filter -> filter.filter(validationAuthHeaderGatewayPreFilter))
-                        .uri("http://socialnetwork-profile-service:8081"))
+                        .uri("http://localhost:8081"))
                 .build();
     }
 }
