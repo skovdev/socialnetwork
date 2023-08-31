@@ -18,10 +18,12 @@
         <module>socialnetwork-api-gateway</module>
         <module>socialnetwork-service-discovery</module>
         <module>socialnetwork-user-service</module>
+        <module>socialnetwork-integration-testing</module>
+        <module>socialnetwork-unit-testing</module>
     </modules>
 
     <properties>
-        <java.version>14</java.version>
+        <java.version>20</java.version>
         <spring.cloud.netflix.eureka.server.version>3.1.2</spring.cloud.netflix.eureka.server.version>
         <spring.cloud.openfeign.version>2.2.5.RELEASE</spring.cloud.openfeign.version>
         <postgresql.version>42.5.4</postgresql.version>
