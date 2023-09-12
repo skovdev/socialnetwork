@@ -18,7 +18,7 @@
     <packaging>jar</packaging>
 
     <properties>
-        <java.version>14</java.version>
+        <java.version>20</java.version>
         <spring.boot.version>2.7.3</spring.boot.version>
         <spring.cloud.netflix.eureka.server.version>3.1.4</spring.cloud.netflix.eureka.server.version>
         <spring.cloud.starter.config.version>3.1.4</spring.cloud.starter.config.version>
