@@ -73,6 +73,7 @@ public class AuthenticationRestController {
             List<String> roles = getRoles(authUser.getAuthRoles());
             String token = jwtTokenProvider.createToken(authUser.getId(), authUser.getUsername(), roles);
             Map<Object, Object> model = new HashMap<>();
+            model.put("authUserId", authUser.getId());
             model.put("username", authUser.getUsername());
             model.put("token", token);
             log.info("User { id: {}, username: {} } authenticated successfully", authUser.getId(), authUser.getUsername());
