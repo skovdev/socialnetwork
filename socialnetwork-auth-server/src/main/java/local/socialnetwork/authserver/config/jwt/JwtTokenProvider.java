@@ -61,6 +61,7 @@ public class JwtTokenProvider {
     public String createToken(UUID id, String username, List<String> roles) {
         String uuid = String.valueOf(id);
         Claims claims = Jwts.claims().setSubject(uuid);
+        claims.put("authUserId", id);
         claims.put("username", username);
         claims.put("isAdmin", isAdmin(roles));
         Date now = new Date();
