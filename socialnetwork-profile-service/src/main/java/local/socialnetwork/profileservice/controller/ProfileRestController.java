@@ -52,14 +52,14 @@ public class ProfileRestController {
         return profileService.findByProfileId(profileId);
     }
 
-    @GetMapping("/user")
-    public ProfileDto findByUserId(@RequestParam("userId") UUID userId) {
-        return profileService.findByUserId(userId);
+    @GetMapping("/user/{authUserId}")
+    public ProfileDto findByAuthUserId(@PathVariable("authUserId") UUID authUserId) {
+        return profileService.findByAuthUserId(authUserId);
     }
 
     @GetMapping("/avatar")
-    public String findAvatarByUserId(@RequestParam("userId") UUID userId) {
-        return profileService.findAvatarByUserId(userId);
+    public String findAvatarByAuthUserId(@RequestParam("authUserId") UUID userId) {
+        return profileService.findAvatarByAuthUserId(userId);
     }
 
     @PostMapping

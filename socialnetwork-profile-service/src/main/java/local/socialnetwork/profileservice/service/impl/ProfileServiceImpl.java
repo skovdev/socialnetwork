@@ -57,6 +57,7 @@ public class ProfileServiceImpl implements ProfileService {
             profileDto.setId(p.getId());
             profileDto.setActive(p.isActive());
             profileDto.setAvatar(p.getAvatar());
+            profileDto.setAuthUserId(p.getAuthUserId());
             profileDto.setUserId(p.getUserId());
             return profileDto;
         }).collect(Collectors.toList());
@@ -70,6 +71,7 @@ public class ProfileServiceImpl implements ProfileService {
             profileDto.setId(profile.getId());
             profileDto.setActive(profile.isActive());
             profileDto.setAvatar(profile.getAvatar());
+            profileDto.setAuthUserId(profile.getAuthUserId());
             profileDto.setUserId(profile.getUserId());
             return profileDto;
         }
@@ -77,13 +79,14 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public ProfileDto findByUserId(UUID userId) {
-        Profile profile = profileRepository.findProfileByUserId(userId);
+    public ProfileDto findByAuthUserId(UUID userId) {
+        Profile profile = profileRepository.findProfileByAuthUserId(userId);
         if (profile != null) {
             ProfileDto profileDto = new ProfileDto();
             profileDto.setId(profile.getId());
             profileDto.setActive(profile.isActive());
             profileDto.setAvatar(profile.getAvatar());
+            profileDto.setAuthUserId(profile.getAuthUserId());
             profileDto.setUserId(profile.getUserId());
             return profileDto;
         }
@@ -91,8 +94,8 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public String findAvatarByUserId(UUID userId) {
-        Profile profile = profileRepository.findProfileByUserId(userId);
+    public String findAvatarByAuthUserId(UUID userId) {
+        Profile profile = profileRepository.findProfileByAuthUserId(userId);
         if (profile != null) {
             return profile.getAvatar();
         }
@@ -106,6 +109,7 @@ public class ProfileServiceImpl implements ProfileService {
             profile.setId(profileDto.getId());
             profile.setActive(profileDto.isActive());
             profile.setAvatar(profileDto.getAvatar());
+            profile.setAuthUserId(profileDto.getAuthUserId());
             profile.setUserId(profileDto.getUserId());
             profileRepository.save(profile);
         }
@@ -113,7 +117,7 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public void updateAvatarProfile(UUID userId, MultipartFile multipartFile) throws ProfileServiceException, IOException {
-        Profile profile = profileRepository.findProfileByUserId(userId);
+        Profile profile = profileRepository.findProfileByAuthUserId(userId);
         if (profile != null) {
             var encodedAvatar = resourceUtil.writeResource(multipartFile, pathUploadAvatar);
             profile.setAvatar(encodedAvatar);
@@ -126,7 +130,7 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public String setDefaultAvatar(UUID userId) throws ProfileServiceException, IOException {
-        Profile profile = profileRepository.findProfileByUserId(userId);
+        Profile profile = profileRepository.findProfileByAuthUserId(userId);
         if (profile != null) {
             String encodedDefaultAvatar = resourceUtil.getEncodedResource(pathDefaultAvatar);
             profile.setAvatar(encodedDefaultAvatar);
@@ -139,7 +143,7 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public boolean changeStatus(UUID userId, boolean isActive) {
-        Profile profile = profileRepository.findProfileByUserId(userId);
+        Profile profile = profileRepository.findProfileByAuthUserId(userId);
         if (profile != null) {
             profile.setActive(isActive);
             profileRepository.save(profile);
