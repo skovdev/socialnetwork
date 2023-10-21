@@ -22,7 +22,10 @@ public class Profile extends AbstractBaseModel {
     @Column(name = "avatar")
     private String avatar;
 
-    @Column(name = "user_id")
+    @Column(name = "auth_user_id", nullable = false, unique = true)
+    private UUID authUserId;
+
+    @Column(name = "user_id", nullable = false, unique = true)
     private UUID userId;
 
     public boolean isActive() {
@@ -41,6 +44,15 @@ public class Profile extends AbstractBaseModel {
     @JsonProperty(value = "avatar")
     public void setAvatar(String avatar) {
         this.avatar = avatar;
+    }
+
+    public UUID getAuthUserId() {
+        return authUserId;
+    }
+
+    @JsonProperty(value = "authUserId")
+    public void setAuthUserId(UUID authUserId) {
+        this.authUserId = authUserId;
     }
 
     public UUID getUserId() {
