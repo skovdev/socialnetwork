@@ -15,5 +15,6 @@ public class ProfileDto {
     UUID id;
     boolean isActive;
     String avatar;
+    UUID authUserId;
     UUID userId;
 }

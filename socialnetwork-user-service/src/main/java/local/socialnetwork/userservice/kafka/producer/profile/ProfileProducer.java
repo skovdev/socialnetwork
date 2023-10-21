@@ -38,15 +38,15 @@ public class ProfileProducer {
     final ResourceUtil resourceUtil;
     final ObjectMapper objectMapper;
 
-    public void sendProfileAndSave(String topic, UUID userId) {
+    public void sendProfileAndSave(String topic, UUID authUserId, UUID userId) {
         try {
-            this.kafkaTemplate.send(topic, objectMapper.writeValueAsString(buildProfile(userId)));
+            this.kafkaTemplate.send(topic, objectMapper.writeValueAsString(buildProfile(authUserId, userId)));
         } catch (JsonProcessingException e) {
             log.error(e.getMessage());
         }
     }
 
-    private ProfileDTO buildProfile(UUID userId) {
+    private ProfileDTO buildProfile(UUID authUserId, UUID userId) {
         ProfileDTO profileDTO = new ProfileDTO();
         profileDTO.setId(UUID.randomUUID());
         profileDTO.setActive(true);
@@ -55,6 +55,7 @@ public class ProfileProducer {
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage());
         }
+        profileDTO.setAuthUserId(authUserId);
         profileDTO.setUserId(userId);
         return profileDTO;
     }

@@ -14,8 +14,8 @@ import java.util.UUID;
 public interface ProfileService {
     List<ProfileDto> findAll();
     ProfileDto findByProfileId(UUID profileId);
-    ProfileDto findByUserId(UUID userId);
-    String findAvatarByUserId(UUID userId);
+    ProfileDto findByAuthUserId(UUID authUserId);
+    String findAvatarByAuthUserId(UUID authUserId);
     void createProfile(ProfileDto profileDto);
     void updateAvatarProfile(UUID userId, MultipartFile multipartFile) throws ProfileServiceException, IOException;
     String setDefaultAvatar(UUID userId) throws ProfileServiceException, IOException;
