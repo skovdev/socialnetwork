@@ -1,7 +1,6 @@
 package local.socialnetwork.userservice.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 
 import io.swagger.v3.oas.annotations.media.Content;
 
@@ -11,7 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 import local.socialnetwork.userservice.aspect.annotation.LogMethodController;
 
-import local.socialnetwork.userservice.model.entity.User;
+import local.socialnetwork.userservice.model.dto.user.UserDto;
 
 import local.socialnetwork.userservice.service.UserService;
 
@@ -39,11 +38,11 @@ public class UserRestController {
     final UserService userService;
 
     @LogMethodController
-    @Operation(summary = "Get the user by id")
-    @ApiResponse(description = "Found the user by id", content = { @Content(mediaType = "application/json") }, responseCode = "200")
-    @GetMapping("/{id}")
-    public ResponseEntity<User> findById(@PathVariable("id") @Parameter(description = "Id of user for getting of user by id") UUID id) {
-        User user = userService.findById(id).orElseThrow(NullPointerException::new);
-        return ResponseEntity.ok().body(user);
+    @Operation(summary = "Get the user by authUserId")
+    @ApiResponse(description = "Found the user by authUserId", content = { @Content(mediaType = "application/json") }, responseCode = "200")
+    @GetMapping("/{authUserId}")
+    public ResponseEntity<UserDto> findByAuthUserId(@PathVariable("authUserId") UUID authUserId) {
+        UserDto userDto = userService.findByAuthUserId(authUserId);
+        return ResponseEntity.ok().body(userDto);
     }
 }
