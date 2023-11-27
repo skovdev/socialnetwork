@@ -40,7 +40,6 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>2.7.0</version>
                 <configuration>
                     <mainClass>local.socialnetwork.configserver.SpringBootRunConfigServer</mainClass>
                 </configuration>
