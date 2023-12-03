@@ -1,6 +1,6 @@
 package local.socialnetwork.authserver.service.impl;
 
-import local.socialnetwork.authserver.dto.SignUpDTO;
+import local.socialnetwork.authserver.dto.SignUpDto;
 
 import local.socialnetwork.authserver.kafka.producer.user.UserProducer;
 
@@ -52,7 +52,7 @@ public class AuthUserServiceImpl implements AuthUserService {
 
     @Transactional
     @Override
-    public void signUp(SignUpDTO signUpDTO) {
+    public void signUp(SignUpDto signUpDTO) {
 
         AuthUser authUser = new AuthUser();
         authUser.setUsername(signUpDTO.getUsername());
