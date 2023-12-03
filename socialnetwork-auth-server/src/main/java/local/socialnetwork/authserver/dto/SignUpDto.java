@@ -1,17 +1,17 @@
-package local.socialnetwork.authserver.dto.user;
+package local.socialnetwork.authserver.dto;
 
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.AccessLevel;
 
 import lombok.experimental.FieldDefaults;
-
-import java.util.UUID;
 
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserDTO {
+public class SignUpDto {
+    String username;
+    String password;
     String firstName;
     String lastName;
     String country;
@@ -20,5 +20,4 @@ public class UserDTO {
     String phone;
     String birthDay;
     String familyStatus;
-    UUID authUserId;
 }
