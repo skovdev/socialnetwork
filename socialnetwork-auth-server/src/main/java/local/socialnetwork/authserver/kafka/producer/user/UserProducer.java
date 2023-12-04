@@ -4,9 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import local.socialnetwork.authserver.dto.SignUpDTO;
+import local.socialnetwork.authserver.dto.SignUpDto;
 
-import local.socialnetwork.authserver.dto.user.UserDTO;
+import local.socialnetwork.authserver.dto.user.UserDto;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -30,16 +30,16 @@ public class UserProducer {
     final KafkaTemplate<String, String> kafkaTemplate;
     final ObjectMapper objectMapper;
 
-    public void sendUserAndSave(String topic, SignUpDTO signUpDTO, UUID authUserId) {
+    public void sendUserAndSave(String topic, SignUpDto signUpDTO, UUID authUserId) {
         try {
             this.kafkaTemplate.send(topic, objectMapper.writeValueAsString(buildUser(signUpDTO, authUserId)));
         } catch (JsonProcessingException e) {
-            log.error(e.getMessage());
+            log.error("Error occurred while sending the user. Message: {}", e.getMessage());
         }
     }
 
-    private UserDTO buildUser(SignUpDTO signUpDTO, UUID authUserId) {
-        UserDTO userDTO = new UserDTO();
+    private UserDto buildUser(SignUpDto signUpDTO, UUID authUserId) {
+        UserDto userDTO = new UserDto();
         userDTO.setFirstName(signUpDTO.getFirstName());
         userDTO.setLastName(signUpDTO.getLastName());
         userDTO.setCountry(signUpDTO.getCountry());
