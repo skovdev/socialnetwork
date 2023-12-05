@@ -4,10 +4,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import local.socialnetwork.profileservice.model.entity.AbstractBaseModel;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Lob;
-import javax.persistence.Table;
+import org.hibernate.annotations.Type;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Lob;
+import jakarta.persistence.Table;
 
 import java.util.UUID;
 
@@ -22,9 +24,7 @@ public class Profile extends AbstractBaseModel {
     @Column(name = "avatar")
     private String avatar;
 
-    @Column(name = "auth_user_id", nullable = false, unique = true)
-    private UUID authUserId;
-
+    @Type(type = "pg-uuid")
     @Column(name = "user_id", nullable = false, unique = true)
     private UUID userId;
 
@@ -44,15 +44,6 @@ public class Profile extends AbstractBaseModel {
     @JsonProperty(value = "avatar")
     public void setAvatar(String avatar) {
         this.avatar = avatar;
-    }
-
-    public UUID getAuthUserId() {
-        return authUserId;
-    }
-
-    @JsonProperty(value = "authUserId")
-    public void setAuthUserId(UUID authUserId) {
-        this.authUserId = authUserId;
     }
 
     public UUID getUserId() {
