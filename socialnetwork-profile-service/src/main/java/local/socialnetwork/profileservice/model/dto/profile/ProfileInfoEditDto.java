@@ -1,13 +1,17 @@
-package local.socialnetwork.userservice.model.dto.user;
+package local.socialnetwork.profileservice.model.dto.profile;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.AccessLevel;
 
-@Setter
+import lombok.experimental.FieldDefaults;
+
 @Getter
+@Setter
 @ToString
-public class UserDTO {
+@FieldDefaults(level = AccessLevel.PRIVATE)
+public class ProfileInfoEditDto {
     String firstName;
     String lastName;
     String country;
@@ -16,5 +20,4 @@ public class UserDTO {
     String phone;
     String birthDay;
     String familyStatus;
-    String authUserId;
 }
