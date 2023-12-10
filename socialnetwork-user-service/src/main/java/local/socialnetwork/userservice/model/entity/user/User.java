@@ -1,16 +1,20 @@
-package local.socialnetwork.userservice.model.entity;
+package local.socialnetwork.userservice.model.entity.user;
 
-import local.socialnetwork.userservice.model.AbstractBaseModel;
+import local.socialnetwork.userservice.model.entity.AbstractBaseModel;
 
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.AccessLevel;
 
 import lombok.experimental.FieldDefaults;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import org.hibernate.annotations.Type;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+
+import java.util.UUID;
 
 @Table(name = "sn_user")
 @Entity
@@ -43,7 +47,8 @@ public class User extends AbstractBaseModel {
     @Column(name = "family_status")
     String familyStatus;
 
-    @Column(name = "auth_user_id", nullable = false)
-    String authUserId;
+    @Type(type = "pg-uuid")
+    @Column(name = "auth_user_id", nullable = false, unique = true)
+    UUID authUserId;
 
 }
