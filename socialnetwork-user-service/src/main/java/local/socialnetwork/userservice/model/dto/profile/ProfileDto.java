@@ -11,10 +11,9 @@ import java.util.UUID;
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ProfileDTO {
+public class ProfileDto {
     UUID id;
     boolean isActive;
     String avatar;
-    UUID authUserId;
     UUID userId;
 }
