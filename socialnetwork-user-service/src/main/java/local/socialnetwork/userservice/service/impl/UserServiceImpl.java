@@ -4,7 +4,7 @@ import local.socialnetwork.userservice.kafka.producer.profile.ProfileProducer;
 
 import local.socialnetwork.userservice.model.dto.user.UserDto;
 
-import local.socialnetwork.userservice.model.entity.User;
+import local.socialnetwork.userservice.model.entity.user.User;
 
 import local.socialnetwork.userservice.repository.UserRepository;
 
