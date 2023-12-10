@@ -3,6 +3,8 @@ package local.socialnetwork.profileservice.service;
 import local.socialnetwork.profileservice.exception.ProfileServiceException;
 
 import local.socialnetwork.profileservice.model.dto.profile.ProfileDto;
+import local.socialnetwork.profileservice.model.dto.profile.ProfileInfoDto;
+import local.socialnetwork.profileservice.model.dto.profile.ProfileInfoEditDto;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -13,11 +15,12 @@ import java.util.UUID;
 
 public interface ProfileService {
     List<ProfileDto> findAll();
-    ProfileDto findByProfileId(UUID profileId);
-    ProfileDto findByAuthUserId(UUID authUserId);
-    String findAvatarByAuthUserId(UUID authUserId);
+    ProfileDto findById(UUID profileId);
+    ProfileInfoDto findProfileInfoByProfileIdAndUserId(UUID profileId, UUID userId);
+    ProfileInfoEditDto findProfileInfoToEditByProfileIdAndUserId(UUID profileId, UUID userId);
+    String findAvatarById(UUID profileId);
     void createProfile(ProfileDto profileDto);
-    void updateAvatarProfile(UUID userId, MultipartFile multipartFile) throws ProfileServiceException, IOException;
-    String setDefaultAvatar(UUID userId) throws ProfileServiceException, IOException;
-    boolean changeStatus(UUID userId, boolean isActive);
+    void updateAvatarProfile(UUID profileId, MultipartFile multipartFile) throws ProfileServiceException, IOException;
+    void setDefaultAvatar(UUID profileId) throws IOException;
+    boolean changeStatus(UUID profileId, boolean isActive);
 }
