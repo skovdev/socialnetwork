@@ -1,6 +1,6 @@
 package local.socialnetwork.userservice.repository;
 
-import local.socialnetwork.userservice.model.entity.User;
+import local.socialnetwork.userservice.model.entity.user.User;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
