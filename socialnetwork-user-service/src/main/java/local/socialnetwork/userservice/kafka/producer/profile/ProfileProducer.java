@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import local.socialnetwork.userservice.model.dto.profile.ProfileDTO;
+import local.socialnetwork.userservice.model.dto.profile.ProfileDto;
 
 import local.socialnetwork.userservice.util.ResourceUtil;
 
@@ -38,16 +38,16 @@ public class ProfileProducer {
     final ResourceUtil resourceUtil;
     final ObjectMapper objectMapper;
 
-    public void sendProfileAndSave(String topic, UUID authUserId, UUID userId) {
+    public void sendProfileAndSave(String topic, UUID userId) {
         try {
-            this.kafkaTemplate.send(topic, objectMapper.writeValueAsString(buildProfile(authUserId, userId)));
+            this.kafkaTemplate.send(topic, objectMapper.writeValueAsString(buildProfile(userId)));
         } catch (JsonProcessingException e) {
             log.error(e.getMessage());
         }
     }
 
-    private ProfileDTO buildProfile(UUID authUserId, UUID userId) {
-        ProfileDTO profileDTO = new ProfileDTO();
+    private ProfileDto buildProfile(UUID userId) {
+        ProfileDto profileDTO = new ProfileDto();
         profileDTO.setId(UUID.randomUUID());
         profileDTO.setActive(true);
         try {
@@ -55,7 +55,6 @@ public class ProfileProducer {
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage());
         }
-        profileDTO.setAuthUserId(authUserId);
         profileDTO.setUserId(userId);
         return profileDTO;
     }
