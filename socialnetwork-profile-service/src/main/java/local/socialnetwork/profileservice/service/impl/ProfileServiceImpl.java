@@ -72,8 +72,14 @@ public class ProfileServiceImpl implements ProfileService {
     @Override
     public ProfileDto findById(UUID profileId) {
         return profileRepository.findById(profileId)
-                .map(profile -> new ProfileDto(profile.getId(), profile.isActive(), profile.getAvatar(), profile.getUserId()
-                )).orElse(null);
+                .map(profile -> {
+                    ProfileDto profileDto = new ProfileDto();
+                    profileDto.setId(profile.getId());
+                    profileDto.setActive(profile.isActive());
+                    profileDto.setAvatar(profile.getAvatar());
+                    profileDto.setUserId(profile.getUserId());
+                    return profileDto;
+                }).orElse(null);
     }
 
     @Override
