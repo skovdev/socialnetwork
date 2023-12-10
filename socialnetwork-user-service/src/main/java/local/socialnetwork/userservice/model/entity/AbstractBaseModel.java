@@ -1,4 +1,4 @@
-package local.socialnetwork.userservice.model;
+package local.socialnetwork.userservice.model.entity;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -7,8 +7,8 @@ import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.Type;
 
-import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
+import jakarta.persistence.Id;
+import jakarta.persistence.MappedSuperclass;
 
 import java.util.UUID;
 
