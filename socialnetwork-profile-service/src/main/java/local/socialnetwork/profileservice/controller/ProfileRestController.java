@@ -155,7 +155,7 @@ public class ProfileRestController {
     })
     @GetMapping(value = "/{profileId}/avatar", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> findAvatarById(@Parameter(description = "This parameter represents id of profile") @PathVariable("profileId") UUID profileId) {
-        String profileAvatar = profileService.findAvatarByProfileId(profileId);
+        String profileAvatar = profileService.findAvatarById(profileId);
         if (profileAvatar != null) {
             return new ResponseEntity<>(profileAvatar, HttpStatus.OK);
         } else {
