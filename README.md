@@ -1,1 +1,1 @@
-# SocialNetwork: Pet-project
+# SocialNetwork: Pet-project for self-education
