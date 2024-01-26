@@ -2,6 +2,7 @@ package local.socialnetwork.apigateway.config;
 
 import local.socialnetwork.apigateway.filter.ValidationAuthHeaderGatewayPreFilter;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.cloud.gateway.route.RouteLocator;
@@ -13,6 +14,12 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class ApiGatewayConfig {
+
+    @Value("${sn.api-gateway.route.host.user-service}")
+    private String userServiceHost;
+
+    @Value("${sn.api-gateway.route.host.profile-service}")
+    private String profileServiceHost;
 
     private ValidationAuthHeaderGatewayPreFilter validationAuthHeaderGatewayPreFilter;
 
@@ -26,10 +33,10 @@ public class ApiGatewayConfig {
         return builder.routes()
                 .route("user-service", r -> r.path("/users/**")
                         .filters(filter -> filter.filter(validationAuthHeaderGatewayPreFilter))
-                        .uri("http://localhost:8084"))
+                        .uri(userServiceHost))
                 .route("profile-service", r -> r.path("/profiles/**")
                         .filters(filter -> filter.filter(validationAuthHeaderGatewayPreFilter))
-                        .uri("http://localhost:8081"))
+                        .uri(profileServiceHost))
                 .build();
     }
 }
