@@ -1,7 +1,9 @@
-FROM openjdk:14
+FROM openjdk:20
 
 EXPOSE 8888
 
-COPY ./target/socialnetwork-config-server-1.0.jar socialnetwork-config-server-1.0
+WORKDIR /app
 
-ENTRYPOINT ["java", "-jar", "socialnetwork-config-server-1.0"]
+COPY ../target/socialnetwork-config-server-1.0.jar /app
+
+ENTRYPOINT ["java", "-jar", "socialnetwork-config-server-1.0.jar"]

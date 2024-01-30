@@ -1,9 +1,11 @@
-FROM openjdk:14
+FROM openjdk:20
 
 EXPOSE 8081
 
-ADD ./wait-for-it.sh /wait-for-it.sh
+ADD ../wait-for-it.sh /wait-for-it.sh
 
-COPY ./target/socialnetwork-profile-service-1.0.jar socialnetwork-profile-service-1.0.jar
+WORKDIR /app
+
+COPY ../target/socialnetwork-profile-service-1.0.jar /app
 
 ENTRYPOINT ["java", "-jar", "socialnetwork-profile-service-1.0.jar"]
