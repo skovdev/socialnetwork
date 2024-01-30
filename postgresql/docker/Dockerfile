@@ -1,7 +1,7 @@
-FROM postgres:12
+FROM postgres:latest
 
 EXPOSE 5432
 
-COPY ./init.sql /docker-entrypoint-initdb.d/init.sql
+COPY ../init.sql /docker-entrypoint-initdb.d/
 
 CMD ["docker-entrypoint.sh", "postgres"]
