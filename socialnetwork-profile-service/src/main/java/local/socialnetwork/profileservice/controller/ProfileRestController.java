@@ -1,8 +1,8 @@
 package local.socialnetwork.profileservice.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-
 import io.swagger.v3.oas.annotations.Parameter;
+
 import io.swagger.v3.oas.annotations.media.Content;
 
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -17,8 +17,6 @@ import local.socialnetwork.profileservice.model.dto.profile.ProfileInfoDto;
 import local.socialnetwork.profileservice.model.dto.profile.ProfileInfoEditDto;
 
 import local.socialnetwork.profileservice.service.ProfileService;
-
-import local.socialnetwork.profileservice.util.ResourceUtil;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -56,7 +54,6 @@ import java.util.Collections;
 public class ProfileRestController {
 
     ProfileService profileService;
-    ResourceUtil resourceUtil;
 
     @Operation(summary = "Find all the profiles")
     @ApiResponses(value = {
@@ -136,9 +133,8 @@ public class ProfileRestController {
                     @Content(mediaType = MediaType.APPLICATION_JSON_VALUE) }, responseCode = "400")
     })
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> save(@Parameter(description = "This parameter represents the encoded data for saving the profile") @RequestBody String encodedProfile) {
+    public ResponseEntity<String> save(@Parameter(description = "This parameter represents the data for saving the profile") @RequestBody ProfileDto profileDto) {
         try {
-            ProfileDto profileDto = (ProfileDto) resourceUtil.convertFromString(encodedProfile);
             profileService.createProfile(profileDto);
             return new ResponseEntity<>("Profile is saved successfully", HttpStatus.CREATED);
         } catch (Exception e) {
@@ -170,9 +166,9 @@ public class ProfileRestController {
             @ApiResponse(description = "Return the error message if the profile avatar is not updated", content = {
                     @Content(mediaType = MediaType.APPLICATION_JSON_VALUE) }, responseCode = "400")
     })
-    @PutMapping(value = "/{profileId}/avatar", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/{profileId}/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> updateAvatar(@Parameter(description = "This parameter represents id of profile") @PathVariable("profileId") UUID profileId,
-                                               @Parameter(description = "This parameter represents the user's photo to update the profile avatar") @RequestBody MultipartFile multipartFile) {
+                                               @Parameter(description = "This parameter represents the user's photo to update the profile avatar") @RequestParam("file") MultipartFile multipartFile) {
         try {
             profileService.updateAvatarProfile(profileId, multipartFile);
             return new ResponseEntity<>("Profile avatar is updated successfully", HttpStatus.OK);
@@ -188,7 +184,7 @@ public class ProfileRestController {
             @ApiResponse(description = "Return the error message if the profile avatar is not deleted", content = {
                     @Content(mediaType = MediaType.APPLICATION_JSON_VALUE) }, responseCode = "400")
     })
-    @DeleteMapping(value = "/{profileId}/avatar", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/{profileId}/avatar", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> deleteAvatar(@Parameter(description = "This parameter represents id of profile") @PathVariable("profileId") UUID profileId) {
         try {
             profileService.setDefaultAvatar(profileId);
