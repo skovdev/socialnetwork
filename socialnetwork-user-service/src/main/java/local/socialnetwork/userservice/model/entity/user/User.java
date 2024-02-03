@@ -8,11 +8,9 @@ import lombok.AccessLevel;
 
 import lombok.experimental.FieldDefaults;
 
-import org.hibernate.annotations.Type;
-
+import jakarta.persistence.Table;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
 
 import java.util.UUID;
 
@@ -47,7 +45,6 @@ public class User extends AbstractBaseModel {
     @Column(name = "family_status")
     String familyStatus;
 
-    @Type(type = "pg-uuid")
     @Column(name = "auth_user_id", nullable = false, unique = true)
     UUID authUserId;
 
