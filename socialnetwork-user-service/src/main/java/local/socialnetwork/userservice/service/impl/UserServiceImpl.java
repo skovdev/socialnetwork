@@ -49,6 +49,7 @@ public class UserServiceImpl implements UserService {
                     userDto.setPhone(user.getPhone());
                     userDto.setBirthDay(user.getBirthDay());
                     userDto.setFamilyStatus(user.getFamilyStatus());
+                    userDto.setAuthUserId(user.getAuthUserId());
                     return userDto;
                 }).findFirst().orElse(null);
     }
