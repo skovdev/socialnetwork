@@ -7,9 +7,9 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.AccessLevel;
 
 import lombok.experimental.FieldDefaults;
 

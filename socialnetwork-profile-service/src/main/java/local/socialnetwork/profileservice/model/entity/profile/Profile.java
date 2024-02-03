@@ -4,12 +4,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import local.socialnetwork.profileservice.model.entity.AbstractBaseModel;
 
-import org.hibernate.annotations.Type;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
 import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
 
 import java.util.UUID;
 
@@ -24,7 +22,6 @@ public class Profile extends AbstractBaseModel {
     @Column(name = "avatar")
     private String avatar;
 
-    @Type(type = "pg-uuid")
     @Column(name = "user_id", nullable = false, unique = true)
     private UUID userId;
 
