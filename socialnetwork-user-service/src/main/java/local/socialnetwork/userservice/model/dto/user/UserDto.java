@@ -19,4 +19,5 @@ public class UserDto {
     String phone;
     String birthDay;
     String familyStatus;
+    UUID authUserId;
 }
