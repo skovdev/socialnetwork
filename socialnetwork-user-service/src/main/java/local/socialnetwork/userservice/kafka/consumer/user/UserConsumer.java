@@ -61,6 +61,7 @@ public class UserConsumer {
         user.setPhone(userDto.getPhone());
         user.setBirthDay(userDto.getBirthDay());
         user.setFamilyStatus(userDto.getFamilyStatus());
+        user.setAuthUserId(userDto.getAuthUserId());
         return user;
     }
 }
