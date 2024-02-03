@@ -2,8 +2,6 @@ package local.socialnetwork.profileservice.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import org.hibernate.annotations.Type;
-
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 
@@ -13,7 +11,6 @@ import java.util.UUID;
 public class AbstractBaseModel {
 
     @Id
-    @Type(type = "pg-uuid")
     private UUID id;
 
     public AbstractBaseModel() {

@@ -31,8 +31,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-
 import java.util.List;
 import java.util.UUID;
 import java.util.Optional;
@@ -139,7 +137,6 @@ public class ProfileServiceImpl implements ProfileService {
     public void createProfile(ProfileDto profileDto) {
         if (profileDto != null) {
             Profile profile = new Profile();
-            profile.setId(profileDto.getId());
             profile.setActive(profileDto.isActive());
             profile.setAvatar(profileDto.getAvatar());
             profile.setUserId(profileDto.getUserId());
@@ -149,7 +146,7 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public void updateAvatarProfile(UUID profileId, MultipartFile multipartFile) throws IOException {
+    public void updateAvatarProfile(UUID profileId, MultipartFile multipartFile) {
         Optional<Profile> profile = profileRepository.findById(profileId);
         if (profile.isPresent()) {
             var encodedAvatar = resourceUtil.writeResource(multipartFile, pathUploadAvatar);
@@ -160,7 +157,7 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public void setDefaultAvatar(UUID profileId) throws IOException {
+    public void setDefaultAvatar(UUID profileId) {
         Optional<Profile> profile = profileRepository.findById(profileId);
         if (profile.isPresent()) {
             String encodedDefaultAvatar = resourceUtil.getEncodedResource(pathDefaultAvatar);

@@ -31,10 +31,10 @@ public class ApiGatewayConfig {
     @Bean
     public RouteLocator configureRoute(RouteLocatorBuilder builder) {
         return builder.routes()
-                .route("user-service", r -> r.path("/users/**")
+                .route("user-service", r -> r.path("/api/v1/users/**")
                         .filters(filter -> filter.filter(validationAuthHeaderGatewayPreFilter))
                         .uri(userServiceHost))
-                .route("profile-service", r -> r.path("/profiles/**")
+                .route("profile-service", r -> r.path("/api/v1/profiles/**")
                         .filters(filter -> filter.filter(validationAuthHeaderGatewayPreFilter))
                         .uri(profileServiceHost))
                 .build();
