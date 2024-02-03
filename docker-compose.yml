@@ -3,6 +3,9 @@ version: "3.9"
 services:
   socialnetwork-postgresql:
     image: socialnetwork-postgresql
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
     ports:
       - "5432:5432"
     volumes:
@@ -15,33 +18,27 @@ services:
 
   socialnetwork-config-server:
     image: socialnetwork-config-server-1.0
-    environment:
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://socialnetwork-eureka-service-discovery:8761/eureka
     ports:
       - "8888:8888"
 
   socialnetwork-api-gateway:
     image: socialnetwork-api-gateway-1.0
     environment:
-      - SPRING_CONFIG_IMPORT=optional:configserver:http://socialnetwork-config-server:8888
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://socialnetwork-eureka-service-discovery:8761/eureka
+      CONFIG_SERVER_HOST: socialnetwork-config-server
+      SPRING_PROFILES_ACTIVE: docker
     ports:
       - "8762:8762"
       - "5009:5009"
     depends_on:
       - socialnetwork-eureka-service-discovery
       - socialnetwork-config-server
-    entrypoint: ./wait-for-it.sh socialnetwork-config-server:8888 --timeout=20 -- java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5009 -jar socialnetwork-api-gateway-1.0.jar
+    entrypoint: ../wait-for-it.sh socialnetwork-config-server:8888 --timeout=20 -- java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5009 -jar socialnetwork-api-gateway-1.0.jar
 
   socialnetwork-auth-server:
     image: socialnetwork-auth-server-1.0
     environment:
-      - SPRING_CONFIG_IMPORT=optional:configserver:http://socialnetwork-config-server:8888
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://socialnetwork-postgresql:5432/sn_auth_server_db
-      - SPRING_DATASOURCE_USERNAME=sn_auth_server_user
-      - SPRING_DATASOURCE_PASSWORD=sn_auth_server_password
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://socialnetwork-eureka-service-discovery:8761/eureka
-      - SN_KAFKA_SERVER=kafka:9092
+      CONFIG_SERVER_HOST: socialnetwork-config-server
+      SPRING_PROFILES_ACTIVE: docker
     ports:
       - "8080:8080"
       - "5005:5005"
@@ -50,17 +47,13 @@ services:
       - socialnetwork-config-server
       - socialnetwork-api-gateway
       - kafka
-    entrypoint: ./wait-for-it.sh socialnetwork-config-server:8888 --timeout=20 -- java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar socialnetwork-auth-server-1.0.jar
+    entrypoint: ../wait-for-it.sh socialnetwork-config-server:8888 --timeout=20 -- java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar socialnetwork-auth-server-1.0.jar
 
   socialnetwork-user-service:
     image: socialnetwork-user-service-1.0
     environment:
-      - SPRING_CONFIG_IMPORT=optional:configserver:http://socialnetwork-config-server:8888
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://socialnetwork-postgresql:5432/sn_user_service_db
-      - SPRING_DATASOURCE_USERNAME=sn_user_service_user
-      - SPRING_DATASOURCE_PASSWORD=sn_user_service_password
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://socialnetwork-eureka-service-discovery:8761/eureka
-      - SN_KAFKA_SERVER=kafka:9092
+      CONFIG_SERVER_HOST: socialnetwork-config-server
+      SPRING_PROFILES_ACTIVE: docker
     ports:
       - "8084:8084"
       - "5006:5006"
@@ -70,18 +63,13 @@ services:
       - socialnetwork-api-gateway
       - socialnetwork-database
       - kafka
-    entrypoint: ./wait-for-it.sh socialnetwork-config-server:8888 --timeout=20 -- java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5006 -jar socialnetwork-user-service-1.0.jar
+    entrypoint: ../wait-for-it.sh socialnetwork-config-server:8888 --timeout=20 -- java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5006 -jar socialnetwork-user-service-1.0.jar
 
   socialnetwork-profile-service:
     image: socialnetwork-profile-service-1.0
     environment:
-      - SPRING_CONFIG_IMPORT=optional:configserver:http://socialnetwork-config-server:8888
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://socialnetwork-postgresql:5432/sn_profile_service_db
-      - SPRING_DATASOURCE_USERNAME=sn_profile_service_user
-      - SPRING_DATASOURCE_PASSWORD=sn_profile_service_password
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://socialnetwork-eureka-service-discovery:8761/eureka
-      - SN_KAFKA_SERVER=kafka:9092
-      - SN_FEIGNCLIENT_USERSERVICE_URL=http://socialnetwork-user-service:8084/api/v1
+      CONFIG_SERVER_HOST: socialnetwork-config-server
+      SPRING_PROFILES_ACTIVE: docker
     ports:
       - "8081:8081"
       - "5007:5007"
@@ -90,7 +78,7 @@ services:
       - socialnetwork-config-server
       - socialnetwork-api-gateway
       - socialnetwork-postgresql
-    entrypoint: ./wait-for-it.sh socialnetwork-config-server:8888 --timeout=20 -- java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5007 -jar socialnetwork-profile-service-1.0.jar
+    entrypoint: ../wait-for-it.sh socialnetwork-config-server:8888 --timeout=20 -- java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5007 -jar socialnetwork-profile-service-1.0.jar
     volumes:
        - /avatar/
 
