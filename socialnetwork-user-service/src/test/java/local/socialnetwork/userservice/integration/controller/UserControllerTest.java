@@ -1,5 +1,7 @@
 package local.socialnetwork.userservice.integration.controller;
 
+import local.socialnetwork.userservice.SpringBootRunUserService;
+
 import local.socialnetwork.userservice.model.dto.user.UserDto;
 
 import org.junit.jupiter.api.Test;
@@ -18,7 +20,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
 import org.springframework.test.context.jdbc.Sql;
@@ -31,9 +32,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @Sql({"/sql/userservice/drop_table_user_userservice.sql",
         "/sql/userservice/create_table_user_userservice.sql",
         "/sql/userservice/insert_data_userservice.sql"})
-@ActiveProfiles("test")
-@TestPropertySource(locations = "classpath:application–test.properties")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@TestPropertySource(locations = "classpath:application-test.properties")
+@SpringBootTest(classes = SpringBootRunUserService.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class UserControllerTest {
 
     // Existing user in the database
