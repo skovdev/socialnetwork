@@ -55,8 +55,8 @@ public class AuthUserServiceImpl implements AuthUserService {
     public void signUp(SignUpDto signUpDTO) {
 
         AuthUser authUser = new AuthUser();
-        authUser.setUsername(signUpDTO.getUsername());
-        authUser.setPassword(passwordEncoder.encode(signUpDTO.getPassword()));
+        authUser.setUsername(signUpDTO.username());
+        authUser.setPassword(passwordEncoder.encode(signUpDTO.password()));
 
         AuthRole authRole = new AuthRole();
         authRole.setAuthority(defaultUserRole);
