@@ -75,14 +75,14 @@ public class AuthenticationRestController {
     @PostMapping(value = "/sign-up", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> signUp(@Parameter(description = "This parameter represents designed for user registration")
                                              @RequestBody SignUpDto signUpDto) {
-        Optional<AuthUser> authUser = authUserService.findByUsername(signUpDto.getUsername());
-        if (authUser.isPresent() && authUser.get().getUsername().equalsIgnoreCase(signUpDto.getUsername())) {
+        Optional<AuthUser> authUser = authUserService.findByUsername(signUpDto.username());
+        if (authUser.isPresent() && authUser.get().getUsername().equalsIgnoreCase(signUpDto.username())) {
             log.info("User '{}' with this username already exists in database", authUser.get().getUsername());
             return new ResponseEntity<>(authUser.get().getUsername() + " is exists in databases", HttpStatus.BAD_REQUEST);
         } else {
             authUserService.signUp(signUpDto);
             log.info("User signed up successfully");
-            return new ResponseEntity<>(signUpDto.getUsername() + " signed up", HttpStatus.OK);
+            return new ResponseEntity<>(signUpDto.username() + " signed up", HttpStatus.OK);
         }
     }
 
@@ -97,9 +97,9 @@ public class AuthenticationRestController {
     public ResponseEntity<Map<Object, Object>> signIn(@Parameter(description = "This parameter represents designed for user authentication during the sign-in process")
                                                           @RequestBody SignInDto signInDto) {
         try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(signInDto.getUsername(), signInDto.getPassword()));
-            AuthUser authUser = authUserService.findByUsername(signInDto.getUsername())
-                    .orElseThrow(() -> new AuthenticationUserNotFoundException(signInDto.getUsername() + " is not found"));
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(signInDto.username(), signInDto.password()));
+            AuthUser authUser = authUserService.findByUsername(signInDto.username())
+                    .orElseThrow(() -> new AuthenticationUserNotFoundException(signInDto.username() + " is not found"));
             List<String> roles = getRoles(authUser.getAuthRoles());
             String token = jwtTokenProvider.createToken(authUser.getId(), authUser.getUsername(), roles);
             Map<Object, Object> model = new HashMap<>();

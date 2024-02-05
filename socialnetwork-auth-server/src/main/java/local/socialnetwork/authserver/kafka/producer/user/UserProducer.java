@@ -34,21 +34,21 @@ public class UserProducer {
         try {
             this.kafkaTemplate.send(topic, objectMapper.writeValueAsString(buildUser(signUpDTO, authUserId)));
         } catch (JsonProcessingException e) {
-            log.error("Error occurred while sending the user. Message: {}", e.getMessage());
+            log.error("Failed to send user. Message: {}", e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
     }
 
     private UserDto buildUser(SignUpDto signUpDTO, UUID authUserId) {
-        UserDto userDTO = new UserDto();
-        userDTO.setFirstName(signUpDTO.getFirstName());
-        userDTO.setLastName(signUpDTO.getLastName());
-        userDTO.setCountry(signUpDTO.getCountry());
-        userDTO.setCity(signUpDTO.getCity());
-        userDTO.setAddress(signUpDTO.getAddress());
-        userDTO.setPhone(signUpDTO.getPhone());
-        userDTO.setBirthDay(signUpDTO.getBirthDay());
-        userDTO.setFamilyStatus(signUpDTO.getFamilyStatus());
-        userDTO.setAuthUserId(authUserId);
-        return userDTO;
+        return new UserDto(
+                signUpDTO.firstName(),
+                signUpDTO.lastName(),
+                signUpDTO.country(),
+                signUpDTO.city(),
+                signUpDTO.address(),
+                signUpDTO.phone(),
+                signUpDTO.birthDay(),
+                signUpDTO.familyStatus(),
+                authUserId);
     }
 }
