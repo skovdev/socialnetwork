@@ -61,7 +61,7 @@ public class UserControllerTest {
         UserDto userDto = response.getBody();
 
         assertNotNull(userDto);
-        assertEquals(userId, userDto.getId());
+        assertEquals(userId, userDto.id());
         assertEquals(HttpStatus.OK, response.getStatusCode());
 
     }

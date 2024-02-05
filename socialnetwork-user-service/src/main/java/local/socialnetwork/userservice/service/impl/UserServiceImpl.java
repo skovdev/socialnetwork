@@ -38,20 +38,18 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto findById(UUID id) {
         return userRepository.findById(id).stream()
-                .map(user -> {
-                    UserDto userDto = new UserDto();
-                    userDto.setId(user.getId());
-                    userDto.setFirstName(user.getFirstName());
-                    userDto.setLastName(user.getLastName());
-                    userDto.setCountry(user.getCountry());
-                    userDto.setCity(user.getCity());
-                    userDto.setAddress(user.getAddress());
-                    userDto.setPhone(user.getPhone());
-                    userDto.setBirthDay(user.getBirthDay());
-                    userDto.setFamilyStatus(user.getFamilyStatus());
-                    userDto.setAuthUserId(user.getAuthUserId());
-                    return userDto;
-                }).findFirst().orElse(null);
+                .map(user -> new UserDto(
+                        user.getId(),
+                        user.getFirstName(),
+                        user.getLastName(),
+                        user.getCountry(),
+                        user.getCity(),
+                        user.getAddress(),
+                        user.getPhone(),
+                        user.getBirthDay(),
+                        user.getFamilyStatus(),
+                        user.getAuthUserId())
+                ).findFirst().orElse(null);
     }
 
     @Override
