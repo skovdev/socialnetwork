@@ -108,11 +108,11 @@ public class ProfileControllerTest {
                 HttpMethod.GET, createHttpEntity(MediaType.APPLICATION_JSON, null), ProfileDto.class);
 
         assertNotNull(response.getBody());
-        assertEquals(response.getBody().getId().toString(), "662483d4-4df3-4d05-8a2a-9635e713b4ac");
-        assertEquals(response.getBody().getUserId().toString(), "8874f8ec-66ce-489d-a14f-3ad58f5daabe");
+        assertEquals(response.getBody().id().toString(), "662483d4-4df3-4d05-8a2a-9635e713b4ac");
+        assertEquals(response.getBody().userId().toString(), "8874f8ec-66ce-489d-a14f-3ad58f5daabe");
         assertEquals(response.getStatusCode(), HttpStatus.OK);
         assertTrue(response.getBody().isActive());
-        assertNotNull(response.getBody().getAvatar());
+        assertNotNull(response.getBody().avatar());
 
     }
 
@@ -137,18 +137,18 @@ public class ProfileControllerTest {
                 HttpMethod.GET, createHttpEntity(MediaType.APPLICATION_JSON, null), ProfileInfoDto.class);
 
         assertNotNull(response.getBody());
-        assertEquals(response.getBody().getId().toString(), "662483d4-4df3-4d05-8a2a-9635e713b4ac");
-        assertEquals(response.getBody().getFirstName(), "test");
-        assertEquals(response.getBody().getLastName(), "test");
-        assertEquals(response.getBody().getCountry(), "test");
-        assertEquals(response.getBody().getCity(), "test");
-        assertEquals(response.getBody().getAddress(), "test");
-        assertEquals(response.getBody().getPhone(), "0500000000");
-        assertEquals(response.getBody().getBirthDay(), "01-01-2023");
-        assertEquals(response.getBody().getFamilyStatus(), "IN_ACTIVE");
+        assertEquals(response.getBody().id().toString(), "662483d4-4df3-4d05-8a2a-9635e713b4ac");
+        assertEquals(response.getBody().firstName(), "test");
+        assertEquals(response.getBody().lastName(), "test");
+        assertEquals(response.getBody().country(), "test");
+        assertEquals(response.getBody().city(), "test");
+        assertEquals(response.getBody().address(), "test");
+        assertEquals(response.getBody().phone(), "0500000000");
+        assertEquals(response.getBody().birthDay(), "01-01-2023");
+        assertEquals(response.getBody().familyStatus(), "IN_ACTIVE");
         assertTrue(response.getBody().isActive());
-        assertNotNull(response.getBody().getAvatar());
-        assertEquals(response.getBody().getUserId().toString(), "8874f8ec-66ce-489d-a14f-3ad58f5daabe");
+        assertNotNull(response.getBody().avatar());
+        assertEquals(response.getBody().userId().toString(), "8874f8ec-66ce-489d-a14f-3ad58f5daabe");
         assertEquals(response.getStatusCode(), HttpStatus.OK);
 
     }
@@ -175,14 +175,14 @@ public class ProfileControllerTest {
                 ProfileInfoEditDto.class);
 
         assertNotNull(response.getBody());
-        assertEquals(response.getBody().getFirstName(), "test");
-        assertEquals(response.getBody().getLastName(), "test");
-        assertEquals(response.getBody().getCountry(), "test");
-        assertEquals(response.getBody().getCity(), "test");
-        assertEquals(response.getBody().getAddress(), "test");
-        assertEquals(response.getBody().getPhone(), "0500000000");
-        assertEquals(response.getBody().getBirthDay(), "01-01-2023");
-        assertEquals(response.getBody().getFamilyStatus(), "IN_ACTIVE");
+        assertEquals(response.getBody().firstName(), "test");
+        assertEquals(response.getBody().lastName(), "test");
+        assertEquals(response.getBody().country(), "test");
+        assertEquals(response.getBody().city(), "test");
+        assertEquals(response.getBody().address(), "test");
+        assertEquals(response.getBody().phone(), "0500000000");
+        assertEquals(response.getBody().birthDay(), "01-01-2023");
+        assertEquals(response.getBody().familyStatus(), "IN_ACTIVE");
         assertEquals(response.getStatusCode(), HttpStatus.OK);
 
     }
@@ -203,12 +203,11 @@ public class ProfileControllerTest {
     @Test
     public void shouldSaveNewProfile() {
 
-        ProfileDto profileDto = new ProfileDto();
-
-        profileDto.setActive(true);
-        var encodedAvatar = resourceUtil.getEncodedResource("/avatar/default-avatar.jpg");
-        profileDto.setAvatar(encodedAvatar);
-        profileDto.setUserId(UUID.randomUUID());
+        ProfileDto profileDto = new ProfileDto(
+                null,
+                true,
+                resourceUtil.getEncodedResource("/avatar/default-avatar.jpg"),
+                UUID.randomUUID());
 
         ResponseEntity<String> response = testRestTemplate.postForEntity(createURLWithPort("/profiles"), profileDto, String.class);
 
@@ -221,13 +220,12 @@ public class ProfileControllerTest {
     @Test
     public void shouldReturnErrorIfProfileIsNotCreated() {
 
-        ProfileDto profileDto = new ProfileDto();
-
-        profileDto.setActive(true);
-        var encodedAvatar = resourceUtil.getEncodedResource("/avatar/default-avatar.jpg");
-        profileDto.setAvatar(encodedAvatar);
-        // Can't create profile because userId is null
-        profileDto.setUserId(null);
+        ProfileDto profileDto = new ProfileDto(
+                null,
+                true,
+                resourceUtil.getEncodedResource("/avatar/default-avatar.jpg"),
+                // Can't create profile because userId is null
+                null);
 
         ResponseEntity<String> response = testRestTemplate.postForEntity(createURLWithPort("/profiles"), profileDto, String.class);
 
@@ -356,16 +354,16 @@ public class ProfileControllerTest {
     }
 
     private UserDto createUserDto() {
-        UserDto userDto = new UserDto();
-        userDto.setId(userId);
-        userDto.setFirstName("test");
-        userDto.setLastName("test");
-        userDto.setCountry("test");
-        userDto.setCity("test");
-        userDto.setAddress("test");
-        userDto.setPhone("0500000000");
-        userDto.setBirthDay("01-01-2023");
-        userDto.setFamilyStatus("IN_ACTIVE");
-        return userDto;
+        return new UserDto(
+                userId,
+                "test",
+                "test",
+                "test",
+                "test",
+                "test",
+                "0500000000",
+                "01-01-2023",
+                "IN_ACTIVE"
+        );
     }
 }

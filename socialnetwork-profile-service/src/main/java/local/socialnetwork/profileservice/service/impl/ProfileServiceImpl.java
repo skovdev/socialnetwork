@@ -33,7 +33,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.Optional;
 
 import java.util.stream.Collectors;
 
@@ -56,74 +55,70 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public List<ProfileDto> findAll() {
-        List<Profile> profile = profileRepository.findAll();
-        return profile.stream().map(p -> {
-            ProfileDto profileDto = new ProfileDto();
-            profileDto.setId(p.getId());
-            profileDto.setActive(p.isActive());
-            profileDto.setAvatar(p.getAvatar());
-            profileDto.setUserId(p.getUserId());
-            return profileDto;
-        }).collect(Collectors.toList());
+        List<Profile> profiles = profileRepository.findAll();
+        return profiles.stream()
+                .map(profile -> new ProfileDto(
+                        profile.getId(),
+                        profile.isActive(),
+                        profile.getAvatar(),
+                        profile.getUserId())
+                ).collect(Collectors.toList());
     }
 
     @Override
     public ProfileDto findById(UUID profileId) {
         return profileRepository.findById(profileId)
-                .map(profile -> {
-                    ProfileDto profileDto = new ProfileDto();
-                    profileDto.setId(profile.getId());
-                    profileDto.setActive(profile.isActive());
-                    profileDto.setAvatar(profile.getAvatar());
-                    profileDto.setUserId(profile.getUserId());
-                    return profileDto;
-                }).orElse(null);
+                .map(profile -> new ProfileDto(
+                        profile.getId(),
+                        profile.isActive(),
+                        profile.getAvatar(),
+                        profile.getUserId())
+                ).orElse(null);
     }
 
     @Override
     public ProfileInfoDto findProfileInfoByProfileIdAndUserId(UUID profileId, UUID userId) {
-        ProfileInfoDto profileInfoDto = null;
-        Optional<Profile> profile = profileRepository.findById(profileId);
-        if (profile.isPresent()) {
-            profileInfoDto = new ProfileInfoDto();
-            profileInfoDto.setId(profile.get().getId());
-            profileInfoDto.setActive(profile.get().isActive());
-            profileInfoDto.setAvatar(profile.get().getAvatar());
-            profileInfoDto.setUserId(profile.get().getUserId());
-            UserDto userDto = userClient.findUserByUserId(userId);
-            if (userDto != null) {
-                profileInfoDto.setFirstName(userDto.getFirstName());
-                profileInfoDto.setLastName(userDto.getLastName());
-                profileInfoDto.setCountry(userDto.getCountry());
-                profileInfoDto.setCity(userDto.getCity());
-                profileInfoDto.setAddress(userDto.getAddress());
-                profileInfoDto.setPhone(userDto.getPhone());
-                profileInfoDto.setBirthDay(userDto.getBirthDay());
-                profileInfoDto.setFamilyStatus(userDto.getFamilyStatus());
-            }
-        }
-        return profileInfoDto;
+        return profileRepository.findById(profileId)
+                .map(profile -> {
+                    UserDto userDto = userClient.findUserByUserId(userId);
+                    if (userDto == null) {
+                        return null;
+                    }
+                    return new ProfileInfoDto(
+                            profile.getId(),
+                            userDto.firstName(),
+                            userDto.lastName(),
+                            userDto.country(),
+                            userDto.city(),
+                            userDto.address(),
+                            userDto.phone(),
+                            userDto.birthDay(),
+                            userDto.familyStatus(),
+                            profile.isActive(),
+                            profile.getAvatar(),
+                            profile.getUserId());
+                }).orElse(null);
     }
 
     @Override
     public ProfileInfoEditDto findProfileInfoToEditByProfileIdAndUserId(UUID profileId, UUID userId) {
-        ProfileInfoEditDto profileInfoEditDto = null;
-        Optional<Profile> profile = profileRepository.findById(profileId);
-        if (profile.isPresent() && profile.get().getUserId().equals(userId)) {
-            UserDto userDto = userClient.findUserByUserId(userId);
-            if (userDto != null) {
-                profileInfoEditDto = new ProfileInfoEditDto();
-                profileInfoEditDto.setFirstName(userDto.getFirstName());
-                profileInfoEditDto.setLastName(userDto.getLastName());
-                profileInfoEditDto.setCountry(userDto.getCountry());
-                profileInfoEditDto.setCity(userDto.getCity());
-                profileInfoEditDto.setAddress(userDto.getAddress());
-                profileInfoEditDto.setPhone(userDto.getPhone());
-                profileInfoEditDto.setBirthDay(userDto.getBirthDay());
-                profileInfoEditDto.setFamilyStatus(userDto.getFamilyStatus());
-            }
-        }
-        return profileInfoEditDto;
+        return profileRepository.findById(profileId)
+                .filter(profile -> profile.getUserId().equals(userId))
+                .map(profile -> {
+                    UserDto userDto = userClient.findUserByUserId(userId);
+                    if (userDto == null) {
+                        return null;
+                    }
+                    return  new ProfileInfoEditDto(
+                            userDto.firstName(),
+                            userDto.lastName(),
+                            userDto.country(),
+                            userDto.city(),
+                            userDto.address(),
+                            userDto.phone(),
+                            userDto.birthDay(),
+                            userDto.familyStatus());
+                }).orElse(null);
     }
 
     @Override
@@ -138,8 +133,8 @@ public class ProfileServiceImpl implements ProfileService {
         if (profileDto != null) {
             Profile profile = new Profile();
             profile.setActive(profileDto.isActive());
-            profile.setAvatar(profileDto.getAvatar());
-            profile.setUserId(profileDto.getUserId());
+            profile.setAvatar(profileDto.avatar());
+            profile.setUserId(profileDto.userId());
             profileRepository.save(profile);
             log.info("Profile is saved. Profile ID: {}", profile.getId());
         }
@@ -147,35 +142,34 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     public void updateAvatarProfile(UUID profileId, MultipartFile multipartFile) {
-        Optional<Profile> profile = profileRepository.findById(profileId);
-        if (profile.isPresent()) {
-            var encodedAvatar = resourceUtil.writeResource(multipartFile, pathUploadAvatar);
-            profile.get().setAvatar(encodedAvatar);
-            profileRepository.save(profile.get());
-            log.info("Profile avatar is updated. Profile ID: {}", profile.get().getId());
-        }
+        profileRepository.findById(profileId)
+                .ifPresent(profile -> {
+                    var encodedAvatar = resourceUtil.writeResource(multipartFile, pathUploadAvatar);
+                    profile.setAvatar(encodedAvatar);
+                    profileRepository.save(profile);
+                    log.info("Profile avatar is updated. Profile ID: {}", profile.getId());
+                });
     }
 
     @Override
     public void setDefaultAvatar(UUID profileId) {
-        Optional<Profile> profile = profileRepository.findById(profileId);
-        if (profile.isPresent()) {
-            String encodedDefaultAvatar = resourceUtil.getEncodedResource(pathDefaultAvatar);
-            profile.get().setAvatar(encodedDefaultAvatar);
-            profileRepository.save(profile.get());
-            log.info("Delete the current avatar and set default avatar. Profile ID: {}", profile.get().getId());
-        }
+        profileRepository.findById(profileId)
+                .ifPresent(profile -> {
+                    String encodedDefaultAvatar = resourceUtil.getEncodedResource(pathDefaultAvatar);
+                    profile.setAvatar(encodedDefaultAvatar);
+                    profileRepository.save(profile);
+                    log.info("Delete the current avatar and set default avatar. Profile ID: {}", profile.getId());
+                });
     }
 
     @Override
     public boolean changeStatus(UUID profileId, boolean isActive) {
-        Optional<Profile> profile = profileRepository.findById(profileId);
-        if (profile.isPresent()) {
-            profile.get().setActive(isActive);
-            profileRepository.save(profile.get());
-            log.info("Status is changed: Profile ID: {}", profile.get().getId());
-            return true;
-        }
-        return false;
+       return profileRepository.findById(profileId)
+               .map(profile -> {
+                   profile.setActive(isActive);
+                   profileRepository.save(profile);
+                   log.info("Status is changed: Profile ID: {}", profile.getId());
+                   return true;
+               }).orElse(false);
     }
 }
