@@ -46,22 +46,22 @@ public class UserConsumer {
         try {
             return objectMapper.readValue(json, UserDto.class);
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error("Failed to read value. Error: {}", e.getMessage());
             return null;
         }
     }
 
     private User convertDtoToUserEntity(UserDto userDto) {
         User user = new User();
-        user.setFirstName(userDto.getFirstName());
-        user.setLastName(userDto.getLastName());
-        user.setCountry(userDto.getCountry());
-        user.setCity(userDto.getCity());
-        user.setAddress(userDto.getAddress());
-        user.setPhone(userDto.getPhone());
-        user.setBirthDay(userDto.getBirthDay());
-        user.setFamilyStatus(userDto.getFamilyStatus());
-        user.setAuthUserId(userDto.getAuthUserId());
+        user.setFirstName(userDto.firstName());
+        user.setLastName(userDto.lastName());
+        user.setCountry(userDto.country());
+        user.setCity(userDto.city());
+        user.setAddress(userDto.address());
+        user.setPhone(userDto.phone());
+        user.setBirthDay(userDto.birthDay());
+        user.setFamilyStatus(userDto.familyStatus());
+        user.setAuthUserId(userDto.authUserId());
         return user;
     }
 }
