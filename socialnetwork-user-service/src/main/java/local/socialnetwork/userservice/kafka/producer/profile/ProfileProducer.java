@@ -31,6 +31,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ProfileProducer {
 
+    private static final boolean PROFILE_ACTIVE = true;
+
     @Value("${sn.profile.default.avatar.path}")
     String pathDefaultAvatar;
 
@@ -42,20 +44,17 @@ public class ProfileProducer {
         try {
             this.kafkaTemplate.send(topic, objectMapper.writeValueAsString(buildProfile(userId)));
         } catch (JsonProcessingException e) {
-            log.error(e.getMessage());
+            log.error("Failed to send profile. Error: {}", e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
     }
 
     private ProfileDto buildProfile(UUID userId) {
-        ProfileDto profileDTO = new ProfileDto();
-        profileDTO.setId(UUID.randomUUID());
-        profileDTO.setActive(true);
         try {
-            profileDTO.setAvatar(resourceUtil.getEncodedResource(pathDefaultAvatar));
+            return new ProfileDto(UUID.randomUUID(), PROFILE_ACTIVE, resourceUtil.getEncodedResource(pathDefaultAvatar), userId);
         } catch (IOException e) {
+            log.error("Failed to build profile. Error: {}", e.getMessage());
             throw new RuntimeException(e.getMessage());
         }
-        profileDTO.setUserId(userId);
-        return profileDTO;
     }
 }
