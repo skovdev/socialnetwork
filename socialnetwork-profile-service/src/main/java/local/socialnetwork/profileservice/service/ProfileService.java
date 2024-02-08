@@ -11,14 +11,15 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface ProfileService {
     List<ProfileDto> findAll();
-    ProfileDto findById(UUID profileId);
-    ProfileInfoDto findProfileInfoByProfileIdAndUserId(UUID profileId, UUID userId);
-    ProfileInfoEditDto findProfileInfoToEditByProfileIdAndUserId(UUID profileId, UUID userId);
-    String findAvatarById(UUID profileId);
+    Optional<ProfileDto> findById(UUID profileId);
+    Optional<ProfileInfoDto> findProfileInfoByProfileIdAndUserId(UUID profileId, UUID userId);
+    Optional<ProfileInfoEditDto> findProfileInfoToEditByProfileIdAndUserId(UUID profileId, UUID userId);
+    Optional<String> findAvatarById(UUID profileId);
     void createProfile(ProfileDto profileDto);
     void updateAvatarProfile(UUID profileId, MultipartFile multipartFile) throws ProfileServiceException, IOException;
     void setDefaultAvatar(UUID profileId) throws IOException;
