@@ -13,8 +13,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import local.socialnetwork.profileservice.constant.VersionAPI;
 
 import local.socialnetwork.profileservice.model.dto.profile.ProfileDto;
-import local.socialnetwork.profileservice.model.dto.profile.ProfileInfoDto;
-import local.socialnetwork.profileservice.model.dto.profile.ProfileInfoEditDto;
 
 import local.socialnetwork.profileservice.service.ProfileService;
 
@@ -62,7 +60,7 @@ public class ProfileRestController {
             @ApiResponse(description = "Return an empty list if the profiles do not exist", content = {
                     @Content(mediaType = MediaType.APPLICATION_JSON_VALUE) }, responseCode = "200")
     })
-    @GetMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public List<ProfileDto> findAll() {
         List<ProfileDto> profiles = profileService.findAll();
         if (profiles != null && !profiles.isEmpty()) {
@@ -76,69 +74,56 @@ public class ProfileRestController {
     @ApiResponses(value = {
             @ApiResponse(description = "Return found the profile", content = {
                     @Content(mediaType = MediaType.APPLICATION_JSON_VALUE) }, responseCode = "200"),
-            @ApiResponse(description = "Return the error if the profile does not exist", content = {
-                    @Content(mediaType = MediaType.APPLICATION_JSON_VALUE) }, responseCode = "404")
+            @ApiResponse(description = "Return the error if the profile does not exist", responseCode = "404")
     })
-    @GetMapping(value = "/{profileId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{profileId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> findByProfileId(@Parameter(description = "This parameter represents id of profile") @PathVariable("profileId") UUID profileId) {
-        ProfileDto profile = profileService.findById(profileId);
-        if (profile != null) {
-            return new ResponseEntity<>(profile, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>("Profile does not exist", HttpStatus.NOT_FOUND);
-        }
+        return profileService.findById(profileId)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @Operation(summary = "Find the profile info by id of profile and id of user")
     @ApiResponses(value = {
             @ApiResponse(description = "Return found the profile info", content = {
                     @Content(mediaType = MediaType.APPLICATION_JSON_VALUE) }, responseCode = "200"),
-            @ApiResponse(description = "Return the error if the profile info does not exist", content = {
-                    @Content(mediaType = MediaType.APPLICATION_JSON_VALUE) }, responseCode = "404")
+            @ApiResponse(description = "Return the error if the profile info does not exist", responseCode = "404")
     })
-    @GetMapping(value = "/{profileId}/users/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{profileId}/users/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> findProfileInfoByProfileIdAndUserId(@Parameter(description = "This parameter represents id of profile") @PathVariable("profileId") UUID profileId,
                                                                  @Parameter(description = "This parameter represents id of user") @PathVariable("userId") UUID userId) {
-        ProfileInfoDto profileInfo = profileService.findProfileInfoByProfileIdAndUserId(profileId, userId);
-        if (profileInfo != null) {
-            return new ResponseEntity<>(profileInfo, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>("There is no profile information", HttpStatus.NOT_FOUND);
-        }
+        return profileService.findProfileInfoByProfileIdAndUserId(profileId, userId)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @Operation(summary = "Find the profile info to edit by id of profile and id of user")
     @ApiResponses(value = {
             @ApiResponse(description = "Return found the profile info to edit", content = {
                     @Content(mediaType = MediaType.APPLICATION_JSON_VALUE) }, responseCode = "200"),
-            @ApiResponse(description = "Return the error if the profile info to be edited does not exist", content = {
-                    @Content(mediaType = MediaType.APPLICATION_JSON_VALUE) }, responseCode = "404")
+            @ApiResponse(description = "Return the error if the profile info to be edited does not exist", responseCode = "404")
     })
-    @GetMapping(value = "/{profileId}/users/{userId}/edit", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{profileId}/users/{userId}/edit", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> findProfileInfoToEditByProfileIdAndUserId(@Parameter(description = "This parameter represents id of profile") @PathVariable("profileId") UUID profileId,
                                                                        @Parameter(description = "This parameter represents id of user") @PathVariable("userId") UUID userId) {
-        ProfileInfoEditDto profileInfoEdit = profileService.findProfileInfoToEditByProfileIdAndUserId(profileId, userId);
-        if (profileInfoEdit != null) {
-            return new ResponseEntity<>(profileInfoEdit, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>("There is no profile information to edit", HttpStatus.NOT_FOUND);
-        }
+        return profileService.findProfileInfoToEditByProfileIdAndUserId(profileId, userId)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @Operation(summary = "Create the new profile")
     @ApiResponses(value = {
-            @ApiResponse(description = "Return the success message if the profile is created", content = {
-                    @Content(mediaType = MediaType.APPLICATION_JSON_VALUE) }, responseCode = "201"),
-            @ApiResponse(description = "Return the error if the profile is not created", content = {
-                    @Content(mediaType = MediaType.APPLICATION_JSON_VALUE) }, responseCode = "400")
+            @ApiResponse(description = "Return the success message if the profile is created", responseCode = "201"),
+            @ApiResponse(description = "Return the error if the profile is not created", responseCode = "400")
     })
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> save(@Parameter(description = "This parameter represents the data for saving the profile") @RequestBody ProfileDto profileDto) {
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> save(@Parameter(description = "This parameter represents the data for saving the profile")
+                                           @RequestBody ProfileDto profileDto) {
         try {
             profileService.createProfile(profileDto);
-            return new ResponseEntity<>("Profile is saved successfully", HttpStatus.CREATED);
+            return ResponseEntity.status(HttpStatus.CREATED).body("Profile is saved successfully");
         } catch (Exception e) {
-            return new ResponseEntity<>("Profile is not saved", HttpStatus.BAD_REQUEST);
+            return ResponseEntity.badRequest().body("Profile is not saved");
         }
     }
 
@@ -146,68 +131,57 @@ public class ProfileRestController {
     @ApiResponses(value = {
             @ApiResponse(description = "Return the profile avatar", content = {
                     @Content(mediaType = MediaType.APPLICATION_JSON_VALUE) }, responseCode = "200"),
-            @ApiResponse(description = "Return the error if the profile avatar does not exist", content = {
-                    @Content(mediaType = MediaType.APPLICATION_JSON_VALUE) }, responseCode = "404")
+            @ApiResponse(description = "Return the error if the profile avatar does not exist", responseCode = "404")
     })
-    @GetMapping(value = "/{profileId}/avatar", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{profileId}/avatar", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> findAvatarById(@Parameter(description = "This parameter represents id of profile") @PathVariable("profileId") UUID profileId) {
-        String profileAvatar = profileService.findAvatarById(profileId);
-        if (profileAvatar != null) {
-            return new ResponseEntity<>(profileAvatar, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>("Profile avatar does not exist", HttpStatus.NOT_FOUND);
-        }
+        return profileService.findAvatarById(profileId)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+
     }
 
     @Operation(summary = "Update the profile avatar")
     @ApiResponses(value = {
-            @ApiResponse(description = "Return the success message if the profile avatar is updated", content = {
-                    @Content(mediaType = MediaType.APPLICATION_JSON_VALUE) }, responseCode = "200"),
-            @ApiResponse(description = "Return the error message if the profile avatar is not updated", content = {
-                    @Content(mediaType = MediaType.APPLICATION_JSON_VALUE) }, responseCode = "400")
+            @ApiResponse(description = "Return the success message if the profile avatar is updated", responseCode = "200"),
+            @ApiResponse(description = "Return the error message if the profile avatar is not updated", responseCode = "400")
     })
     @PutMapping(value = "/{profileId}/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> updateAvatar(@Parameter(description = "This parameter represents id of profile") @PathVariable("profileId") UUID profileId,
                                                @Parameter(description = "This parameter represents the user's photo to update the profile avatar") @RequestParam("file") MultipartFile multipartFile) {
         try {
             profileService.updateAvatarProfile(profileId, multipartFile);
-            return new ResponseEntity<>("Profile avatar is updated successfully", HttpStatus.OK);
+            return ResponseEntity.ok("Profile avatar is updated successfully");
         } catch (Exception e) {
-            return new ResponseEntity<>("Profile avatar is not updated", HttpStatus.BAD_REQUEST);
+            return ResponseEntity.badRequest().body("Profile avatar is not updated");
         }
     }
 
     @Operation(summary = "Delete the profile avatar")
     @ApiResponses(value = {
-            @ApiResponse(description = "Return the success message if the profile avatar is deleted", content = {
-                    @Content(mediaType = MediaType.APPLICATION_JSON_VALUE) }, responseCode = "200"),
-            @ApiResponse(description = "Return the error message if the profile avatar is not deleted", content = {
-                    @Content(mediaType = MediaType.APPLICATION_JSON_VALUE) }, responseCode = "400")
+            @ApiResponse(description = "Return the success message if the profile avatar is deleted", responseCode = "200"),
+            @ApiResponse(description = "Return the error message if the profile avatar is not deleted", responseCode = "400")
     })
     @DeleteMapping(value = "/{profileId}/avatar", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> deleteAvatar(@Parameter(description = "This parameter represents id of profile") @PathVariable("profileId") UUID profileId) {
         try {
             profileService.setDefaultAvatar(profileId);
-            return new ResponseEntity<>("Profile avatar is deleted successfully", HttpStatus.OK);
+            return ResponseEntity.ok("Profile avatar is deleted successfully");
         } catch (Exception e) {
-            return new ResponseEntity<>("Profile avatar is not deleted", HttpStatus.BAD_REQUEST);
+            return ResponseEntity.badRequest().body("Profile avatar is not deleted");
         }
     }
 
     @Operation(summary = "Change the profile status")
     @ApiResponses(value = {
-            @ApiResponse(description = "Return the success message if the profile status is changed", content = {
-                    @Content(mediaType = MediaType.APPLICATION_JSON_VALUE) }, responseCode = "200"),
-            @ApiResponse(description = "Return the error message if the profile status is not changed", content = {
-                    @Content(mediaType = MediaType.APPLICATION_JSON_VALUE) }, responseCode = "400")
+            @ApiResponse(description = "Return the success message if the profile status is changed", responseCode = "200"),
+            @ApiResponse(description = "Return the error message if the profile status is not changed", responseCode = "400")
     })
     @PutMapping(value = "/{profileId}/status", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> changeStatus(@Parameter(description = "This parameter represents id of profile") @PathVariable("profileId") UUID profileId,
                                                @Parameter(description = "This parameter represents whether the profile is active or not") @RequestParam("isActive") boolean isActive) {
-        if (profileService.changeStatus(profileId, isActive)) {
-            return new ResponseEntity<>("Status is changed successfully", HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>("Status is not changed", HttpStatus.BAD_REQUEST);
-        }
+        return profileService.changeStatus(profileId, isActive) ?
+                ResponseEntity.ok("Status is changed successfully") :
+                ResponseEntity.badRequest().body("Status is not changed");
     }
 }

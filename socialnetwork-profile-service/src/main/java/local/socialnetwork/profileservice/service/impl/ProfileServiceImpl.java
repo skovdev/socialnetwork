@@ -32,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import java.util.stream.Collectors;
@@ -66,18 +67,18 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public ProfileDto findById(UUID profileId) {
+    public Optional<ProfileDto> findById(UUID profileId) {
         return profileRepository.findById(profileId)
                 .map(profile -> new ProfileDto(
                         profile.getId(),
                         profile.isActive(),
                         profile.getAvatar(),
                         profile.getUserId())
-                ).orElse(null);
+                );
     }
 
     @Override
-    public ProfileInfoDto findProfileInfoByProfileIdAndUserId(UUID profileId, UUID userId) {
+    public Optional<ProfileInfoDto> findProfileInfoByProfileIdAndUserId(UUID profileId, UUID userId) {
         return profileRepository.findById(profileId)
                 .map(profile -> {
                     UserDto userDto = userClient.findUserByUserId(userId);
@@ -97,11 +98,11 @@ public class ProfileServiceImpl implements ProfileService {
                             profile.isActive(),
                             profile.getAvatar(),
                             profile.getUserId());
-                }).orElse(null);
+                });
     }
 
     @Override
-    public ProfileInfoEditDto findProfileInfoToEditByProfileIdAndUserId(UUID profileId, UUID userId) {
+    public Optional<ProfileInfoEditDto> findProfileInfoToEditByProfileIdAndUserId(UUID profileId, UUID userId) {
         return profileRepository.findById(profileId)
                 .filter(profile -> profile.getUserId().equals(userId))
                 .map(profile -> {
@@ -109,7 +110,7 @@ public class ProfileServiceImpl implements ProfileService {
                     if (userDto == null) {
                         return null;
                     }
-                    return  new ProfileInfoEditDto(
+                    return new ProfileInfoEditDto(
                             userDto.firstName(),
                             userDto.lastName(),
                             userDto.country(),
@@ -118,14 +119,12 @@ public class ProfileServiceImpl implements ProfileService {
                             userDto.phone(),
                             userDto.birthDay(),
                             userDto.familyStatus());
-                }).orElse(null);
+                });
     }
 
     @Override
-    public String findAvatarById(UUID profileId) {
-        return profileRepository.findById(profileId)
-                .map(Profile::getAvatar)
-                .orElse(null);
+    public Optional<String> findAvatarById(UUID profileId) {
+        return profileRepository.findById(profileId).map(Profile::getAvatar);
     }
 
     @Override
