@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
+import java.util.Optional;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -36,7 +37,7 @@ public class UserServiceImpl implements UserService {
     final ProfileProducer profileProducer;
 
     @Override
-    public UserDto findById(UUID id) {
+    public Optional<UserDto> findById(UUID id) {
         return userRepository.findById(id).stream()
                 .map(user -> new UserDto(
                         user.getId(),
@@ -49,7 +50,7 @@ public class UserServiceImpl implements UserService {
                         user.getBirthDay(),
                         user.getFamilyStatus(),
                         user.getAuthUserId())
-                ).findFirst().orElse(null);
+                ).findFirst();
     }
 
     @Override
