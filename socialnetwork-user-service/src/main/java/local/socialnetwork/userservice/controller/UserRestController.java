@@ -15,8 +15,6 @@ import local.socialnetwork.userservice.aspect.annotation.LogMethodController;
 
 import local.socialnetwork.userservice.constant.VersionAPI;
 
-import local.socialnetwork.userservice.model.dto.user.UserDto;
-
 import local.socialnetwork.userservice.service.UserService;
 
 import lombok.AccessLevel;
@@ -26,7 +24,6 @@ import lombok.experimental.FieldDefaults;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
@@ -52,16 +49,12 @@ public class UserRestController {
     @ApiResponses(value = {
             @ApiResponse(description = "Return a found user", content = {
                     @Content(mediaType = MediaType.APPLICATION_JSON_VALUE) }, responseCode = "200"),
-            @ApiResponse(description = "Return error message if user does not exist", content = {
-                    @Content(mediaType = MediaType.APPLICATION_JSON_VALUE) }, responseCode = "404")
+            @ApiResponse(description = "Return error message if user does not exist", responseCode = "404")
     })
-    @GetMapping(value = "/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> findByUserId(@Parameter(description = "This parameter represents id of user") @PathVariable("userId") UUID userId) {
-        UserDto user = userService.findById(userId);
-        if (user != null) {
-            return new ResponseEntity<>(user, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>("User does not exist", HttpStatus.NOT_FOUND);
-        }
+        return userService.findById(userId)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 }
