@@ -52,6 +52,11 @@ import java.util.Optional;
 
 import java.util.stream.Collectors;
 
+/**
+ * Handles the registration and authentication/authorization of users.
+ * Provides endpoints for new user registration and existing user login,
+ * issuing JWT tokens for successful authentication.
+ */
 @Tag(name = "AuthenticationRestController", description = "Controller for registration and authentication/authorization of users.")
 @Slf4j
 @RestController
@@ -64,6 +69,15 @@ public class AuthenticationRestController {
     final AuthenticationManager authenticationManager;
     final JwtTokenProvider jwtTokenProvider;
 
+    /**
+     * Registers a new user with the given sign-up details.
+     * Validates if a user already exists with the provided username to prevent duplicates.
+     *
+     * @param signUpDto Object containing the sign-up details such as username and password.
+     * @return ResponseEntity indicating the outcome of the registration process.
+     *         Returns OK (200) with a success message if registration is successful,
+     *         or BAD REQUEST (400) with an error message if the user already exists.
+     */
     @Operation(summary = "User registration")
     @ApiResponses(value = {
             @ApiResponse(description = "User successfully registered", responseCode = "200"),
@@ -83,6 +97,15 @@ public class AuthenticationRestController {
         }
     }
 
+    /**
+     * Authenticates a user with the provided sign-in credentials.
+     * If authentication is successful, generates and returns a JWT token along with user details.
+     *
+     * @param signInDto Object containing the sign-in details such as username and password.
+     * @return ResponseEntity containing the authentication token and user details if successful,
+     *         or UNAUTHORIZED (401) status if authentication fails due to invalid credentials or other errors.
+     * @throws AuthenticationUserNotFoundException if the user does not exist in the database.
+     */
     @Operation(summary = "User authentication and authorization")
     @ApiResponses(value = {
             @ApiResponse(description = "User successfully logged in", content = {
@@ -104,6 +127,14 @@ public class AuthenticationRestController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
+
+    /**
+     * Constructs the response model for a successfully authenticated user,
+     * including user ID, username, and authentication token.
+     *
+     * @param authUser The authenticated user for whom the response model is being created.
+     * @return A map representing the response model with user details and token.
+     */
     private Map<Object, Object> createResponseModel(AuthUser authUser) {
         Map<Object, Object> model = new HashMap<>();
         model.put("authUserId", authUser.getId());
@@ -112,10 +143,22 @@ public class AuthenticationRestController {
         return model;
     }
 
+    /**
+     * Generates a JWT token for the given user based on their ID, username, and roles.
+     *
+     * @param authUser The user for whom the token is being generated.
+     * @return A JWT token string that represents the user's authentication and authorization information.
+     */
     private String generateToken(AuthUser authUser) {
        return jwtTokenProvider.createToken(authUser.getId(), authUser.getUsername(), getRoles(authUser.getAuthRoles()));
     }
 
+    /**
+     * Extracts the role authorities from the user's roles.
+     *
+     * @param authRoles The list of roles associated with the user.
+     * @return A list of strings representing the authorities of the user's roles.
+     */
     private List<String> getRoles(List<AuthRole> authRoles) {
         return authRoles.stream()
                 .map(AuthRole::getAuthority)
