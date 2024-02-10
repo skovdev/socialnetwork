@@ -43,7 +43,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.util.Map;
 import java.util.List;
@@ -67,22 +66,20 @@ public class AuthenticationRestController {
 
     @Operation(summary = "User registration")
     @ApiResponses(value = {
-            @ApiResponse(description = "User successfully registered", content = {
-                    @Content(mediaType = MediaType.APPLICATION_JSON_VALUE) }, responseCode = "200"),
-            @ApiResponse(description = "User already exists in database", content = {
-                    @Content(mediaType = MediaType.APPLICATION_JSON_VALUE) }, responseCode = "400")
+            @ApiResponse(description = "User successfully registered", responseCode = "200"),
+            @ApiResponse(description = "User already exists in database", responseCode = "400")
     })
-    @PostMapping(value = "/sign-up", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> signUp(@Parameter(description = "This parameter represents designed for user registration")
+    @PostMapping(value = "/sign-up", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> signUp(@Parameter(description = "This parameter represents designed for user registration")
                                              @RequestBody SignUpDto signUpDto) {
         Optional<AuthUser> authUser = authUserService.findByUsername(signUpDto.username());
         if (authUser.isPresent() && authUser.get().getUsername().equalsIgnoreCase(signUpDto.username())) {
             log.info("User '{}' with this username already exists in database", authUser.get().getUsername());
-            return new ResponseEntity<>(authUser.get().getUsername() + " is exists in databases", HttpStatus.BAD_REQUEST);
+            return ResponseEntity.badRequest().body(authUser.get().getUsername() + " is exists in databases");
         } else {
             authUserService.signUp(signUpDto);
             log.info("User signed up successfully");
-            return new ResponseEntity<>(signUpDto.username() + " signed up", HttpStatus.OK);
+            return ResponseEntity.ok(signUpDto.username() + " signed up");
         }
     }
 
@@ -94,34 +91,34 @@ public class AuthenticationRestController {
                     @Content(mediaType = MediaType.APPLICATION_JSON_VALUE) }, responseCode = "401")
     })
     @PostMapping(value = "/sign-in", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<Object, Object>> signIn(@Parameter(description = "This parameter represents designed for user authentication during the sign-in process")
+    public ResponseEntity<?> signIn(@Parameter(description = "This parameter represents designed for user authentication during the sign-in process")
                                                           @RequestBody SignInDto signInDto) {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(signInDto.username(), signInDto.password()));
             AuthUser authUser = authUserService.findByUsername(signInDto.username())
                     .orElseThrow(() -> new AuthenticationUserNotFoundException(signInDto.username() + " is not found"));
-            List<String> roles = getRoles(authUser.getAuthRoles());
-            String token = jwtTokenProvider.createToken(authUser.getId(), authUser.getUsername(), roles);
-            Map<Object, Object> model = new HashMap<>();
-            model.put("authUserId", authUser.getId());
-            model.put("username", authUser.getUsername());
-            model.put("token", token);
             log.info("User { id: {}, username: {} } successfully authenticated", authUser.getId(), authUser.getUsername());
-            return new ResponseEntity<>(model, HttpStatus.OK);
-        } catch (RuntimeException e) {
-            throw new AuthenticationUserException(e.getMessage());
+            return ResponseEntity.ok(createResponseModel(authUser));
+        } catch (AuthenticationUserException e) {
+            log.info("Authorization error: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
+    }
+    private Map<Object, Object> createResponseModel(AuthUser authUser) {
+        Map<Object, Object> model = new HashMap<>();
+        model.put("authUserId", authUser.getId());
+        model.put("username", authUser.getUsername());
+        model.put("token", generateToken(authUser));
+        return model;
+    }
+
+    private String generateToken(AuthUser authUser) {
+       return jwtTokenProvider.createToken(authUser.getId(), authUser.getUsername(), getRoles(authUser.getAuthRoles()));
     }
 
     private List<String> getRoles(List<AuthRole> authRoles) {
         return authRoles.stream()
                 .map(AuthRole::getAuthority)
                 .collect(Collectors.toList());
-    }
-
-    @ExceptionHandler(AuthenticationUserException.class)
-    public ResponseEntity<?> handlerAuthenticationException(RuntimeException e) {
-        log.info("Authorization Error: {}", e.getMessage());
-        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 }
