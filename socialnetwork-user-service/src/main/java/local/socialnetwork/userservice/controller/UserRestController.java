@@ -34,6 +34,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
 
+/**
+ * Controller class responsible for handling user-related CRUD operations.
+ *
+ * @author Stanislav Kovalenko
+ */
 @Tag(name = "UserRestController", description = "Controller for processing user-related CRUD operations")
 @Slf4j
 @RestController
@@ -42,8 +47,19 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserRestController {
 
+    /**
+     * Service layer dependency for user-related operations.
+     */
     final UserService userService;
 
+    /**
+     * Endpoint to find a user by their unique identifier.
+     *
+     * @param userId The unique identifier of the user.
+     * @return A ResponseEntity indicating the outcome of the user retrieval process.
+     *         Returns OK (200) with the found user if the user exists,
+     *         or NOT FOUND (404) if the user does not exist.
+     */
     @LogMethodController
     @Operation(summary = "Find the user by id of user")
     @ApiResponses(value = {
