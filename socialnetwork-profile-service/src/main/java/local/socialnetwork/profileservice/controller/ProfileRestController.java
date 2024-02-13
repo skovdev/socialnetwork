@@ -43,6 +43,11 @@ import java.util.List;
 import java.util.UUID;
 import java.util.Collections;
 
+/**
+ * Controller class responsible for handling profile-related CRUD operations.
+ *
+ * @author Stanislav Kovalenko
+ */
 @Tag(name = "ProfileRestController", description = "Controller for processing profile-related CRUD operations")
 @Slf4j
 @RestController
@@ -51,8 +56,17 @@ import java.util.Collections;
 @AllArgsConstructor
 public class ProfileRestController {
 
+    /**
+     * Service layer dependency for profile-related operations.
+     */
     ProfileService profileService;
 
+    /**
+     * Fetches all profiles
+     *
+     * @return A List of {@link ProfileDto}. If the database contains profiles, returns a non-empty list.
+     *         Returns an empty list if no profiles are found.
+     */
     @Operation(summary = "Find all the profiles")
     @ApiResponses(value = {
             @ApiResponse(description = "Return all found the profiles", content = {
@@ -70,6 +84,14 @@ public class ProfileRestController {
         }
     }
 
+    /**
+     * Finds a specific profile by its ID.
+     *
+     * @param profileId The ID of the profile to find.
+     * @return A ResponseEntity indicating the outcome of the profile retrieval process.
+     *         Returns OK (200) with the found ProfileDto if the profile exists,
+     *         or NOT FOUND (404) if the profile does not exist.
+     */
     @Operation(summary = "Find the profile by id of profile")
     @ApiResponses(value = {
             @ApiResponse(description = "Return found the profile", content = {
@@ -83,6 +105,15 @@ public class ProfileRestController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    /**
+     * Finds profile information based on profile ID and user ID.
+     *
+     * @param profileId The ID of the profile.
+     * @param userId The ID of the user.
+     * @return A ResponseEntity indicating the outcome of the profile info retrieval process.
+     *         Returns OK (200) with profile information if found,
+     *         or NOT FOUND (404) if the information does not exist.
+     */
     @Operation(summary = "Find the profile info by id of profile and id of user")
     @ApiResponses(value = {
             @ApiResponse(description = "Return found the profile info", content = {
@@ -97,6 +128,15 @@ public class ProfileRestController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    /**
+     * Finds profile information for editing based on profile ID and user ID.
+     *
+     * @param profileId The ID of the profile.
+     * @param userId The ID of the user.
+     * @return A ResponseEntity indicating the outcome of the editable profile info retrieval process.
+     *         Returns OK (200) with editable profile information if found,
+     *         or NOT FOUND (404) if the information does not exist.
+     */
     @Operation(summary = "Find the profile info to edit by id of profile and id of user")
     @ApiResponses(value = {
             @ApiResponse(description = "Return found the profile info to edit", content = {
@@ -111,6 +151,14 @@ public class ProfileRestController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    /**
+     * Creates a new profile with the given data.
+     *
+     * @param profileDto Data transfer object containing the profile information to be saved.
+     * @return A ResponseEntity indicating the outcome of the profile creation process.
+     *         Returns CREATED (201) with a success message if the profile is created successfully,
+     *         or BAD REQUEST (400) if the profile cannot be created.
+     */
     @Operation(summary = "Create the new profile")
     @ApiResponses(value = {
             @ApiResponse(description = "Return the success message if the profile is created", responseCode = "201"),
@@ -127,6 +175,14 @@ public class ProfileRestController {
         }
     }
 
+    /**
+     * Finds the avatar for a specific profile by its ID.
+     *
+     * @param profileId The ID of the profile to find the avatar for.
+     * @return A ResponseEntity indicating the outcome of the avatar retrieval process.
+     *         Returns OK (200) with the avatar if found,
+     *         or NOT FOUND (404) if the avatar does not exist.
+     */
     @Operation(summary = "Find the profile avatar by id of profile")
     @ApiResponses(value = {
             @ApiResponse(description = "Return the profile avatar", content = {
@@ -141,6 +197,15 @@ public class ProfileRestController {
 
     }
 
+    /**
+     * Updates the avatar for a specific profile.
+     *
+     * @param profileId The ID of the profile for which to update the avatar.
+     * @param multipartFile The new avatar file as a MultipartFile.
+     * @return A ResponseEntity indicating the outcome of the avatar update process.
+     *         Returns OK (200) with a success message if the avatar is updated successfully,
+     *         or BAD REQUEST (400) if the update fails.
+     */
     @Operation(summary = "Update the profile avatar")
     @ApiResponses(value = {
             @ApiResponse(description = "Return the success message if the profile avatar is updated", responseCode = "200"),
@@ -157,6 +222,14 @@ public class ProfileRestController {
         }
     }
 
+    /**
+     * Deletes the avatar for a specific profile by its ID.
+     *
+     * @param profileId The ID of the profile for which to delete the avatar.
+     * @return A ResponseEntity indicating the outcome of the avatar deletion process.
+     *         Returns OK (200) with a success message if the avatar is deleted successfully,
+     *         or NOT FOUND (404) if the avatar does not exist.
+     */
     @Operation(summary = "Delete the profile avatar")
     @ApiResponses(value = {
             @ApiResponse(description = "Return the success message if the profile avatar is deleted", responseCode = "200"),
@@ -172,6 +245,15 @@ public class ProfileRestController {
         }
     }
 
+    /**
+     * Changes the status of a profile.
+     *
+     * @param profileId The ID of the profile for which to change the status.
+     * @param isActive The new status to be applied to the profile.
+     * @return A ResponseEntity indicating the outcome of the status change process.
+     *         Returns OK (200) with a success message if the status is changed successfully,
+     *         or NOT FOUND (404) if the profile does not exist.
+     */
     @Operation(summary = "Change the profile status")
     @ApiResponses(value = {
             @ApiResponse(description = "Return the success message if the profile status is changed", responseCode = "200"),
