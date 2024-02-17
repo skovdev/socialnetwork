@@ -37,6 +37,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
 import org.springframework.web.bind.annotation.RequestBody;
@@ -122,7 +123,7 @@ public class AuthenticationRestController {
                     .orElseThrow(() -> new AuthenticationUserNotFoundException(signInDto.username() + " is not found"));
             log.info("User { id: {}, username: {} } successfully authenticated", authUser.getId(), authUser.getUsername());
             return ResponseEntity.ok(createResponseModel(authUser));
-        } catch (AuthenticationUserException e) {
+        } catch (AuthenticationUserException | BadCredentialsException e) {
             log.info("Authorization error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
