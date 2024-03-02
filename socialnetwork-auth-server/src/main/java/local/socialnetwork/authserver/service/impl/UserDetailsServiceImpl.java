@@ -1,8 +1,8 @@
 package local.socialnetwork.authserver.service.impl;
 
-import local.socialnetwork.authserver.model.entity.AuthUser;
+import local.socialnetwork.authserver.entity.AuthUser;
 
-import local.socialnetwork.authserver.model.springsecurity.UserPrincipal;
+import local.socialnetwork.authserver.config.security.model.UserPrincipal;
 
 import local.socialnetwork.authserver.repository.AuthUserRepository;
 

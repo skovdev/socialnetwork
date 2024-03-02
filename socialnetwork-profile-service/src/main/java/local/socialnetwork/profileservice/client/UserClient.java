@@ -1,6 +1,6 @@
 package local.socialnetwork.profileservice.client;
 
-import local.socialnetwork.profileservice.model.dto.user.UserDto;
+import local.socialnetwork.profileservice.dto.user.UserDto;
 
 import org.springframework.cloud.openfeign.FeignClient;
 

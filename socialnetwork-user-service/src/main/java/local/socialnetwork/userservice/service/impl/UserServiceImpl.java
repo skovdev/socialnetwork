@@ -1,10 +1,12 @@
 package local.socialnetwork.userservice.service.impl;
 
-import local.socialnetwork.userservice.kafka.producer.profile.ProfileProducer;
+import local.socialnetwork.userservice.kafka.constant.KafkaTopics;
 
-import local.socialnetwork.userservice.model.dto.user.UserDto;
+import local.socialnetwork.userservice.kafka.saga.signup.producer.profile.ProfileRegistrationCompletedProducer;
 
-import local.socialnetwork.userservice.model.entity.user.User;
+import local.socialnetwork.userservice.dto.user.UserDto;
+
+import local.socialnetwork.userservice.entity.user.User;
 
 import local.socialnetwork.userservice.repository.UserRepository;
 
@@ -15,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 
 import lombok.experimental.FieldDefaults;
 
-import org.springframework.beans.factory.annotation.Value;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Service;
 
@@ -24,17 +26,15 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.UUID;
 import java.util.Optional;
 
+@Slf4j
 @Service
-@FieldDefaults(level = AccessLevel.PRIVATE)
 @Transactional
 @RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserServiceImpl implements UserService {
 
-    @Value("${sn.kafka.topic.profile.new}")
-    String kafkaTopicNewProfile;
-
     final UserRepository userRepository;
-    final ProfileProducer profileProducer;
+    final ProfileRegistrationCompletedProducer profileRegistrationCompletedProducer;
 
     @Override
     public Optional<UserDto> findById(UUID id) {
@@ -54,13 +54,35 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void save(User user) {
-        userRepository.save(user);
-        profileProducer.sendProfileAndSave(kafkaTopicNewProfile, user.getId());
+    public void save(UserDto userDto) {
+        User user = userRepository.save(convertDtoToUserEntity(userDto));
+        profileRegistrationCompletedProducer.sendProfileDataToCreate(KafkaTopics.PROFILE_COMPLETED_TOPIC, user.getAuthUserId(), user.getId());
+        log.info("User is saved successfully. UserID: {}", user.getId());
     }
 
     @Override
     public void deleteById(UUID id) {
         userRepository.deleteById(id);
+        log.info("User is deleted. UserID: {}", id);
+    }
+
+    @Override
+    public void deleteByAuthUserId(UUID authUserId) {
+        userRepository.deleteByAuthUserId(authUserId);
+        log.info("User is deleted. AuthUserID: {}", authUserId);
+    }
+
+    private User convertDtoToUserEntity(UserDto userDto) {
+        User user = new User();
+        user.setFirstName(userDto.firstName());
+        user.setLastName(userDto.lastName());
+        user.setCountry(userDto.country());
+        user.setCity(userDto.city());
+        user.setAddress(userDto.address());
+        user.setPhone(userDto.phone());
+        user.setBirthDay(userDto.birthDay());
+        user.setFamilyStatus(userDto.familyStatus());
+        user.setAuthUserId(userDto.authUserId());
+        return user;
     }
 }

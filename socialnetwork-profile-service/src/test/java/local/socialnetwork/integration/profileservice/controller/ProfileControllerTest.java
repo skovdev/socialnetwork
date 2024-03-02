@@ -4,11 +4,11 @@ import local.socialnetwork.profileservice.SpringBootRunProfileService;
 
 import local.socialnetwork.profileservice.client.UserClient;
 
-import local.socialnetwork.profileservice.model.dto.profile.ProfileDto;
-import local.socialnetwork.profileservice.model.dto.profile.ProfileInfoDto;
-import local.socialnetwork.profileservice.model.dto.profile.ProfileInfoEditDto;
+import local.socialnetwork.profileservice.dto.profile.ProfileDto;
+import local.socialnetwork.profileservice.dto.profile.ProfileInfoDto;
+import local.socialnetwork.profileservice.dto.profile.ProfileInfoEditDto;
 
-import local.socialnetwork.profileservice.model.dto.user.UserDto;
+import local.socialnetwork.profileservice.dto.user.UserDto;
 
 import local.socialnetwork.profileservice.service.ProfileService;
 import local.socialnetwork.profileservice.util.ResourceUtil;
