@@ -1,4 +1,4 @@
-package local.socialnetwork.profileservice.model.entity;
+package local.socialnetwork.profileservice.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

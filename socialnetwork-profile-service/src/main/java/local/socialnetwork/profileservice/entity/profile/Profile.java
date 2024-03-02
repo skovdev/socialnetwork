@@ -1,8 +1,8 @@
-package local.socialnetwork.profileservice.model.entity.profile;
+package local.socialnetwork.profileservice.entity.profile;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import local.socialnetwork.profileservice.model.entity.AbstractBaseModel;
+import local.socialnetwork.profileservice.entity.AbstractBaseModel;
 
 import jakarta.persistence.Lob;
 import jakarta.persistence.Table;

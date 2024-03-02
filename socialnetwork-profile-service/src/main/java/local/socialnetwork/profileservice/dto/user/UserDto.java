@@ -1,8 +1,8 @@
-package local.socialnetwork.profileservice.model.dto.profile;
+package local.socialnetwork.profileservice.dto.user;
 
 import java.util.UUID;
 
-public record ProfileInfoDto(
+public record UserDto(
         UUID id,
         String firstName,
         String lastName,
@@ -11,8 +11,5 @@ public record ProfileInfoDto(
         String address,
         String phone,
         String birthDay,
-        String familyStatus,
-        boolean isActive,
-        String avatar,
-        UUID userId
+        String familyStatus
 ) {}

@@ -12,7 +12,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 import local.socialnetwork.profileservice.constant.VersionAPI;
 
-import local.socialnetwork.profileservice.model.dto.profile.ProfileDto;
+import local.socialnetwork.profileservice.dto.profile.ProfileDto;
 
 import local.socialnetwork.profileservice.service.ProfileService;
 
@@ -168,7 +168,7 @@ public class ProfileRestController {
     public ResponseEntity<String> save(@Parameter(description = "This parameter represents the data for saving the profile")
                                            @RequestBody ProfileDto profileDto) {
         try {
-            profileService.createProfile(profileDto);
+            profileService.save(profileDto);
             return ResponseEntity.status(HttpStatus.CREATED).body("Profile is saved successfully");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Profile is not saved");

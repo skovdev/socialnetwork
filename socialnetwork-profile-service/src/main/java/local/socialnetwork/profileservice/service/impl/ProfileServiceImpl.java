@@ -2,13 +2,13 @@ package local.socialnetwork.profileservice.service.impl;
 
 import local.socialnetwork.profileservice.client.UserClient;
 
-import local.socialnetwork.profileservice.model.dto.profile.ProfileDto;
-import local.socialnetwork.profileservice.model.dto.profile.ProfileInfoDto;
-import local.socialnetwork.profileservice.model.dto.profile.ProfileInfoEditDto;
+import local.socialnetwork.profileservice.dto.profile.ProfileDto;
+import local.socialnetwork.profileservice.dto.profile.ProfileInfoDto;
+import local.socialnetwork.profileservice.dto.profile.ProfileInfoEditDto;
 
-import local.socialnetwork.profileservice.model.dto.user.UserDto;
+import local.socialnetwork.profileservice.dto.user.UserDto;
 
-import local.socialnetwork.profileservice.model.entity.profile.Profile;
+import local.socialnetwork.profileservice.entity.profile.Profile;
 
 import local.socialnetwork.profileservice.repository.ProfileRepository;
 
@@ -32,8 +32,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
+import java.util.Optional;
 
 import java.util.stream.Collectors;
 
@@ -128,15 +128,9 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public void createProfile(ProfileDto profileDto) {
-        if (profileDto != null) {
-            Profile profile = new Profile();
-            profile.setActive(profileDto.isActive());
-            profile.setAvatar(profileDto.avatar());
-            profile.setUserId(profileDto.userId());
-            profileRepository.save(profile);
-            log.info("Profile is saved. Profile ID: {}", profile.getId());
-        }
+    public void save(ProfileDto profileDto) {
+        Profile profile = profileRepository.save(convertDtoToEntity(profileDto));
+        log.info("Profile is saved successfully. ProfileID: {}", profile.getId());
     }
 
     @Override
@@ -170,5 +164,13 @@ public class ProfileServiceImpl implements ProfileService {
                    log.info("Status is changed: Profile ID: {}", profile.getId());
                    return true;
                }).orElse(false);
+    }
+
+    private Profile convertDtoToEntity(ProfileDto profileDto) {
+        Profile profile = new Profile();
+        profile.setActive(profileDto.isActive());
+        profile.setAvatar(profileDto.avatar());
+        profile.setUserId(profileDto.userId());
+        return profile;
     }
 }
