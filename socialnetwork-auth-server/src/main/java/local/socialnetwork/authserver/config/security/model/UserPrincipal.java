@@ -1,4 +1,4 @@
-package local.socialnetwork.authserver.model.springsecurity;
+package local.socialnetwork.authserver.config.security.model;
 
 import lombok.Getter;
 

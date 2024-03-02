@@ -5,7 +5,7 @@ import local.socialnetwork.authserver.SpringBootRunAuthServer;
 import local.socialnetwork.authserver.dto.SignInDto;
 import local.socialnetwork.authserver.dto.SignUpDto;
 
-import local.socialnetwork.authserver.kafka.producer.user.UserProducer;
+import local.socialnetwork.authserver.kafka.saga.signup.producer.user.UserDetailsCreationProducer;
 
 import org.junit.jupiter.api.Test;
 
@@ -61,12 +61,12 @@ public class AuthenticationControllerTest {
     private TestRestTemplate testRestTemplate;
 
     @MockBean
-    private UserProducer userProducer;
+    private UserDetailsCreationProducer userDetailsCreationProducer;
 
     @Test
     public void shouldRegisterAuthNewUser() {
 
-        Mockito.doNothing().when(userProducer).sendUserAndSave(Mockito.any(), Mockito.any(), Mockito.any());
+        Mockito.doNothing().when(userDetailsCreationProducer).sendUserDetailsToCreate(Mockito.any(), Mockito.any(), Mockito.any());
 
         SignUpDto signUpDto = new SignUpDto(
                 "testNewUsername",
