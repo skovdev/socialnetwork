@@ -1,4 +1,4 @@
-package local.socialnetwork.authserver.model.entity;
+package local.socialnetwork.authserver.entity;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;

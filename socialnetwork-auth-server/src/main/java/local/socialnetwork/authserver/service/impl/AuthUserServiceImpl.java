@@ -2,10 +2,12 @@ package local.socialnetwork.authserver.service.impl;
 
 import local.socialnetwork.authserver.dto.SignUpDto;
 
-import local.socialnetwork.authserver.kafka.producer.user.UserProducer;
+import local.socialnetwork.authserver.kafka.constant.KafkaTopics;
 
-import local.socialnetwork.authserver.model.entity.AuthRole;
-import local.socialnetwork.authserver.model.entity.AuthUser;
+import local.socialnetwork.authserver.kafka.saga.signup.producer.user.UserDetailsCreationProducer;
+
+import local.socialnetwork.authserver.entity.AuthRole;
+import local.socialnetwork.authserver.entity.AuthUser;
 
 import local.socialnetwork.authserver.repository.AuthRoleRepository;
 import local.socialnetwork.authserver.repository.AuthUserRepository;
@@ -17,17 +19,23 @@ import lombok.RequiredArgsConstructor;
 
 import lombok.experimental.FieldDefaults;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Value;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import org.springframework.stereotype.Service;
 
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
+import java.util.UUID;
 import java.util.Optional;
+import java.util.Collections;
 
+@Slf4j
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @RequiredArgsConstructor
@@ -36,12 +44,9 @@ public class AuthUserServiceImpl implements AuthUserService {
     @Value("${sn.auth.user.signup.default.role}")
     String defaultUserRole;
 
-    @Value("${sn.kafka.topic.user.new}")
-    String kafkaTopicNewUser;
-
     final AuthUserRepository authUserRepository;
     final AuthRoleRepository authRoleRepository;
-    final UserProducer userProducer;
+    final UserDetailsCreationProducer userDetailsCreationProducer;
     final PasswordEncoder passwordEncoder;
 
     @Transactional
@@ -67,7 +72,23 @@ public class AuthUserServiceImpl implements AuthUserService {
         authUserRepository.save(authUser);
         authRoleRepository.save(authRole);
 
-        userProducer.sendUserAndSave(kafkaTopicNewUser, signUpDTO, authUser.getId());
+        userDetailsCreationProducer.sendUserDetailsToCreate(KafkaTopics.AUTH_USER_REGISTERED_TOPIC, signUpDTO, authUser.getId());
 
+        log.info("Auth user is saved successfully. AuthUserID: {}", authUser.getId());
+
+    }
+
+    @Transactional
+    @Override
+    public void deleteById(UUID id) {
+
+        authUserRepository.findById(id)
+                .ifPresentOrElse(
+                        authUser -> {
+                            authUserRepository.delete(authUser);
+                            log.info("Auth user is deleted. AuthUserID: {}", id);
+                        },
+                        () -> log.info("Auth user not found. AuthUserID: {}", id)
+                );
     }
 }

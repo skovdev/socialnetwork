@@ -20,8 +20,8 @@ import local.socialnetwork.authserver.dto.SignUpDto;
 import local.socialnetwork.authserver.exception.AuthenticationUserException;
 import local.socialnetwork.authserver.exception.AuthenticationUserNotFoundException;
 
-import local.socialnetwork.authserver.model.entity.AuthUser;
-import local.socialnetwork.authserver.model.entity.AuthRole;
+import local.socialnetwork.authserver.entity.AuthUser;
+import local.socialnetwork.authserver.entity.AuthRole;
 
 import local.socialnetwork.authserver.service.AuthUserService;
 
@@ -93,7 +93,7 @@ public class AuthenticationRestController {
             return ResponseEntity.badRequest().body(authUser.get().getUsername() + " is exists in databases");
         } else {
             authUserService.signUp(signUpDto);
-            log.info("User signed up successfully");
+            log.info("User '{}' signed up successfully", signUpDto.username());
             return ResponseEntity.ok(signUpDto.username() + " signed up");
         }
     }
