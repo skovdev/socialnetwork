@@ -1,6 +1,6 @@
 package local.socialnetwork.profileservice.repository;
 
-import local.socialnetwork.profileservice.model.entity.profile.Profile;
+import local.socialnetwork.profileservice.entity.profile.Profile;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

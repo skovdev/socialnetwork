@@ -1,9 +1,6 @@
-package local.socialnetwork.profileservice.model.dto.user;
+package local.socialnetwork.profileservice.dto.profile;
 
-import java.util.UUID;
-
-public record UserDto(
-        UUID id,
+public record ProfileInfoEditDto(
         String firstName,
         String lastName,
         String country,
