@@ -1,6 +1,6 @@
-package local.socialnetwork.userservice.model.entity.user;
+package local.socialnetwork.userservice.entity.user;
 
-import local.socialnetwork.userservice.model.entity.AbstractBaseModel;
+import local.socialnetwork.userservice.entity.AbstractBaseModel;
 
 import lombok.Getter;
 import lombok.Setter;

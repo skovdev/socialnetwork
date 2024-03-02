@@ -2,7 +2,7 @@ package local.socialnetwork.userservice.integration.controller;
 
 import local.socialnetwork.userservice.SpringBootRunUserService;
 
-import local.socialnetwork.userservice.model.dto.user.UserDto;
+import local.socialnetwork.userservice.dto.user.UserDto;
 
 import org.junit.jupiter.api.Test;
 

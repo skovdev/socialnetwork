@@ -1,4 +1,4 @@
-package local.socialnetwork.userservice.model.entity;
+package local.socialnetwork.userservice.entity;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -1,4 +1,4 @@
-package local.socialnetwork.userservice.model.dto.profile;
+package local.socialnetwork.userservice.dto.profile;
 
 import java.util.UUID;
 
