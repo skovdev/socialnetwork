@@ -39,7 +39,7 @@
         <spring.cloud.gateway.version>4.1.0</spring.cloud.gateway.version>
         <spring.cloud.loadbalancer.version>4.1.0</spring.cloud.loadbalancer.version>
         <spring.cloud.openfeign.version>4.1.0</spring.cloud.openfeign.version>
-        <spring.cloud.kafka.version>4.0.2</spring.cloud.kafka.version>
+        <spring.cloud.kafka.version>4.1.0</spring.cloud.kafka.version>
         <jakarta.persistence.api.version>3.1.0</jakarta.persistence.api.version>
         <jjwt.version>0.11.5</jjwt.version>
         <postgresql.version>42.5.4</postgresql.version>

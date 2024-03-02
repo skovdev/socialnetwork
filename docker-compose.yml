@@ -90,7 +90,7 @@ services:
       KAFKA_ADVERTISED_HOST_NAME: kafka
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_CREATE_TOPIC: "topic.user.new:1, topic.profile.new:1"
+      KAFKA_CREATE_TOPIC: "auth-user-registered:1, user-details-created:1, profile-completed:1, user-details-failed:1, profile-completed-failed:1"
     depends_on:
       - zookeeper
 
