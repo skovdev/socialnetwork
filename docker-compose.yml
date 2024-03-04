@@ -10,16 +10,22 @@ services:
       - "5432:5432"
     volumes:
       - ./pgdata:/var/lib/postgresql/data
+    networks:
+      - socialnetwork-network
 
   socialnetwork-eureka-service-discovery:
     image: socialnetwork-service-discovery-1.0
     ports:
       - "8761:8761"
+    networks:
+      - socialnetwork-network
 
   socialnetwork-config-server:
     image: socialnetwork-config-server-1.0
     ports:
       - "8888:8888"
+    networks:
+      - socialnetwork-network
 
   socialnetwork-api-gateway:
     image: socialnetwork-api-gateway-1.0
@@ -33,6 +39,8 @@ services:
       - socialnetwork-eureka-service-discovery
       - socialnetwork-config-server
     entrypoint: ../wait-for-it.sh socialnetwork-config-server:8888 --timeout=20 -- java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5009 -jar socialnetwork-api-gateway-1.0.jar
+    networks:
+      - socialnetwork-network
 
   socialnetwork-auth-server:
     image: socialnetwork-auth-server-1.0
@@ -48,6 +56,8 @@ services:
       - socialnetwork-api-gateway
       - kafka
     entrypoint: ../wait-for-it.sh socialnetwork-config-server:8888 --timeout=20 -- java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 -jar socialnetwork-auth-server-1.0.jar
+    networks:
+      - socialnetwork-network
 
   socialnetwork-user-service:
     image: socialnetwork-user-service-1.0
@@ -64,6 +74,8 @@ services:
       - socialnetwork-database
       - kafka
     entrypoint: ../wait-for-it.sh socialnetwork-config-server:8888 --timeout=20 -- java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5006 -jar socialnetwork-user-service-1.0.jar
+    networks:
+      - socialnetwork-network
 
   socialnetwork-profile-service:
     image: socialnetwork-profile-service-1.0
@@ -81,23 +93,35 @@ services:
     entrypoint: ../wait-for-it.sh socialnetwork-config-server:8888 --timeout=20 -- java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5007 -jar socialnetwork-profile-service-1.0.jar
     volumes:
        - /avatar/
+    networks:
+      - socialnetwork-network
 
   kafka:
-    image: wurstmeister/kafka
+    image: wurstmeister/kafka:latest
     ports:
       - "9092:9092"
     environment:
       KAFKA_ADVERTISED_HOST_NAME: kafka
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_CREATE_TOPIC: "auth-user-registered:1, user-details-created:1, profile-completed:1, user-details-failed:1, profile-completed-failed:1"
+    volumes:
+      - ./kafka/kafka-init.sh:/kafka/kafka-init.sh
+    command: [ "/bin/sh", "-c", "chmod +x /kafka/kafka-init.sh && /kafka/kafka-init.sh" ]
     depends_on:
       - zookeeper
+    networks:
+      - socialnetwork-network
 
   zookeeper:
-    image: wurstmeister/zookeeper
+    image: wurstmeister/zookeeper:latest
     ports:
       - "2181:2181"
+    networks:
+      - socialnetwork-network
+
+networks:
+  socialnetwork-network:
+    driver: bridge
 
 #  socialnetwork-app-client:
 #    image: socialnetwork-app-client
