@@ -2,9 +2,7 @@ package local.socialnetwork.authserver.service.impl;
 
 import local.socialnetwork.authserver.dto.SignUpDto;
 
-import local.socialnetwork.authserver.kafka.constant.KafkaTopics;
-
-import local.socialnetwork.authserver.kafka.saga.signup.producer.user.UserDetailsCreationProducer;
+import local.socialnetwork.authserver.event.UserDetailsEvent;
 
 import local.socialnetwork.authserver.entity.AuthRole;
 import local.socialnetwork.authserver.entity.AuthUser;
@@ -23,12 +21,12 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Value;
 
+import org.springframework.context.ApplicationEventPublisher;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import org.springframework.stereotype.Service;
 
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
@@ -46,7 +44,7 @@ public class AuthUserServiceImpl implements AuthUserService {
 
     final AuthUserRepository authUserRepository;
     final AuthRoleRepository authRoleRepository;
-    final UserDetailsCreationProducer userDetailsCreationProducer;
+    final ApplicationEventPublisher applicationEventPublisher;
     final PasswordEncoder passwordEncoder;
 
     @Transactional
@@ -72,7 +70,7 @@ public class AuthUserServiceImpl implements AuthUserService {
         authUserRepository.save(authUser);
         authRoleRepository.save(authRole);
 
-        userDetailsCreationProducer.sendUserDetailsToCreate(KafkaTopics.AUTH_USER_REGISTERED_TOPIC, signUpDTO, authUser.getId());
+        applicationEventPublisher.publishEvent(new UserDetailsEvent(signUpDTO, authUser.getId()));
 
         log.info("Auth user is saved successfully. AuthUserID: {}", authUser.getId());
 
