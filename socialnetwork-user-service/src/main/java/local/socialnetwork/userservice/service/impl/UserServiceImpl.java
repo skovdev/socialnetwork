@@ -1,5 +1,6 @@
 package local.socialnetwork.userservice.service.impl;
 
+import local.socialnetwork.userservice.event.ProfileCompletedEvent;
 import local.socialnetwork.userservice.kafka.constant.KafkaTopics;
 
 import local.socialnetwork.userservice.kafka.saga.signup.producer.profile.ProfileRegistrationCompletedProducer;
@@ -19,6 +20,7 @@ import lombok.experimental.FieldDefaults;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -34,7 +36,7 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 
     final UserRepository userRepository;
-    final ProfileRegistrationCompletedProducer profileRegistrationCompletedProducer;
+    final ApplicationEventPublisher applicationEventPublisher;
 
     @Override
     public Optional<UserDto> findById(UUID id) {
@@ -56,7 +58,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void save(UserDto userDto) {
         User user = userRepository.save(convertDtoToUserEntity(userDto));
-        profileRegistrationCompletedProducer.sendProfileDataToCreate(KafkaTopics.PROFILE_COMPLETED_TOPIC, user.getAuthUserId(), user.getId());
+        applicationEventPublisher.publishEvent(new ProfileCompletedEvent(user));
         log.info("User is saved successfully. UserID: {}", user.getId());
     }
 
