@@ -20,12 +20,6 @@ import org.springframework.stereotype.Component;
 import java.util.UUID;
 import java.util.Optional;
 
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ExecutorService;
-
-import static java.util.concurrent.CompletableFuture.runAsync;
-
 @Slf4j
 @Component
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -34,29 +28,17 @@ public class ProfileRegistrationCompletedFailedConsumer {
 
     static final String USER_DEFAULT_GROUP_ID = "user-default-group-id";
 
-    static final ExecutorService executorService = Executors.newFixedThreadPool(10);
-
     final UserService userService;
 
     @KafkaListener(topics = KafkaTopics.PROFILE_COMPLETED_FAILED_TOPIC, groupId = USER_DEFAULT_GROUP_ID)
     public void onProfileCompletedFailed(ConsumerRecord<String, String> consumerRecord) {
+        log.info("Profile completed is failed. Attempting to delete the user");
+        parseAuthUserId(consumerRecord)
+                .ifPresentOrElse(
+                        userService::deleteByAuthUserId,
+                        () -> log.error("Failed to process consumer record due to invalid UUID: '{}'", consumerRecord.value())
+                );
 
-        runAsync(() -> {
-
-            try {
-                TimeUnit.SECONDS.sleep(1);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                log.error("Thread interrupted during sleep", e);
-            }
-
-            parseAuthUserId(consumerRecord)
-                    .ifPresentOrElse(
-                            userService::deleteByAuthUserId,
-                            () -> log.error("Failed to process consumer record due to invalid UUID: '{}'", consumerRecord.value())
-                    );
-
-        }, executorService);
     }
 
     private Optional<UUID> parseAuthUserId(ConsumerRecord<String, String> consumerRecord) {
