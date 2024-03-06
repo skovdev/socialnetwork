@@ -25,7 +25,7 @@ public class UserDetailsListener {
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleUserDetailsEvent(UserDetailsEvent event) {
-        userDetailsCreationProducer.sendUserDetailsToCreate(KafkaTopics.AUTH_USER_REGISTERED_TOPIC,
+        userDetailsCreationProducer.sendUserDetailsToCreate(KafkaTopics.USER_DETAILS_CREATED,
                 event.signUp(), event.authUserId());
     }
 }
