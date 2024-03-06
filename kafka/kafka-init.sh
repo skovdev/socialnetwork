@@ -35,7 +35,6 @@ echo "Kafka is ready."
 
 # Define topics along with their desired replication factors and partitions
 topics=(
-    "auth-user-registered:1:1"
     "user-details-created:1:1"
     "profile-completed:1:1"
     "user-details-failed:1:1"
