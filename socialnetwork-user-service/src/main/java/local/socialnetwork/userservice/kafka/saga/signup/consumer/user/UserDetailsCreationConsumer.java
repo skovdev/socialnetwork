@@ -37,7 +37,7 @@ public class UserDetailsCreationConsumer {
     final KafkaTemplate<String, String> kafkaTemplate;
     final ObjectMapper objectMapper;
 
-    @KafkaListener(topics = KafkaTopics.USER_DETAILS_CREATED, groupId = USER_DEFAULT_GROUP_ID)
+    @KafkaListener(topics = KafkaTopics.USER_DETAILS_CREATED_TOPIC, groupId = USER_DEFAULT_GROUP_ID)
     public void receiveUserToCreate(ConsumerRecord<String, String> consumerRecord) {
         log.info("Received user data to create. Topic: {} - Timestamp: {}", consumerRecord.topic(), consumerRecord.timestamp());
         parseUserDto(consumerRecord)
