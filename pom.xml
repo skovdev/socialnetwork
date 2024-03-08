@@ -31,6 +31,7 @@
         <spring.boot.security.version>3.2.0</spring.boot.security.version>
         <spring.boot.data.jpa.version>3.2.0</spring.boot.data.jpa.version>
         <spring.boot.aop.version>3.2.0</spring.boot.aop.version>
+        <spring.boot.actuator.version>3.2.3</spring.boot.actuator.version>
         <spring.boot.test.version>3.2.0</spring.boot.test.version>
         <spring.cloud.netflix.eureka.server.version>4.1.0</spring.cloud.netflix.eureka.server.version>
         <spring.cloud.netflix.eureka.client.version>4.1.0</spring.cloud.netflix.eureka.client.version>
@@ -86,6 +87,11 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-aop</artifactId>
                 <version>${spring.boot.aop.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-actuator</artifactId>
+                <version>${spring.boot.actuator.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
