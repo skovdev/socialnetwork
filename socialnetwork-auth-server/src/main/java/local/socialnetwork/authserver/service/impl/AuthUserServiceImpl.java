@@ -2,6 +2,9 @@ package local.socialnetwork.authserver.service.impl;
 
 import local.socialnetwork.authserver.dto.SignUpDto;
 
+import local.socialnetwork.authserver.dto.authuser.AuthRoleDto;
+import local.socialnetwork.authserver.dto.authuser.AuthUserDto;
+
 import local.socialnetwork.authserver.event.UserDetailsEvent;
 
 import local.socialnetwork.authserver.entity.AuthRole;
@@ -33,6 +36,8 @@ import java.util.UUID;
 import java.util.Optional;
 import java.util.Collections;
 
+import java.util.stream.Collectors;
+
 @Slf4j
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -49,8 +54,19 @@ public class AuthUserServiceImpl implements AuthUserService {
 
     @Transactional
     @Override
-    public Optional<AuthUser> findByUsername(String username) {
-        return authUserRepository.findByUsername(username);
+    public Optional<AuthUserDto> findByUsername(String username) {
+        return authUserRepository.findByUsername(username)
+                .map(authUser -> new AuthUserDto(
+                        authUser.getId(),
+                        authUser.getUsername(),
+                        authUser.getPassword(),
+                        authUser.getAuthRoles()
+                                .stream()
+                                .map(authRole -> new AuthRoleDto(
+                                        authRole.getId(),
+                                        authRole.getAuthority(),
+                                        authRole.getAuthUser().getId()))
+                                .collect(Collectors.toList())));
     }
 
     @Transactional

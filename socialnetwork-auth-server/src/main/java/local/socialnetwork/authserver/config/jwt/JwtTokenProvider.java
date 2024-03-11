@@ -1,9 +1,9 @@
 package local.socialnetwork.authserver.config.jwt;
 
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
 
 import jakarta.annotation.PostConstruct;
@@ -32,11 +32,11 @@ import javax.crypto.spec.SecretKeySpec;
 
 import java.security.Key;
 
-import java.util.Base64;
+import java.util.Map;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
+import java.util.Base64;
 
 @Component
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -45,6 +45,7 @@ public class JwtTokenProvider {
 
     @Value("${security.jwt.token.secret-key}")
     String secretKey;
+
     @Value("${security.jwt.token.expire-length}")
     long validityInMilliseconds;
 
