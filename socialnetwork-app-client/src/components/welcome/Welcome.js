@@ -1,16 +1,19 @@
 import React from "react";
 
-import "./Welcome.css";
+import { Typography, Box } from '@mui/material';
 
 const Welcome = () => {
     
     return (
-    
-        <div className="welcome">
-            <p>Welcome to the social network. Connect with friends and the world around you on the social network</p>
-        </div>
-
+        <Box sx={{ padding: 2 }}>
+            <Typography variant="h4" component="h1" gutterBottom>
+                Welcome to the social network
+            </Typography>
+            <Typography variant="h6">
+                Connect with friends and the world around you. Explore, share, and engage on the social network.
+            </Typography>
+        </Box>
     );
-}
+};
 
 export default Welcome;
