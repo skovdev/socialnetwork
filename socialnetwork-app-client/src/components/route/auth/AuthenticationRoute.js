@@ -1,20 +1,17 @@
 import React from "react";
 
-import { Route, Redirect } from "react-router-dom";
+import { Navigate, Route } from "react-router-dom";
 
 import AuthService from "../../../service/auth/AuthService";
 
-const AuthenticationRoute = (props) => {
-
-    const {component: Component, ...rest} = props;
-
-    return (
+const AuthenticationRoute = ({ children, ...rest }) => {
     
-        <Route {...rest} render={(props) => {
-                return AuthService.getToken() ? (<Component {...props} />) : (<Redirect to={"/"}/>)
-             }}
+    return (
+        <Route
+            {...rest}
+            element={AuthService.getToken() ? children : <Navigate to="/" replace />}
         />
-    )
-}
+    );
+};
 
 export default AuthenticationRoute;
