@@ -1,13 +1,10 @@
-import DecodeJwtToken from "../../util/jwt/DecodeJwtToken";
+import JwtTokenDecoder from "../../util/jwt/JwtTokenDecoder";
 
 class AuthService {
 
-    static getProfile() {
-
-        const token = localStorage.sn_id_token;
-
-        return DecodeJwtToken.decode(token);
-
+    static getAuthData() {
+        const token = localStorage.getItem("sn_id_token");
+        return JwtTokenDecoder.decode(token);
     }
 
     static setToken(token) {
