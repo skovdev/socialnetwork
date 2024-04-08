@@ -119,14 +119,14 @@ services:
     networks:
       - socialnetwork-network
 
+  socialnetwork-app-client:
+    image: socialnetwork-app-client-1.0
+    ports:
+      - "3000:3000"
+    volumes:
+      - /app/node_modules
+      - ./:/app
+
 networks:
   socialnetwork-network:
     driver: bridge
-
-#  socialnetwork-app-client:
-#    image: socialnetwork-app-client
-#    ports:
-#      - "3000:3000"
-#    volumes:
-#      - /app/node_modules
-#      - ./:/app
