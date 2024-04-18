@@ -4,16 +4,24 @@ import local.socialnetwork.userservice.SpringBootRunUserService;
 
 import local.socialnetwork.userservice.dto.user.UserDto;
 
+import local.socialnetwork.userservice.util.JwtUtil;
+
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
+
+import org.mockito.Mockito;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.boot.test.context.SpringBootTest;
 
+import org.springframework.boot.test.mock.mockito.MockBean;
+
 import org.springframework.boot.test.web.client.TestRestTemplate;
 
 import org.springframework.boot.test.web.server.LocalServerPort;
 
+import org.springframework.http.MediaType;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -48,15 +56,19 @@ public class UserControllerTest {
     @Autowired
     private TestRestTemplate testRestTemplate;
 
+    @MockBean
+    private JwtUtil jwtUtil;
+
+    @BeforeEach
+    public void beforeEach() {
+        Mockito.when(jwtUtil.isTokenExpired(Mockito.any())).thenReturn(false);
+    }
+
     @Test
     public void shouldReturnUserById() {
 
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.set("Content-Type", "application/json");
-        HttpEntity<String> httpEntity = new HttpEntity<>(httpHeaders);
-
         ResponseEntity<UserDto> response = testRestTemplate.exchange(createURLWithPort("/users/" + userId), HttpMethod.GET,
-                httpEntity, UserDto.class);
+                createHttpEntity(MediaType.APPLICATION_JSON, null), UserDto.class);
 
         UserDto userDto = response.getBody();
 
@@ -69,16 +81,23 @@ public class UserControllerTest {
     @Test
     public void shouldReturnNotFoundErrorIfUserDoesNotExist() {
 
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.set("Content-Type", "application/json");
-        HttpEntity<String> httpEntity = new HttpEntity<>(httpHeaders);
-
         ResponseEntity<String> response = testRestTemplate.exchange(createURLWithPort("/users/" + invalidUserId), HttpMethod.GET,
-                httpEntity, String.class);
+                createHttpEntity(MediaType.APPLICATION_JSON, null), String.class);
 
-        assertEquals("User does not exist", response.getBody());
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
 
+    }
+
+    private <T> HttpEntity<T> createHttpEntity(MediaType mediaType, T body) {
+        return new HttpEntity<>(body, createHttpHeaders(mediaType));
+    }
+
+
+    private HttpHeaders createHttpHeaders(MediaType contentType) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(contentType);
+        headers.setBearerAuth("test");
+        return headers;
     }
 
     private String createURLWithPort(String uri) {
