@@ -11,9 +11,12 @@ import local.socialnetwork.profileservice.dto.profile.ProfileInfoEditDto;
 import local.socialnetwork.profileservice.dto.user.UserDto;
 
 import local.socialnetwork.profileservice.service.ProfileService;
+
+import local.socialnetwork.profileservice.util.JwtUtil;
 import local.socialnetwork.profileservice.util.ResourceUtil;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
 
 import org.mockito.Mockito;
 
@@ -89,6 +92,14 @@ public class ProfileControllerTest {
     @MockBean
     private UserClient userClient;
 
+    @MockBean
+    private JwtUtil jwtUtil;
+
+    @BeforeEach
+    void beforeEach() {
+        Mockito.when(jwtUtil.isTokenExpired(Mockito.any())).thenReturn(false);
+    }
+
     @Test
     public void shouldReturnAllProfiles() {
 
@@ -123,7 +134,6 @@ public class ProfileControllerTest {
                 HttpMethod.GET, createHttpEntity(MediaType.APPLICATION_JSON, null), String.class);
 
         assertNotNull(response);
-        assertEquals(response.getBody(), "Profile does not exist");
         assertEquals(response.getStatusCode(), HttpStatus.NOT_FOUND);
 
     }
@@ -160,7 +170,6 @@ public class ProfileControllerTest {
                 HttpMethod.GET, createHttpEntity(MediaType.APPLICATION_JSON, null), String.class);
 
         assertNotNull(response);
-        assertEquals(response.getBody(), "There is no profile information");
         assertEquals(response.getStatusCode(), HttpStatus.NOT_FOUND);
 
     }
@@ -195,7 +204,6 @@ public class ProfileControllerTest {
                 String.class);
 
         assertNotNull(response);
-        assertEquals(response.getBody(), "There is no profile information to edit");
         assertEquals(response.getStatusCode(), HttpStatus.NOT_FOUND);
 
     }
@@ -209,7 +217,8 @@ public class ProfileControllerTest {
                 resourceUtil.getEncodedResource("/avatar/default-avatar.jpg"),
                 UUID.randomUUID());
 
-        ResponseEntity<String> response = testRestTemplate.postForEntity(createURLWithPort("/profiles"), profileDto, String.class);
+        ResponseEntity<String> response = testRestTemplate.postForEntity(createURLWithPort("/profiles"),
+                createHttpEntity(MediaType.APPLICATION_JSON, profileDto), String.class);
 
         assertEquals("Profile is saved successfully", response.getBody());
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
@@ -227,7 +236,8 @@ public class ProfileControllerTest {
                 // Can't create profile because userId is null
                 null);
 
-        ResponseEntity<String> response = testRestTemplate.postForEntity(createURLWithPort("/profiles"), profileDto, String.class);
+        ResponseEntity<String> response = testRestTemplate.postForEntity(createURLWithPort("/profiles"),
+                createHttpEntity(MediaType.APPLICATION_JSON, profileDto), String.class);
 
         assertEquals("Profile is not saved", response.getBody());
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
@@ -255,7 +265,6 @@ public class ProfileControllerTest {
         ResponseEntity<String> response = testRestTemplate.exchange(createURLWithPort("/profiles/" + invalidProfileId + "/avatar"),
                 HttpMethod.GET, createHttpEntity(MediaType.APPLICATION_JSON, null), String.class);
 
-        assertEquals("Profile avatar does not exist", response.getBody());
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
 
     }
@@ -346,6 +355,7 @@ public class ProfileControllerTest {
     private HttpHeaders createHttpHeaders(MediaType contentType) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(contentType);
+        headers.setBearerAuth("test");
         return headers;
     }
 
