@@ -4,8 +4,6 @@ import io.jsonwebtoken.MalformedJwtException;
 
 import io.jsonwebtoken.security.SignatureException;
 
-import local.socialnetwork.apigateway.annotation.LoggingFilter;
-
 import local.socialnetwork.apigateway.util.JwtUtils;
 
 import lombok.AccessLevel;
@@ -37,7 +35,6 @@ public class ValidationAuthHeaderGatewayPreFilter implements GatewayFilter {
 
     final JwtUtils jwtUtils;
 
-    @LoggingFilter
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
 
