@@ -6,10 +6,10 @@ import java.util.Optional;
 
 public class UUIDUtil {
 
-    private UUID getUUIDValueFromMap(String key, Map<String, Object> dataMap) {
+    public static UUID getUUIDValueFromMap(String key, Map<String, Object> dataMap) {
         return Optional.ofNullable(dataMap.get(key))
-                .filter(UUID.class::isInstance)
-                .map(UUID.class::cast)
+                .map(Object::toString)
+                .map(UUID::fromString)
                 .orElse(null);
     }
 }
