@@ -20,7 +20,4 @@ public class AbstractBaseModel {
     @Id
     UUID id;
 
-    public AbstractBaseModel() {
-        this.id = UUID.randomUUID();
-    }
 }
