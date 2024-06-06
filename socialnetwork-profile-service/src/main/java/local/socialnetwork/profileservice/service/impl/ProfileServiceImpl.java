@@ -111,6 +111,7 @@ public class ProfileServiceImpl implements ProfileService {
                         return null;
                     }
                     return new ProfileInfoEditDto(
+                            userDto.id(),
                             userDto.firstName(),
                             userDto.lastName(),
                             userDto.country(),
@@ -168,6 +169,7 @@ public class ProfileServiceImpl implements ProfileService {
 
     private Profile convertDtoToEntity(ProfileDto profileDto) {
         Profile profile = new Profile();
+        profile.setId(profileDto.id());
         profile.setActive(profileDto.isActive());
         profile.setAvatar(profileDto.avatar());
         profile.setUserId(profileDto.userId());
