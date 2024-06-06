@@ -1,13 +1,20 @@
 package local.socialnetwork.profileservice.kafka.saga.signup.consumer.profile;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import local.socialnetwork.profileservice.dto.profile.ProfileDto;
 
 import local.socialnetwork.profileservice.kafka.constant.KafkaTopics;
 
-import local.socialnetwork.profileservice.dto.user.UserProfileDto;
-
 import local.socialnetwork.profileservice.service.ProfileService;
 
+import local.socialnetwork.profileservice.util.MapUtil;
+
+import local.socialnetwork.profileservice.util.UUIDUtil;
 import lombok.AccessLevel;
 
 import lombok.RequiredArgsConstructor;
@@ -24,7 +31,9 @@ import org.springframework.kafka.core.KafkaTemplate;
 
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
+import java.util.Map;
+import java.util.UUID;
+import java.util.HashMap;
 
 @Slf4j
 @Service
@@ -41,33 +50,54 @@ public class ProfileRegistrationCompletedConsumer {
     @KafkaListener(topics = KafkaTopics.PROFILE_COMPLETED_TOPIC, groupId = PROFILE_GROUP_ID)
     public void receiveProfileDataToCreate(ConsumerRecord<String, String> consumerRecord) {
         log.info("Received profile data to create. Topic: {} - Timestamp: {}", consumerRecord.topic(), consumerRecord.timestamp());
-         parseUserProfileDto(consumerRecord)
-                 .ifPresentOrElse(
-                         this::createProfile,
-                         ()-> log.error("Failed to process consumer record due to parsing error: '{}'", consumerRecord.value())
-                 );
-    }
-    private Optional<UserProfileDto> parseUserProfileDto(ConsumerRecord<String, String> consumerRecord) {
-        try {
-            UserProfileDto userProfileDto = objectMapper.readValue(consumerRecord.value(), UserProfileDto.class);
-            return Optional.ofNullable(userProfileDto);
-        } catch (Exception e) {
-            log.error("Failed to parse consumer record value. Error: {}", e.getMessage());
-            return Optional.empty();
-        }
+        buildProfile(parseJsonToMap(consumerRecord));
     }
 
-    private void createProfile(UserProfileDto userProfileDto) {
+    private void buildProfile(Map<String, Object> dataMap) {
         try {
+            ProfileDto profileDto = buildProfileDto(dataMap);
             log.info("Attempting to save a profile");
-            profileService.save(userProfileDto.profile());
+            profileService.save(profileDto);
         } catch (Exception e) {
-            handleProfileCompletedFailed(userProfileDto, e);
+            log.error("Failed to process saving of the profile");
+            handleProfileCompletedFailed(dataMap);
         }
     }
 
-    private void handleProfileCompletedFailed(UserProfileDto userProfileDto, Exception e) {
-        log.error("Failed to save a profile. Error: {}", e.getMessage());
-        kafkaTemplate.send(KafkaTopics.PROFILE_COMPLETED_FAILED_TOPIC, String.valueOf(userProfileDto.authUserId()));
+    private Map<String, Object> parseJsonToMap(ConsumerRecord<String, String> consumerRecord) {
+        try {
+            String json = consumerRecord.value();
+            return objectMapper.readValue(json, new TypeReference<>() {
+            });
+        } catch (JsonProcessingException e) {
+            log.error("Failed to read the json object. Error: {}", e.getMessage(), e);
+            throw new RuntimeException("Failed to read the json object: " + e.getMessage(), e);
+        }
+    }
+
+    private ProfileDto buildProfileDto(Map<String, Object> dataMap) {
+        return new ProfileDto(
+                UUIDUtil.getUUIDValueFromMap("id", dataMap),
+                MapUtil.getValue(dataMap, "isActive", Boolean.class),
+                MapUtil.getValue(dataMap, "avatar", String.class),
+                UUIDUtil.getUUIDValueFromMap("userId", dataMap));
+    }
+
+    private void handleProfileCompletedFailed(Map<String, Object> dataMap) {
+        Map<String, Object> dataToSend = prepareDataToSend(dataMap);
+        try {
+            String message = objectMapper.writeValueAsString(dataToSend);
+            kafkaTemplate.send(KafkaTopics.PROFILE_COMPLETED_FAILED_TOPIC, message);
+        } catch (JsonProcessingException e) {
+            log.error("Failed to serialize the json object. Error: {}", e.getMessage(), e);
+            throw new RuntimeException("Failed to serialize the json object: " + e.getMessage(), e);
+        }
+    }
+
+    private Map<String, Object> prepareDataToSend(Map<String, Object> dataMap) {
+        Map<String, Object> dataToSend = new HashMap<>();
+        dataToSend.put("authUserId", UUIDUtil.getUUIDValueFromMap("authUserId", dataMap));
+        dataToSend.put("userId", UUIDUtil.getUUIDValueFromMap("userId", dataMap));
+        return dataToSend;
     }
 }
