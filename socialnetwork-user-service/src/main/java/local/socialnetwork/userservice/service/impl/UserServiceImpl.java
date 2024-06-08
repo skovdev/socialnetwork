@@ -76,7 +76,7 @@ public class UserServiceImpl implements UserService {
 
     private User convertDtoToUserEntity(UserDto userDto) {
         User user = new User();
-        user.setId(UUID.randomUUID());
+        user.setId(userDto.id());
         user.setFirstName(userDto.firstName());
         user.setLastName(userDto.lastName());
         user.setCountry(userDto.country());
