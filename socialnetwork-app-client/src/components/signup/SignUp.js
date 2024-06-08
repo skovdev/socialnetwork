@@ -4,7 +4,6 @@ import { Button, TextField, Grid, Typography, Container, Snackbar, Paper } from 
 
 import MuiAlert from '@mui/material/Alert';
 
-import AuthService from "../../service/auth/AuthService";
 import AppConstants from "../../constants/AppConstants";
 
 const SignUp = () => {
@@ -18,7 +17,7 @@ const SignUp = () => {
         city: '',
         address: '',
         phone: '',
-        birthday: '',
+        birthDay: '',
         familyStatus: ''
     });
 
