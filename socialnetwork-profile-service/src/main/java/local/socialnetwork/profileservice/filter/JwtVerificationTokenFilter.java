@@ -10,6 +10,8 @@ import jakarta.servlet.http.HttpFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import local.socialnetwork.profileservice.service.TokenService;
+
 import local.socialnetwork.profileservice.util.JwtUtil;
 
 import lombok.AccessLevel;
@@ -29,6 +31,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtVerificationTokenFilter extends HttpFilter {
 
+    final TokenService tokenService;
     final JwtUtil jwtUtil;
 
     @Override
@@ -45,6 +48,8 @@ public class JwtVerificationTokenFilter extends HttpFilter {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Bearer token is missing.");
             return;
         }
+
+        tokenService.setToken(bearerToken);
 
         try {
             if (!jwtUtil.isTokenExpired(bearerToken)) {
