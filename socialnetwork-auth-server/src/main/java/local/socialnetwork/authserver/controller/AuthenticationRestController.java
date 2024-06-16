@@ -53,6 +53,8 @@ import java.util.HashMap;
 
 import java.util.Optional;
 
+import java.util.UUID;
+
 import java.util.stream.Collectors;
 
 /**
@@ -148,6 +150,27 @@ public class AuthenticationRestController {
     @GetMapping(value = "/{username}")
     public ResponseEntity<?> findByUsername(@Parameter(description = "This parameter represents username of auth user") @PathVariable("username") String username) {
         return authUserService.findByUsername(username)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    /**
+     * Endpoint to find an authentication identifier by username
+     *
+     * @param username The username of the auth user.
+     * @return A ResponseEntity indicating the outcome of the authentication identifier retrieval process.
+     *         Returns OK (200) with the found authentication identifier if the auth user exists,
+     *         or NOT FOUND (404) if the auth user does not exist.
+     */
+    @Operation(summary = "Find the authentication identifier by username")
+    @ApiResponses(value = {
+            @ApiResponse(description = "Return a found authentication identifier", content = {
+                    @Content(mediaType = MediaType.APPLICATION_JSON_VALUE) }, responseCode = "200"),
+            @ApiResponse(description = "Return error message if auth user does not exist", responseCode = "404")
+    })
+    @GetMapping(value = "/{username}/id")
+    public ResponseEntity<UUID> findAuthIdByUsername(@Parameter(description = "This parameter represents username of auth user") @PathVariable("username") String username) {
+        return authUserService.findAuthIdByUsername(username)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
