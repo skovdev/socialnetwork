@@ -9,6 +9,7 @@ import java.util.Optional;
 
 public interface AuthUserService {
     Optional<AuthUserDto> findByUsername(String username);
+    Optional<UUID> findAuthIdByUsername(String username);
     void signUp(SignUpDto registrationDTO);
     void deleteById(UUID id);
 }
