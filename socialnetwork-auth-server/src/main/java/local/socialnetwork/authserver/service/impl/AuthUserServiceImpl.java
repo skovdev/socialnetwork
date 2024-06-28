@@ -69,11 +69,6 @@ public class AuthUserServiceImpl implements AuthUserService {
                                 .collect(Collectors.toList())));
     }
 
-    @Override
-    public Optional<UUID> findAuthIdByUsername(String username) {
-        return authUserRepository.findByUsername(username).map(AuthUser::getId);
-    }
-
     @Transactional
     @Override
     public void signUp(SignUpDto signUpDTO) {
