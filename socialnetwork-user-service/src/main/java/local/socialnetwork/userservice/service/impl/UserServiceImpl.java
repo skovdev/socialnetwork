@@ -56,6 +56,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Optional<UUID> findUserIdByAuthUserId(UUID authUserId) {
+        return userRepository.findUserByAuthUserId(authUserId).map(User::getId);
+    }
+
+    @Override
     public void save(UserDto userDto) {
         User user = userRepository.save(convertDtoToUserEntity(userDto));
         applicationEventPublisher.publishEvent(new ProfileCompletedEvent(user));
