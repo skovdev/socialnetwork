@@ -73,4 +73,27 @@ public class UserRestController {
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
+
+    /**
+     * Endpoint to find the user identifier by the authentication identifier.
+     *
+     * @param authUserId The authentication unique identifier.
+     * @return A ResponseEntity indicating the outcome of the user identifier retrieval process.
+     *         Returns OK (200) with the found user identifier if the user identifier exists,
+     *         or NOT FOUND (404) if the user identifier does not exist.
+     */
+    @LogMethodController
+    @Operation(summary = "Find the user identifier by the authentication identifier")
+    @ApiResponses(value = {
+            @ApiResponse(description = "Return the found user identifier", content = {
+                    @Content(mediaType = MediaType.APPLICATION_JSON_VALUE) }, responseCode = "200"),
+            @ApiResponse(description = "Return error message if the user identifier does not exist", responseCode = "404")
+    })
+    @GetMapping(value = "/{authUserId}/id", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> findByUserIdByAuthUserId(@Parameter(description = "This parameter represents the authentication identifier")
+                                                          @PathVariable("authUserId") UUID authUserId) {
+        return userService.findUserIdByAuthUserId(authUserId)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
 }
