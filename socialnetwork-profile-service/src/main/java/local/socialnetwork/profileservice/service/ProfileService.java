@@ -20,6 +20,7 @@ public interface ProfileService {
     Optional<ProfileInfoDto> findProfileInfoByProfileIdAndUserId(UUID profileId, UUID userId);
     Optional<ProfileInfoEditDto> findProfileInfoToEditByProfileIdAndUserId(UUID profileId, UUID userId);
     Optional<String> findAvatarById(UUID profileId);
+    Optional<UUID> findProfileIdByUserId(UUID userId);
     void save(ProfileDto profileDto);
     void updateAvatarProfile(UUID profileId, MultipartFile multipartFile) throws ProfileServiceException, IOException;
     void setDefaultAvatar(UUID profileId) throws IOException;

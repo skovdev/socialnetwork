@@ -129,6 +129,11 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
+    public Optional<UUID> findProfileIdByUserId(UUID userId) {
+        return profileRepository.findProfileByUserId(userId).map(Profile::getId);
+    }
+
+    @Override
     public void save(ProfileDto profileDto) {
         Profile profile = profileRepository.save(convertDtoToEntity(profileDto));
         log.info("Profile is saved successfully. ProfileID: {}", profile.getId());
