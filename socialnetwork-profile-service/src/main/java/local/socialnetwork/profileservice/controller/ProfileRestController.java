@@ -152,6 +152,29 @@ public class ProfileRestController {
     }
 
     /**
+     * Finds a specific profile identifier by user identifier.
+     *
+     * @param userId The user unique identifier.
+     * @return A ResponseEntity indicating the outcome of the profile identifier retrieval process.
+     *         Returns OK (200) with the found profile identifier if the profile identifier exists,
+     *         or NOT FOUND (404) if the profile identifier does not exist.
+     */
+    @Operation(summary = "Find the profile identifier by the user identifier")
+    @ApiResponses(value = {
+            @ApiResponse(description = "Return found the profile identifier", content = {
+                    @Content(mediaType = MediaType.APPLICATION_JSON_VALUE) }, responseCode = "200"),
+            @ApiResponse(description = "Return the error if the profile identifier does not exist", responseCode = "404")
+    })
+    @GetMapping(value = "/{userId}/id", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> findProfileIdByUserId(@Parameter(description = "This parameter represents the user identifier")
+                                                     @PathVariable("userId") UUID userId) {
+        return profileService.findProfileIdByUserId(userId)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+
+    /**
      * Creates a new profile with the given data.
      *
      * @param profileDto Data transfer object containing the profile information to be saved.
