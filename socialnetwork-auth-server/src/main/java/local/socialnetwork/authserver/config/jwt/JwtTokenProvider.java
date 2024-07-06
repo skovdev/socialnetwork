@@ -34,8 +34,6 @@ import java.security.Key;
 
 import java.util.Map;
 import java.util.Date;
-import java.util.List;
-import java.util.UUID;
 import java.util.Base64;
 
 @Component
@@ -59,24 +57,15 @@ public class JwtTokenProvider {
                 SignatureAlgorithm.HS256.getJcaName());
     }
 
-    public String createToken(UUID id, String username, List<String> roles) {
-        String uuid = String.valueOf(id);
-        Claims claims = Jwts.claims().setSubject(uuid);
-        claims.put("authUserId", id);
-        claims.put("username", username);
-        claims.put("isAdmin", isAdmin(roles));
+    public String createToken(Map<String, Object> data) {
         Date now = new Date();
         Date validity = new Date(now.getTime() + validityInMilliseconds);
         return Jwts.builder()
-                   .setClaims(claims)
+                   .setClaims(data)
                    .setIssuedAt(now)
                    .setExpiration(validity)
                    .signWith(key)
                    .compact();
-    }
-
-    private boolean isAdmin(List<String> roles) {
-        return roles.stream().anyMatch(role -> role.equalsIgnoreCase("ADMIN"));
     }
 
     Authentication getAuthentication(String token) {
@@ -119,5 +108,24 @@ public class JwtTokenProvider {
             throw new InvalidJwtAuthenticationException("Expired or invalid JWT token");
         }
         return true;
+    }
+
+    public String extendToken(String token, Map<String, Object> data) {
+        if (validateToken(token)) {
+            Claims claims = extractClaims(token);
+            if (claims != null) {
+                claims.putAll(data);
+                return createToken(claims);
+            }
+        }
+        throw new RuntimeException("Invalid token");
+    }
+
+    private Claims extractClaims(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
     }
 }

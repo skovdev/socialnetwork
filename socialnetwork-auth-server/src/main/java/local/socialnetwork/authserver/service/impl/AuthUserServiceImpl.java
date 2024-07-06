@@ -1,17 +1,23 @@
 package local.socialnetwork.authserver.service.impl;
 
+import local.socialnetwork.authserver.client.UserFeignClient;
+import local.socialnetwork.authserver.client.ProfileFeignClient;
+
+import local.socialnetwork.authserver.config.jwt.JwtTokenProvider;
+
 import local.socialnetwork.authserver.dto.SignUpDto;
 
-import local.socialnetwork.authserver.dto.authuser.AuthRoleDto;
 import local.socialnetwork.authserver.dto.authuser.AuthUserDto;
+import local.socialnetwork.authserver.dto.authuser.AuthRoleDto;
+import local.socialnetwork.authserver.dto.authuser.AuthAdditionalTokenDataDto;
 
 import local.socialnetwork.authserver.event.UserDetailsEvent;
 
-import local.socialnetwork.authserver.entity.AuthRole;
 import local.socialnetwork.authserver.entity.AuthUser;
+import local.socialnetwork.authserver.entity.AuthRole;
 
-import local.socialnetwork.authserver.repository.AuthRoleRepository;
 import local.socialnetwork.authserver.repository.AuthUserRepository;
+import local.socialnetwork.authserver.repository.AuthRoleRepository;
 
 import local.socialnetwork.authserver.service.AuthUserService;
 
@@ -32,7 +38,10 @@ import org.springframework.stereotype.Service;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Map;
 import java.util.UUID;
+import java.util.List;
+import java.util.HashMap;
 import java.util.Optional;
 import java.util.Collections;
 
@@ -50,10 +59,46 @@ public class AuthUserServiceImpl implements AuthUserService {
     final AuthUserRepository authUserRepository;
     final AuthRoleRepository authRoleRepository;
     final ApplicationEventPublisher applicationEventPublisher;
+    final JwtTokenProvider jwtTokenProvider;
     final PasswordEncoder passwordEncoder;
+    final UserFeignClient userFeignClient;
+    final ProfileFeignClient profileFeignClient;
 
-    @Transactional
     @Override
+    public String generateToken(AuthUserDto authUserDto) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("authUserId", authUserDto.id());
+        data.put("username", authUserDto.username());
+        data.put("isAdmin", isAdmin(getRoles(authUserDto.authRoles())));
+        return jwtTokenProvider.createToken(data);
+    }
+
+    private boolean isAdmin(List<String> roles) {
+        return roles.stream()
+                .anyMatch(role -> role.equalsIgnoreCase("ADMIN"));
+    }
+
+    private List<String> getRoles(List<AuthRoleDto> authRoles) {
+        return authRoles.stream()
+                .map(AuthRoleDto::authority)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public String extendToken(String token, Map<String, Object> data) {
+        return jwtTokenProvider.extendToken(token, data);
+    }
+
+    @Override
+    @Transactional
+    public Optional<AuthAdditionalTokenDataDto> findAdditionalTokenData(UUID authUserId) {
+      return Optional.ofNullable(userFeignClient.findUserIdByAuthUserId(authUserId))
+              .flatMap(userId -> Optional.ofNullable(profileFeignClient.findProfileIdByUserId(userId))
+                      .map(profileId -> new AuthAdditionalTokenDataDto(userId, profileId)));
+    }
+
+    @Override
+    @Transactional
     public Optional<AuthUserDto> findByUsername(String username) {
         return authUserRepository.findByUsername(username)
                 .map(authUser -> new AuthUserDto(
@@ -69,8 +114,8 @@ public class AuthUserServiceImpl implements AuthUserService {
                                 .collect(Collectors.toList())));
     }
 
-    @Transactional
     @Override
+    @Transactional
     public void signUp(SignUpDto signUpDTO) {
 
         AuthUser authUser = new AuthUser();
@@ -94,8 +139,8 @@ public class AuthUserServiceImpl implements AuthUserService {
 
     }
 
-    @Transactional
     @Override
+    @Transactional
     public void deleteById(UUID id) {
 
         authUserRepository.findById(id)
