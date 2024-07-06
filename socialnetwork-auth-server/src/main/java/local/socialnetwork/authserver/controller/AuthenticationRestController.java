@@ -10,22 +10,23 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-import local.socialnetwork.authserver.config.jwt.JwtTokenProvider;
-
 import local.socialnetwork.authserver.constant.VersionAPI;
 
 import local.socialnetwork.authserver.dto.SignInDto;
 import local.socialnetwork.authserver.dto.SignUpDto;
 
 import local.socialnetwork.authserver.dto.authuser.AuthUserDto;
-import local.socialnetwork.authserver.dto.authuser.AuthRoleDto;
+import local.socialnetwork.authserver.dto.authuser.AuthAdditionalTokenDataDto;
 
 import local.socialnetwork.authserver.exception.AuthenticationUserException;
 import local.socialnetwork.authserver.exception.AuthenticationUserNotFoundException;
+import local.socialnetwork.authserver.exception.AuthenticationAdditionalTokenDataNotFoundException;
 
+import local.socialnetwork.authserver.service.TokenService;
 import local.socialnetwork.authserver.service.AuthUserService;
 
 import lombok.AccessLevel;
+
 import lombok.RequiredArgsConstructor;
 
 import lombok.experimental.FieldDefaults;
@@ -48,14 +49,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
-import java.util.List;
 import java.util.HashMap;
 
 import java.util.Optional;
-
-import java.util.UUID;
-
-import java.util.stream.Collectors;
 
 /**
  * Handles the registration and authentication/authorization of users.
@@ -70,9 +66,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AuthenticationRestController {
 
-    final AuthUserService authUserService;
     final AuthenticationManager authenticationManager;
-    final JwtTokenProvider jwtTokenProvider;
+    final AuthUserService authUserService;
+    final TokenService tokenService;
 
     /**
      * Registers a new user with the given sign-up details.
@@ -126,11 +122,29 @@ public class AuthenticationRestController {
             AuthUserDto authUser = authUserService.findByUsername(signInDto.username())
                     .orElseThrow(() -> new AuthenticationUserNotFoundException(signInDto.username() + " is not found"));
             log.info("User { id: {}, username: {} } successfully authenticated", authUser.id(), authUser.username());
-            return ResponseEntity.ok(createResponseModel(authUser));
+            String token = authUserService.generateToken(authUser);
+            tokenService.setToken(token);
+            AuthAdditionalTokenDataDto authData = authUserService.findAdditionalTokenData(authUser.id())
+                    .orElseThrow(() -> new AuthenticationAdditionalTokenDataNotFoundException("The authentication additional token data for username: '" + signInDto.username() + "' is not found"));
+            String extendedToken = authUserService.extendToken(token, addAdditionalDataToToken(authData));
+            return ResponseEntity.ok(createResponseModel(authUser, extendedToken));
         } catch (AuthenticationUserException | BadCredentialsException e) {
             log.info("Authorization error: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
+    }
+
+    /**
+     * Adds additional data to the token.
+     *
+     * @param authData The authentication data.
+     * @return A map containing the additional data to be added to the token.
+     */
+    private Map<String, Object> addAdditionalDataToToken(AuthAdditionalTokenDataDto authData) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("userId", authData.userId());
+        data.put("profileId", authData.profileId());
+        return data;
     }
 
     /**
@@ -155,39 +169,17 @@ public class AuthenticationRestController {
     }
 
     /**
-     * Constructs the response model for a successfully authenticated user,
-     * including user ID, username, and authentication token.
+     * Creates a response model containing the authentication user details and token.
      *
-     * @param authUser The authenticated user for whom the response model is being created.
-     * @return A map representing the response model with user details and token.
+     * @param authUserDto The authentication user details.
+     * @param token The JWT token generated for the authenticated user.
+     * @return A map containing the authentication user details and token.
      */
-    private Map<Object, Object> createResponseModel(AuthUserDto authUser) {
+    private Map<Object, Object> createResponseModel(AuthUserDto authUserDto, String token) {
         Map<Object, Object> model = new HashMap<>();
-        model.put("authUserId", authUser.id());
-        model.put("username", authUser.username());
-        model.put("token", generateToken(authUser));
+        model.put("authUserId", authUserDto.id());
+        model.put("username", authUserDto.username());
+        model.put("token", token);
         return model;
-    }
-
-    /**
-     * Generates a JWT token for the given user based on their ID, username, and roles.
-     *
-     * @param authUser The user for whom the token is being generated.
-     * @return A JWT token string that represents the user's authentication and authorization information.
-     */
-    private String generateToken(AuthUserDto authUser) {
-       return jwtTokenProvider.createToken(authUser.id(), authUser.username(), getRoles(authUser.authRoles()));
-    }
-
-    /**
-     * Extracts the role authorities from the user's roles.
-     *
-     * @param authRoles The list of roles associated with the user.
-     * @return A list of strings representing the authorities of the user's roles.
-     */
-    private List<String> getRoles(List<AuthRoleDto> authRoles) {
-        return authRoles.stream()
-                .map(AuthRoleDto::authority)
-                .collect(Collectors.toList());
     }
 }
