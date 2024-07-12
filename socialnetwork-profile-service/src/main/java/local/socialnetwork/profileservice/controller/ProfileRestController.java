@@ -236,7 +236,7 @@ public class ProfileRestController {
     })
     @PutMapping(value = "/{profileId}/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> updateAvatar(@Parameter(description = "This parameter represents id of profile") @PathVariable("profileId") UUID profileId,
-                                               @Parameter(description = "This parameter represents the user's photo to update the profile avatar") @RequestParam("file") MultipartFile multipartFile) {
+                                               @Parameter(description = "This parameter represents the user's photo to update the profile avatar") @RequestParam("profileAvatar") MultipartFile multipartFile) {
         try {
             profileService.updateAvatarProfile(profileId, multipartFile);
             return ResponseEntity.ok("Profile avatar is updated successfully");
@@ -261,8 +261,7 @@ public class ProfileRestController {
     @DeleteMapping(value = "/{profileId}/avatar", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> deleteAvatar(@Parameter(description = "This parameter represents id of profile") @PathVariable("profileId") UUID profileId) {
         try {
-            profileService.setDefaultAvatar(profileId);
-            return ResponseEntity.ok("Profile avatar is deleted successfully");
+            return ResponseEntity.ok(profileService.setDefaultAvatar(profileId));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Profile avatar is not deleted");
         }

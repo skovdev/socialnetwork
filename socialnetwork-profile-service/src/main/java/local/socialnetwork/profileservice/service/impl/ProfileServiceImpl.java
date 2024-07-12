@@ -151,14 +151,15 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public void setDefaultAvatar(UUID profileId) {
-        profileRepository.findById(profileId)
-                .ifPresent(profile -> {
+    public String setDefaultAvatar(UUID profileId) {
+        return profileRepository.findById(profileId)
+                .map(profile -> {
                     String encodedDefaultAvatar = resourceUtil.getEncodedResource(pathDefaultAvatar);
                     profile.setAvatar(encodedDefaultAvatar);
                     profileRepository.save(profile);
                     log.info("Delete the current avatar and set default avatar. Profile ID: {}", profile.getId());
-                });
+                    return encodedDefaultAvatar;
+                }).orElse(null);
     }
 
     @Override

@@ -23,6 +23,6 @@ public interface ProfileService {
     Optional<UUID> findProfileIdByUserId(UUID userId);
     void save(ProfileDto profileDto);
     void updateAvatarProfile(UUID profileId, MultipartFile multipartFile) throws ProfileServiceException, IOException;
-    void setDefaultAvatar(UUID profileId) throws IOException;
+    String setDefaultAvatar(UUID profileId) throws IOException;
     boolean changeStatus(UUID profileId, boolean isActive);
 }
