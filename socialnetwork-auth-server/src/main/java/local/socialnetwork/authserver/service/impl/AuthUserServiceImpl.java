@@ -6,6 +6,7 @@ import local.socialnetwork.authserver.client.ProfileFeignClient;
 import local.socialnetwork.authserver.config.jwt.JwtTokenProvider;
 
 import local.socialnetwork.authserver.dto.SignUpDto;
+import local.socialnetwork.authserver.dto.ChangePasswordDto;
 
 import local.socialnetwork.authserver.dto.authuser.AuthUserDto;
 import local.socialnetwork.authserver.dto.authuser.AuthRoleDto;
@@ -151,5 +152,29 @@ public class AuthUserServiceImpl implements AuthUserService {
                         },
                         () -> log.info("Auth user not found. AuthUserID: {}", id)
                 );
+    }
+
+    @Override
+    public boolean changePassword(ChangePasswordDto changePasswordDto) {
+        String username = changePasswordDto.username();
+        log.info("Attempting to change password for user: {}", username);
+        Optional<AuthUser> authUser = authUserRepository.findByUsername(username);
+        if (authUser.isPresent()) {
+            return updatePassword(authUser.get(), changePasswordDto.newPassword(), username);
+        } else {
+            log.info("User not found. Password can't be changed. Username: {}", username);
+            return false;
+        }
+    }
+    private boolean updatePassword(AuthUser authUser, String newPassword, String username) {
+        try {
+            authUser.setPassword(passwordEncoder.encode(newPassword));
+            authUserRepository.save(authUser);
+            log.info("Password successfully changed for user: {}", username);
+            return true;
+        } catch (Exception e) {
+            log.error("Failed to change password for user: {}", username, e);
+            throw new RuntimeException("An error occurred while updating the password for user: " + username, e);
+        }
     }
 }
