@@ -14,6 +14,7 @@ import local.socialnetwork.authserver.constant.VersionAPI;
 
 import local.socialnetwork.authserver.dto.SignInDto;
 import local.socialnetwork.authserver.dto.SignUpDto;
+import local.socialnetwork.authserver.dto.ChangePasswordDto;
 
 import local.socialnetwork.authserver.dto.authuser.AuthUserDto;
 import local.socialnetwork.authserver.dto.authuser.AuthAdditionalTokenDataDto;
@@ -42,6 +43,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -148,6 +150,21 @@ public class AuthenticationRestController {
     }
 
     /**
+     * Creates a response model containing the authentication user details and token.
+     *
+     * @param authUserDto The authentication user details.
+     * @param token The JWT token generated for the authenticated user.
+     * @return A map containing the authentication user details and token.
+     */
+    private Map<Object, Object> createResponseModel(AuthUserDto authUserDto, String token) {
+        Map<Object, Object> model = new HashMap<>();
+        model.put("authUserId", authUserDto.id());
+        model.put("username", authUserDto.username());
+        model.put("token", token);
+        return model;
+    }
+
+    /**
      * Endpoint to find an auth user by username
      *
      * @param username The username of the auth user.
@@ -169,17 +186,23 @@ public class AuthenticationRestController {
     }
 
     /**
-     * Creates a response model containing the authentication user details and token.
+     * Changes the password of the authenticated user.
      *
-     * @param authUserDto The authentication user details.
-     * @param token The JWT token generated for the authenticated user.
-     * @return A map containing the authentication user details and token.
+     * @param changePasswordDto Object containing the new password details.
+     * @return ResponseEntity indicating the outcome of the password change process.
+     *         Returns OK (200) if the password is successfully changed,
+     *         or NOT FOUND (404) if the user is not found.
      */
-    private Map<Object, Object> createResponseModel(AuthUserDto authUserDto, String token) {
-        Map<Object, Object> model = new HashMap<>();
-        model.put("authUserId", authUserDto.id());
-        model.put("username", authUserDto.username());
-        model.put("token", token);
-        return model;
+    @Operation(summary = "Change the password of the authenticated user")
+    @ApiResponses(value = {
+            @ApiResponse(description = "Password successfully changed", responseCode = "200", content = {
+                    @Content(mediaType = MediaType.APPLICATION_JSON_VALUE) }),
+            @ApiResponse(description = "User not found", responseCode = "404", content = {
+                    @Content(mediaType = MediaType.APPLICATION_JSON_VALUE) })
+    })
+    @PutMapping(value = "/change-password", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Boolean> changePassword(@RequestBody ChangePasswordDto changePasswordDto) {
+        boolean isChanged = authUserService.changePassword(changePasswordDto);
+        return new ResponseEntity<>(isChanged, isChanged ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
     }
 }
