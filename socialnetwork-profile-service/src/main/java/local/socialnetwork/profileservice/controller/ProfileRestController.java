@@ -281,11 +281,15 @@ public class ProfileRestController {
             @ApiResponse(description = "Return the success message if the profile status is changed", responseCode = "200"),
             @ApiResponse(description = "Return the error message if the profile status is not changed", responseCode = "400")
     })
-    @PutMapping(value = "/{profileId}/status", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> changeStatus(@Parameter(description = "This parameter represents id of profile") @PathVariable("profileId") UUID profileId,
+    @PutMapping(value = "/{profileId}/status", produces = MediaType.TEXT_PLAIN_VALUE)
+    public ResponseEntity<?> changeStatus(@Parameter(description = "This parameter represents id of profile") @PathVariable("profileId") UUID profileId,
                                                @Parameter(description = "This parameter represents whether the profile is active or not") @RequestParam("isActive") boolean isActive) {
-        return profileService.changeStatus(profileId, isActive) ?
-                ResponseEntity.ok("Status is changed successfully") :
-                ResponseEntity.badRequest().body("Status is not changed");
+
+        try {
+            profileService.changeStatus(profileId, isActive);
+            return ResponseEntity.ok("Status is changed successfully");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Status is not changed");
+        }
     }
 }
