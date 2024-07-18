@@ -163,14 +163,13 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public boolean changeStatus(UUID profileId, boolean isActive) {
-       return profileRepository.findById(profileId)
-               .map(profile -> {
-                   profile.setActive(isActive);
-                   profileRepository.save(profile);
-                   log.info("Status is changed: Profile ID: {}", profile.getId());
-                   return true;
-               }).orElse(false);
+    public void changeStatus(UUID profileId, boolean isActive) {
+        profileRepository.findById(profileId)
+                .ifPresentOrElse(profile -> {
+                    profile.setActive(isActive);
+                    profileRepository.save(profile);
+                    log.info("Status is changed: Profile ID: {}", profile.getId());
+                }, () -> log.warn("Profile not found: Profile ID: {}", profileId));
     }
 
     private Profile convertDtoToEntity(ProfileDto profileDto) {

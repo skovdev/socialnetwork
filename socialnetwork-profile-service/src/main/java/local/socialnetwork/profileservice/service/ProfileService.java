@@ -24,5 +24,5 @@ public interface ProfileService {
     void save(ProfileDto profileDto);
     void updateAvatarProfile(UUID profileId, MultipartFile multipartFile) throws ProfileServiceException, IOException;
     String setDefaultAvatar(UUID profileId) throws IOException;
-    boolean changeStatus(UUID profileId, boolean isActive);
+    void changeStatus(UUID profileId, boolean isActive);
 }
