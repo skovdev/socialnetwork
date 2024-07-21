@@ -1,11 +1,9 @@
 package local.socialnetwork.userservice.service.impl;
 
 import local.socialnetwork.userservice.event.ProfileCompletedEvent;
-import local.socialnetwork.userservice.kafka.constant.KafkaTopics;
-
-import local.socialnetwork.userservice.kafka.saga.signup.producer.profile.ProfileRegistrationCompletedProducer;
 
 import local.socialnetwork.userservice.dto.user.UserDto;
+import local.socialnetwork.userservice.dto.user.UserRequestUpdateDto;
 
 import local.socialnetwork.userservice.entity.user.User;
 
@@ -65,6 +63,26 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.save(convertDtoToUserEntity(userDto));
         applicationEventPublisher.publishEvent(new ProfileCompletedEvent(user));
         log.info("User is saved successfully. UserID: {}", user.getId());
+    }
+
+    @Override
+    public void update(UUID id, UserRequestUpdateDto userRequestUpdateDto) {
+        userRepository.findById(id).ifPresentOrElse(user -> {
+            updateUserDetails(user, userRequestUpdateDto);
+            userRepository.save(user);
+            log.info("User is updated successfully. UserID: {}", id);
+        }, () -> log.warn("User with ID: {} not found.", id));
+    }
+
+    private void updateUserDetails(User user, UserRequestUpdateDto userRequestUpdateDto) {
+        user.setFirstName(userRequestUpdateDto.firstName());
+        user.setLastName(userRequestUpdateDto.lastName());
+        user.setCountry(userRequestUpdateDto.country());
+        user.setCity(userRequestUpdateDto.city());
+        user.setAddress(userRequestUpdateDto.address());
+        user.setPhone(userRequestUpdateDto.phone());
+        user.setBirthDay(userRequestUpdateDto.birthDay());
+        user.setFamilyStatus(userRequestUpdateDto.familyStatus());
     }
 
     @Override
