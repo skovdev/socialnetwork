@@ -118,7 +118,7 @@ public class UserRestController {
             @ApiResponse(description = "Return error message if the user does not exist", responseCode = "404")
     })
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> update(@PathVariable UUID id, @RequestBody UserRequestUpdateDto userRequestUpdateDto) {
+    public ResponseEntity<String> update(@PathVariable("id") UUID id, @RequestBody UserRequestUpdateDto userRequestUpdateDto) {
        try {
             userService.update(id, userRequestUpdateDto);
             return ResponseEntity.ok("User with ID: " + id + " is updated");
