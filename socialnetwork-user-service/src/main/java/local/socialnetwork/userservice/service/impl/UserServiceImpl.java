@@ -75,14 +75,22 @@ public class UserServiceImpl implements UserService {
     }
 
     private void updateUserDetails(User user, UserRequestUpdateDto userRequestUpdateDto) {
-        user.setFirstName(userRequestUpdateDto.firstName());
-        user.setLastName(userRequestUpdateDto.lastName());
-        user.setCountry(userRequestUpdateDto.country());
-        user.setCity(userRequestUpdateDto.city());
-        user.setAddress(userRequestUpdateDto.address());
-        user.setPhone(userRequestUpdateDto.phone());
-        user.setBirthDay(userRequestUpdateDto.birthDay());
-        user.setFamilyStatus(userRequestUpdateDto.familyStatus());
+        user.setFirstName(userRequestUpdateDto.firstName() != null  && !userRequestUpdateDto.firstName().isEmpty() ?
+                userRequestUpdateDto.firstName() : user.getFirstName());
+        user.setLastName(userRequestUpdateDto.lastName() != null && !userRequestUpdateDto.lastName().isEmpty() ?
+                userRequestUpdateDto.lastName() : user.getLastName());
+        user.setCountry(userRequestUpdateDto.country() != null && !userRequestUpdateDto.country().isEmpty() ?
+                userRequestUpdateDto.country() : user.getCountry());
+        user.setCity(userRequestUpdateDto.city() != null && !userRequestUpdateDto.city().isEmpty() ?
+                userRequestUpdateDto.city() : user.getCity());
+        user.setAddress(userRequestUpdateDto.address() != null && !userRequestUpdateDto.address().isEmpty() ?
+                userRequestUpdateDto.address() : user.getAddress());
+        user.setPhone(userRequestUpdateDto.phone() != null && !userRequestUpdateDto.phone().isEmpty() ?
+                userRequestUpdateDto.phone() : user.getPhone());
+        user.setBirthDay(userRequestUpdateDto.birthDay() != null && !userRequestUpdateDto.birthDay().isEmpty() ?
+                userRequestUpdateDto.birthDay() : user.getBirthDay());
+        user.setFamilyStatus(userRequestUpdateDto.familyStatus() != null && !userRequestUpdateDto.familyStatus().isEmpty() ?
+                userRequestUpdateDto.familyStatus() : user.getFamilyStatus());
     }
 
     @Override
