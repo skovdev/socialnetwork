@@ -1,213 +1,284 @@
-import React, { useState, useEffect } from "react";
-
-import "./EditProfile.css";
-
-import Header from "../../header/Header";
+import React, { useState, useEffect, useCallback } from "react";
+import { Container, Box, Typography, TextField, Button, CircularProgress, Avatar } from "@mui/material";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 
 import AppConstants from "../../../constants/AppConstants";
-
 import AuthService from "../../../service/auth/AuthService";
+import JwtTokenDecoder from "../../../util/jwt/JwtTokenDecoder";
 
+import Header from "../../header/Header";
 import UpdateCurrentAvatar from "./avatar/UpdateCurrentAvatar";
-
 import DefaultAvatar from "./avatar/DefaultAvatar";
 import ChangePasswordProfile from "./password/ChangePasswordProfile";
 
-const EditProfile = (props) => {
+import "./EditProfile.css";
 
+// Create a custom theme
+const theme = createTheme({
+    components: {
+        MuiOutlinedInput: {
+            styleOverrides: {
+                root: {
+                    '& .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#000', // Default border color
+                    },
+                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#000', // Hover border color
+                    },
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#000', // Focused border color
+                    },
+                },
+            },
+        },
+        MuiInputLabel: {
+            styleOverrides: {
+                root: {
+                    '&.Mui-focused': {
+                        color: '#000', // Label color when focused
+                    },
+                },
+            },
+        },
+    },
+});
+
+const EditProfile = () => {
     const [profile, setProfile] = useState({});
     const [isLoaded, setIsLoaded] = useState(false);
-    const [error, setError] = useState(false);
-    
-    const [avatar, setAvatar] = useState('');
+    const [error, setError] = useState(null);
+    const [avatar, setAvatar] = useState("");
 
-    const [firstName, setFirstName] = useState('');
-    const [lastName, setLastName] = useState('');
-    const [country, setCountry] = useState('');
-    const [city, setCity] = useState('');
-    const [address, setAddress] = useState('');
-    const [phone, setPhone] = useState('');
-    const [birthday, setBirthday] = useState('');
-    const [familyStatus, setFamilyStatus] = useState('');
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
+    const [country, setCountry] = useState("");
+    const [city, setCity] = useState("");
+    const [address, setAddress] = useState("");
+    const [phone, setPhone] = useState("");
+    const [birthDay, setBirthDay] = useState("");
+    const [familyStatus, setFamilyStatus] = useState("");
 
-    useEffect(() => {
-        loadProfileInformationByUsername();
-    }, []);
+    const loadProfileAvatar = useCallback(async () => {
+        try {
+            const token = AuthService.getToken();
+            const decodedToken = JwtTokenDecoder.decode(token);
 
-    useEffect(() => {
-        loadProfileAvatar();
-    }, []);
-
-    const loadProfileAvatar = () => {
-
-        const urlGetProfileAvatar = AppConstants.API_HOST + "/profiles/avatar?username=" + AuthService.getProfile().username;
-
-        fetch(urlGetProfileAvatar, {
-            method: "GET",
-            headers: {
-                "Authorization" : "Bearer " + AuthService.getToken()
-            }
-        }).then(response => {
+            const response = await fetch(`${AppConstants.API_GATEWAY_HOST}/api/v1/profiles/${decodedToken.profileId}/avatar`, {
+                method: "GET",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+            });
 
             if (!response.ok) {
-                throw new Error("Failed load avatar of profile");
+                throw new Error("Failed to load the avatar. Please try again later or contact support if the issue persists");
             }
 
-            return response.text();
-
-        }).then(data => {
+            const data = await response.text();
             setAvatar(data);
             setIsLoaded(true);
-        }).catch(error => {
-            setIsLoaded(false);
-            setError(true);
-        });
-    };
+        } catch (error) {
+            setError(error);
+        }
+    }, []);
 
-    const loadProfileInformationByUsername = () => {
+    const loadProfileInformation = useCallback(async () => {
+        try {
+            const token = AuthService.getToken();
+            const decodedToken = JwtTokenDecoder.decode(token);
 
-        const urlGetProfileByUsername = AppConstants.API_HOST + "/profiles/user/" + props.match.params.username + "/edit";
-
-        fetch(urlGetProfileByUsername, {
-            method: "GET",
-            headers: {
-                "Authorization" : "Bearer " + AuthService.getToken(),
-                "Content-Type" : "application/json"
-            }
-        }).then(response => {
+            const response = await fetch(`${AppConstants.API_GATEWAY_HOST}/api/v1/profiles/${decodedToken.profileId}/users/${decodedToken.userId}/edit`, {
+                method: "GET",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+            });
 
             if (!response.ok) {
-                throw new Error("Failed load information of profile");
+                throw new Error("Failed to load the profile information. Please try again later or contact support if the issue persists.");
             }
-            
-            return response.json();
-        
-        }).then(data => {
+
+            const data = await response.json();
             setProfile(data);
+            setFirstName(data.firstName);
+            setLastName(data.lastName);
+            setCountry(data.country);
+            setCity(data.city);
+            setAddress(data.address);
+            setPhone(data.phone);
+            setBirthDay(data.birthDay);
+            setFamilyStatus(data.familyStatus);
             setIsLoaded(true);
-        }).catch(error => {
-            setIsLoaded(false);
-            setError(true);
-        });
-    };
+        } catch (error) {
+            setError(error);
+        }
+    }, []);
 
-    const updateProfileInformation = (event) => {
-
+    const updateProfileInformation = async (event) => {
         event.preventDefault();
 
-        const profileId = AuthService.getProfile().sub;
-
-        const urlUpdateProfile = AppConstants.API_HOST + "/profiles/" + profileId;
-
-        let updatedProfile = {
-            firstName: firstName ? firstName : profile.firstName,
-            lastName: lastName ? lastName : profile.lastName,
-            country: country ? country : profile.country,
-            city: city ? city : profile.city,
-            address: address ? address : profile.address,
-            phone: phone ? phone : profile.address,
-            birthday: birthday ? birthday : profile.birthday,
-            familyStatus: familyStatus ? familyStatus : profile.familyStatus
+        const updatedProfile = {
+            firstName: firstName,
+            lastName: lastName,
+            country: country,
+            city: city,
+            address: address,
+            phone: phone,
+            birthDay: birthDay,
+            familyStatus: familyStatus,
         };
 
-        fetch(urlUpdateProfile, {
-            method: "PUT",
-            headers: {
-                "Authorization" : "Bearer " + AuthService.getToken(),
-                "Content-Type" : "application/json"
-            },
-            body: JSON.stringify(updatedProfile)
-        }).then(response => {
+        try {
+            const token = AuthService.getToken();
+            const decodedToken = JwtTokenDecoder.decode(token);
+
+            const response = await fetch(`${AppConstants.API_GATEWAY_HOST}/api/v1/users/${decodedToken.userId}`, {
+                method: "PUT",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(updatedProfile),
+            });
 
             if (!response.ok) {
-                throw new Error("Failed update information of profile");
+                throw new Error("Failed to update the profile information. Please try again later or contact support if the issue persists.");
             }
 
-            return response;
-
-        }).then(data => {
             setIsLoaded(true);
-            alert("Updated");
-            console.log(data);
-        }).catch(error => {
-            setIsLoaded(false);
-            setError(true);            
-        });
+            alert("Profile updated successfully");
+        } catch (error) {
+            setError(error);
+        }
     };
 
+    useEffect(() => {
+        loadProfileInformation();
+        loadProfileAvatar();
+    }, [loadProfileInformation, loadProfileAvatar]);
+
     if (error) {
+        return <Typography color="error">{error.message}</Typography>;
+    }
 
-        return (
+    if (!isLoaded) {
+        return <Box display="flex" justifyContent="center" alignItems="center" height="100vh"><CircularProgress /></Box>;
+    }
 
-            <div>
-                <p>Test</p>
-            </div>
-            
-        );
-    } else if (!isLoaded) {
-
-        return (
-
-            <div>
-                <p>Loading...</p>
-            </div>
-            
-        );
-    } else {
-        return (
-            <div>
+    return (
+        <ThemeProvider theme={theme}>
+            <Container>
                 <Header />
-                <div className="edit-profile">
-                    <h2>Profile Information</h2>
-                    <div className="current-profile-avatar">
-                        <img className="rounded border" src={'data:image/jpeg;base64,' + avatar} />
-                        <div className="avatar-buttons-wrapper">
+                <Box className="edit-profile">
+                    <Typography variant="h4" gutterBottom>
+                        Profile Information
+                    </Typography>
+                    <Box className="current-profile-avatar" mb={4} display="flex" alignItems="center">
+                        <Avatar
+                            src={`data:image/jpeg;base64,${avatar}`}
+                            alt="Avatar"
+                            sx={{ width: 150, height: 150, marginRight: 2, borderRadius: 1, border: '2px solid black' }}
+                        />
+                        <Box className="avatar-buttons-wrapper" display="flex" flexDirection="column" ml={2}>
                             <UpdateCurrentAvatar setAvatar={setAvatar} />
                             <DefaultAvatar setAvatar={setAvatar} />
-                        </div>
-                    </div>
-                    <h4>Change password</h4>
-                    <div className="change-current-password">
-                        <ChangePasswordProfile /> 
-                    </div>
-                    <h4>Personal Information</h4>
-                    <div className="form-group input-width">
-                        <label htmlFor="firstName">First name</label>
-                        <input type="text" id="firstName" className="form-control" onChange={e => setFirstName(e.target.value)} defaultValue={profile.firstName} />
-                    </div>
-                    <div className="form-group input-width">
-                        <label htmlFor="lastName">Last name</label>
-                        <input type="text" id="lastName" className="form-control" onChange={e => setLastName(e.target.value)} defaultValue={profile.lastName} />
-                    </div>                    
-                    <div className="form-group input-width">
-                        <label htmlFor="country">Country</label>
-                        <input type="text" id="country" className="form-control" onChange={e => setCountry(e.target.value)} defaultValue={profile.country} />
-                    </div>                    
-                    <div className="form-group input-width">
-                        <label htmlFor="city">City</label>
-                        <input type="text" id="city" className="form-control" onChange={e => setCity(e.target.value)} defaultValue={profile.city} />
-                    </div>                    
-                    <div className="form-group input-width">
-                        <label htmlFor="address">Address</label>
-                        <input type="text" id="address" className="form-control" onChange={e => setAddress(e.target.value)} defaultValue={profile.address} />
-                    </div>                    
-                    <div className="form-group input-width">
-                        <label htmlFor="phone">Phone</label>
-                        <input type="text" id="phone" className="form-control" onChange={e => setPhone(e.target.value)} defaultValue={profile.phone} />
-                    </div>                    
-                    <div className="form-group input-width">
-                        <label htmlFor="birthday">Birthday</label>
-                        <input type="text" id="birthday" className="form-control" onChange={e => setBirthday(e.target.value)} defaultValue={profile.birthday} />
-                    </div>                    
-                    <div className="form-group input-width">
-                        <label htmlFor="familyStatus">Family status</label>
-                        <input type="text" id="familyStatus" className="form-control" onChange={e => setFamilyStatus(e.target.value)} defaultValue={profile.familyStatus} />
-                    </div>
-                    <button className="btn btn-dark mb-3" onClick={updateProfileInformation}>Update</button>
-                </div>
-            </div>
-        )
-    }
-}
+                        </Box>
+                    </Box>
+                    <Typography variant="h6" gutterBottom>
+                        Change Password
+                    </Typography>
+                    <Box mb={4}>
+                        <ChangePasswordProfile />
+                    </Box>
+                    <Typography variant="h6" gutterBottom>
+                        Personal Information
+                    </Typography>
+                    <Box component="form" onSubmit={updateProfileInformation} noValidate>
+                        <TextField
+                            label="First name"
+                            variant="outlined"
+                            fullWidth
+                            margin="normal"
+                            value={firstName}
+                            onChange={(e) => setFirstName(e.target.value)}
+                        />
+                        <TextField
+                            label="Last name"
+                            variant="outlined"
+                            fullWidth
+                            margin="normal"
+                            value={lastName}
+                            onChange={(e) => setLastName(e.target.value)}
+                        />
+                        <TextField
+                            label="Country"
+                            variant="outlined"
+                            fullWidth
+                            margin="normal"
+                            value={country}
+                            onChange={(e) => setCountry(e.target.value)}
+                        />
+                        <TextField
+                            label="City"
+                            variant="outlined"
+                            fullWidth
+                            margin="normal"
+                            value={city}
+                            onChange={(e) => setCity(e.target.value)}
+                        />
+                        <TextField
+                            label="Address"
+                            variant="outlined"
+                            fullWidth
+                            margin="normal"
+                            value={address}
+                            onChange={(e) => setAddress(e.target.value)}
+                        />
+                        <TextField
+                            label="Phone"
+                            variant="outlined"
+                            fullWidth
+                            margin="normal"
+                            value={phone}
+                            onChange={(e) => setPhone(e.target.value)}
+                        />
+                        <TextField
+                            label="Birthday"
+                            variant="outlined"
+                            fullWidth
+                            margin="normal"
+                            value={birthDay}
+                            onChange={(e) => setBirthDay(e.target.value)}
+                        />
+                        <TextField
+                            label="Family Status"
+                            variant="outlined"
+                            fullWidth
+                            margin="normal"
+                            value={familyStatus}
+                            onChange={(e) => setFamilyStatus(e.target.value)}
+                        />
+                        <Button
+                            type="submit"
+                            variant="contained"
+                            fullWidth
+                            sx={{
+                                backgroundColor: '#000',
+                                color: '#fff',
+                                '&:hover': {
+                                    backgroundColor: '#333',
+                                },
+                            }}
+                        >
+                            Update
+                        </Button>
+                    </Box>
+                </Box>
+            </Container>
+        </ThemeProvider>
+    );
+};
 
 export default EditProfile;

@@ -1,64 +1,69 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
+import { Box, CircularProgress, Typography, Avatar as MuiAvatar } from "@mui/material";
 
-import "./Avatar.css";
+import AuthService from "../../../service/auth/AuthService";
+import AppConstants from "../../../constants/AppConstants";
+import JwtTokenDecoder from "../../../util/jwt/JwtTokenDecoder";
 
 import EditButton from "../edit/button/EditButton";
 
-import AuthService from "../../../service/auth/AuthService";
+import "./Avatar.css";
 
-import AppConstants from "../../../constants/AppConstants";
+const Avatar = () => {
+    const [username, setUsername] = useState("");
+    const [avatar, setAvatar] = useState("");
+    const [isLoaded, setIsLoaded] = useState(false);
+    const [error, setError] = useState(null);
 
-const Avatar = (props) => {
+    const fetchAvatar = useCallback(async () => {
+        try {
+            const token = AuthService.getToken();
+            const decodedToken = JwtTokenDecoder.decode(token);
 
-    const [avatar, setAvatar] = useState({})
-    const [isLoaded, setIsLoaded] = useState(false)
-    const [error, serError] = useState(false)
-    const [errorMessage, setErrorMessage] = useState("")
+            setUsername(decodedToken.username);
 
-    useEffect(() => {
-        loadAvatarProfile();
-    }, []);
-
-    const loadAvatarProfile = () => {
-
-        const urlGetAvatar = AppConstants.API_HOST + "/profiles/avatar?username=" + AuthService.getProfile().username;
-        const token = AuthService.getToken();
-
-        fetch(urlGetAvatar, {
-            method: "GET",
-            headers: {
-                "Authorization": "Bearer " + token,
-                "Content-Type": "application/json"
-            }
-        }).then(response => {
+            const response = await fetch(`${AppConstants.API_GATEWAY_HOST}/api/v1/profiles/${decodedToken.profileId}/avatar`, {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+            });
 
             if (!response.ok) {
-                throw new Error("Failed load avatar of profile")
+                throw new Error("Failed to load the avatar. Please try again later or contact support if the issue persists.");
             }
 
-            return response.text()
+            const data = await response.text();
+            setAvatar(data);
+            setIsLoaded(true);
+        } catch (error) {
+            setError(error);
+        }
+    }, []);
 
-        }).then(data => {
-            setAvatar(data)
-            setIsLoaded(true)
-        }).catch(error => {
-            serError(true)
-            setErrorMessage(error.message)
-        })
-    }
+    useEffect(() => {
+        fetchAvatar();
+    }, [fetchAvatar]);
 
     if (error) {
-        return <div>{errorMessage}</div>
-    } else if (!isLoaded) {
-        return <div>Loading...</div>
-    } else {
-        return (
-            <div className="avatar-profile">
-                <img src={'data:image/jpeg;base64,' + avatar} />
-                <EditButton username={props.username} />
-            </div>
-        )
+        return <Typography color="error">{error.message}</Typography>;
     }
-}
+
+    if (!isLoaded) {
+        return <CircularProgress />;
+    }
+
+    return (
+        <Box className="avatar-profile">
+            <MuiAvatar
+                src={`data:image/jpeg;base64,${avatar}`}
+                alt="Avatar"
+                className="avatar-image"
+            />
+            <EditButton username={username} />
+        </Box>
+    );
+};
 
 export default Avatar;

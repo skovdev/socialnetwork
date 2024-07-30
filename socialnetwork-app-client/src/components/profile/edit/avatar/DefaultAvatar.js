@@ -1,40 +1,53 @@
-import React from "react";
+import React, { useCallback } from "react";
+import { Box, Button } from "@mui/material";
 
 import AppConstants from "../../../../constants/AppConstants";
-
 import AuthService from "../../../../service/auth/AuthService";
+import JwtTokenDecoder from "../../../../util/jwt/JwtTokenDecoder";
 
-const DefaultAvatar = (props) => {
+const DefaultAvatar = ({ setAvatar }) => {
 
-    const setDefaultAvatar = () => {
+    const setDefaultAvatar = useCallback(async () => {
+        try {
+            const token = AuthService.getToken();
+            const decodedToken = JwtTokenDecoder.decode(token);
 
-        const setDefaultAvatarEndpoint = AppConstants.API_HOST + "/profiles/avatar?username=" + AuthService.getProfile().username;
-
-        fetch(setDefaultAvatarEndpoint, {
-            method: "DELETE",
-            headers: {
-                "Authorization" : "Bearer " + AuthService.getToken()
-            }
-        }).then(response => {
+            const response = await fetch(`${AppConstants.API_GATEWAY_HOST}/api/v1/profiles/${decodedToken.profileId}/avatar`, {
+                method: "DELETE",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json"
+                }
+            });
 
             if (!response.ok) {
-                throw new Error("Failed set default avatar");
+                throw new Error("An error occurred while setting default avatar. Please try again later or contact support if the issue persists");
             }
 
-            return response.text();
-
-        }).then(avatar => {
-            props.setAvatar(avatar);
-        }).catch(error => {
-            console.log(error);
-        });
-    }
+            const avatar = await response.text();
+            setAvatar(avatar);
+        } catch (error) {
+            console.error(error);
+        }
+    }, [setAvatar]);
 
     return (
-        <div className="mt-3">
-            <button className="btn btn-dark" onClick={setDefaultAvatar}>Set Default Avatar</button>
-        </div>
-    )
-}
+        <Box mt={3}>
+            <Button
+                variant="contained"
+                onClick={setDefaultAvatar}
+                sx={{
+                    backgroundColor: '#000',
+                    color: '#fff',
+                    '&:hover': {
+                        backgroundColor: '#333',
+                    },
+                }}
+            >
+                Set Default Avatar
+            </Button>
+        </Box>
+    );
+};
 
 export default DefaultAvatar;
