@@ -48,7 +48,7 @@ const SignIn = () => {
             AuthService.setToken(responseData.token);
             const decodedToken = JwtTokenDecoder.decode(responseData.token);
 
-            navigate(decodedToken.isAdmin ? "/admin/dashboard" : `/profile/${decodedToken.username}`);
+            navigate(decodedToken.isAdmin ? "/admin/dashboard" : "/profile/${decodedToken.username}");
             
             setNotification({
                 open: true,

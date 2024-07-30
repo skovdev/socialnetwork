@@ -1,7 +1,9 @@
 .personal-info {
     display: block;
-    margin: 10px;
-    width: 430px;
+    padding: 10px;
+    margin: 16px;
+    width: 500px;
+    height: 255px;
     background-color: #ffffff;
     border: 1px solid #a5a5a5;
     border-radius: 5px;
@@ -9,7 +11,6 @@
 
 .personal-info .full-name {
     margin: 10px;
-    padding: 10px;
     border-bottom: 1px solid #a5a5a5;
 }
 

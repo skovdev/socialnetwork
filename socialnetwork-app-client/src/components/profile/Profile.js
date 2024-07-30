@@ -1,87 +1,122 @@
-import React, { useEffect, useState } from "react";
-import { useHistory } from "react-router-dom";
-
-import "./Profile.css";
-
-import Header from "../header/Header";
-import Menu from "./menu/Menu";
-import PersonalInfo from "./info/Personalnfo";
-import Avatar from "./avatar/Avatar";
+import React, { useEffect, useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+import { Box, Container, Typography, createTheme, ThemeProvider } from "@mui/material";
 
 import AuthService from "../../service/auth/AuthService";
-
 import AppConstants from "../../constants/AppConstants";
+import JwtTokenDecoder from "../../util/jwt/JwtTokenDecoder";
 
-const Profile = (props) => {
+import Menu from "./menu/Menu";
+import Avatar from "./avatar/Avatar";
+import Header from "../header/Header";
 
+import "./Profile.css";
+import PersonalInfo from "./info/Personalnfo";
+
+// Create a custom theme
+const theme = createTheme({
+    components: {
+        MuiOutlinedInput: {
+            styleOverrides: {
+                root: {
+                    '& .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#000', // Default border color
+                    },
+                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#000', // Hover border color
+                    },
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#000', // Focused border color
+                    },
+                },
+            },
+        },
+        MuiInputLabel: {
+            styleOverrides: {
+                root: {
+                    '&.Mui-focused': {
+                        color: '#000', // Label color when focused
+                    },
+                },
+            },
+        },
+    },
+});
+
+const Profile = () => {
     const [isProfileDisabled, setIsProfileDisabled] = useState(false);
-    const [error, setError] = useState(false)
-    const [errorMessage, setErrorMessage] = useState("")
+    const [error, setError] = useState(null);
+    const navigate = useNavigate();
 
-    const history = useHistory()
+    const fetchProfile = useCallback(async () => {
+        try {
+            const token = AuthService.getToken();
+            const decodedToken = JwtTokenDecoder.decode(token);
 
-    useEffect(() => {
-
-        let username = props.match.params.username;
-
-        const urlGetProfileByUsername = AppConstants.API_HOST + "/profiles/user/" + username;
-        const token = AuthService.getToken();
-
-        fetch(urlGetProfileByUsername, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": "Bearer " + token
-            }
-        }).then(response => {
+            const response = await fetch(`${AppConstants.API_GATEWAY_HOST}/api/v1/profiles/${decodedToken.profileId}/users/${decodedToken.userId}`, {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+            });
 
             if (!response.ok) {
-                throw new Error("Failed load profile of user")
+                throw new Error("An error occurred while loading your profile. Please try again later or contact support if the issue persists");
             }
 
-            return response.json()
+            const data = await response.json();
 
-        }).then(data => {
-
-            if (!data.active) {
+            if (!data.isActive) {
                 setIsProfileDisabled(true);
             }
-        }).catch(error => {
-            setError(true)
-            setErrorMessage(error.message);
+        } catch (error) {
+            setError(error);
             AuthService.logout();
-            history.push("/");
-        });
-    });
+            navigate("/");
+        }
+    }, [navigate]);
+
+    useEffect(() => {
+        fetchProfile();
+    }, [fetchProfile]);
 
     if (isProfileDisabled) {
         return (
-            <div className="profile">
-                <Header />
-                <p className="disabled">Profile is disabled</p>
-            </div>
-        )
-    } else {
-
-        if (error) {
-            return <div>{errorMessage}</div>
-        }  else {
-    
-            return (
-            
-                <div className="profile">
-                    <Header />
-                    <div className="profile-first-column">
-                        <Menu />
-                        <Avatar username={props.match.params.username} />
-                        <PersonalInfo />
-                    </div>
-                    <div className="profile-second-column">
-                    </div>
-                </div>
-            );
-        }
+            <ThemeProvider theme={theme}>
+                <Container className="profile">
+                    <Typography variant="h6" color="error" className="disabled">
+                        Profile is disabled
+                    </Typography>
+                </Container>
+            </ThemeProvider>
+        );
     }
-}
+
+    if (error) {
+        return (
+            <ThemeProvider theme={theme}>
+                <Container className="profile">
+                    <Typography variant="h6" color="error" className="disabled">
+                        {error.message}
+                    </Typography>
+                </Container>
+            </ThemeProvider>
+        );
+    }
+
+    return (
+        <ThemeProvider theme={theme}>
+            <Container className="profile">
+                <Header />
+                <Box className="profile-column">
+                    <Menu />
+                    <Avatar />
+                    <PersonalInfo />
+                </Box>
+            </Container>
+        </ThemeProvider>
+    );
+};
 
 export default Profile;
