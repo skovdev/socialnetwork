@@ -1,18 +1,12 @@
 .avatar-profile {
-    display: block;
-    margin: 10px;
-    padding: 9px;
-    width: 296px;
-    background-color: #ffffff;
-    border: 1px solid #a5a5a5;
-    border-radius: 5px;
+    text-align: center;
+    margin-top: 16px;
 }
 
-.avatar-profile img {
-    display: block;
-    margin: 4px auto;
-    margin-bottom: 12px;
-    width: 268px;
+.avatar-profile .avatar-image {
+    width: 350px;
+    height: 450px;
     border-radius: 5px;
     border: 1px solid #a5a5a5;
+    margin-bottom: 16px;
 }

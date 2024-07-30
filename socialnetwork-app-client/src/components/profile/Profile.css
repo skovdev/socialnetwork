@@ -1,5 +1,5 @@
 .profile {
-    display: block;
+    display: flex;
     width: 100%;
 }
 
@@ -9,14 +9,10 @@
     text-align: center;
 }
 
-.profile .profile-first-column{
+.profile .profile-column {
     display: flex;
     justify-content: center;
     flex-direction: row;
-}
-
-.profile .profile-second-column{
-    display: flex;
-    justify-content: center;
-    flex-direction: row;
+    background-color: #ffffff;
+    min-height: 100vh;
 }

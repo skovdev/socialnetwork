@@ -1,93 +1,81 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
+import { Box, Typography, CircularProgress } from "@mui/material";
+
+import AuthService from "../../../service/auth/AuthService";
+import AppConstants from "../../../constants/AppConstants";
+import JwtTokenDecoder from "../../../util/jwt/JwtTokenDecoder";
 
 import "./PersonalInfo.css";
 
-import "bootstrap/dist/css/bootstrap.min.css";
-
-import AuthService from "../../../service/auth/AuthService";
-
-import AppConstants from "../../../constants/AppConstants";
-
 const PersonalInfo = () => {
+    const [profileInfo, setProfileInfo] = useState({});
+    const [isLoaded, setIsLoaded] = useState(false);
+    const [error, setError] = useState(null);
 
-    const [profileInfo, setProfileInfo] = useState({})
-    const [isLoaded, setIsLoaded] = useState(false)
-    const [error, serError] = useState(false)
-    const [errorMessage, setErrorMessage] = useState("") 
+    const loadProfileInfo = useCallback(async () => {
+        try {
+            const token = AuthService.getToken();
+            const decodedToken = JwtTokenDecoder.decode(token);
 
-    useEffect(() => {
-        loadProfile();
-    }, []);
-
-    const loadProfile = () => {
-
-        let username = AuthService.getProfile().username;
-
-        const urlGetProfileDetails = AppConstants.API_HOST + "/profiles/user/" + username;
-        const token = AuthService.getToken();
-
-        fetch(urlGetProfileDetails, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": "Bearer " + token
-            }
-        }).then(response => {
+            const response = await fetch(`${AppConstants.API_GATEWAY_HOST}/api/v1/profiles/${decodedToken.profileId}/users/${decodedToken.userId}`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`,
+                },
+            });
 
             if (!response.ok) {
-                throw new Error("Failed load profile of user")
+                throw new Error("Failed to load the profile information. Please try again later or contact support if the issue persists.");
             }
 
-            return response.json()
+            const data = await response.json();
+            setProfileInfo(data);
+            setIsLoaded(true);
+        } catch (error) {
+            setError(error);
+        }
+    }, []);
 
-        }).then(data => {
-            setProfileInfo(data)
-            setIsLoaded(true)
-        }).catch(error => {
-            serError(true)
-            setErrorMessage(error.message)
-        });
-    };
+    useEffect(() => {
+        loadProfileInfo();
+    }, [loadProfileInfo]);
 
     if (error) {
-        return <div>{errorMessage}</div>
-    } else if (!isLoaded) {
-        return <div>Loading...</div>
-    } else {
-        return (
-
-            <div>
-
-                <div className="personal-info">
-                     <div className="full-name">
-                        <h4>{profileInfo.firstName} {profileInfo.lastName}</h4>
-                    </div>
-                    <div className="additional-info">
-                        <div className="biirthday">
-                            <h5>Birthday: {profileInfo.birthDay}</h5>
-                        </div>
-                        <div className="country">
-                            <h5>Country: {profileInfo.country}</h5>
-                        </div>
-                        <div className="city">
-                            <h5>City: {profileInfo.city}</h5>
-                        </div>
-                        <div className="family-status">
-                            <h5>Family status: {profileInfo.familyStatus}</h5>
-                        </div>
-                        <div className="phone">
-                            <h5>Phone: {profileInfo.phone}</h5>
-                        </div>
-                        <div className="address">
-                            <h5>Address: {profileInfo.address}</h5>
-                         </div>
-                    </div>
-                </div>
-               
-            </div>
-
-        );
+        return <Typography color="error">{error.message}</Typography>;
     }
-}
- 
+
+    if (!isLoaded) {
+        return <CircularProgress />;
+    }
+
+    return (
+        <Box className="personal-info">
+            <Typography className="full-name" variant="h4" gutterBottom>
+                {profileInfo.firstName} {profileInfo.lastName}
+            </Typography>
+            <Box className="additional-info">
+                <Typography variant="h6">
+                    Birthday: {profileInfo.birthDay}
+                </Typography>
+                <Typography variant="h6">
+                    Country: {profileInfo.country}
+                </Typography>
+                <Typography variant="h6">
+                    City: {profileInfo.city}
+                </Typography>
+                <Typography variant="h6">
+                    Family status: {profileInfo.familyStatus}
+                </Typography>
+                <Typography variant="h6">
+                    Phone: {profileInfo.phone}
+                </Typography>
+                <Typography variant="h6">
+                    Address: {profileInfo.address}
+                </Typography>
+            </Box>
+        </Box>
+    );
+};
+
 export default PersonalInfo;
