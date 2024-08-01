@@ -1,8 +1,17 @@
 .dashboard {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    background-color: #fff;
+    color: #000;
 }
 
-.dashboard .profile-panel {
-    flex-grow: 1;
+.monthly-registered-users {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.profile-panel {
+    width: 100%;
 }
