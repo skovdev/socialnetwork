@@ -1,128 +1,129 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Select, MenuItem, Typography, Box, CircularProgress } from "@mui/material";
 
 import "./ProfileList.css";
 
 import AppConstants from "../../../../constants/AppConstants";
-
 import AuthService from "../../../../service/auth/AuthService";
+import JwtTokenDecoder from "../../../../util/jwt/JwtTokenDecoder";
 
 const ProfileList = () => {
+    const [profiles, setProfiles] = useState([]);
+    const [username, setUsername] = useState("");
+    const [isLoaded, setIsLoaded] = useState(false);
+    const [error, setError] = useState(null);
 
-    const [profiles, setProfiles] = useState([])
-    const [isLoaded, setIsLoaded] = useState(false)
-    const [error, serError] = useState(false)
-    const [errorMessage, setErrorMessage] = useState("")
+    const loadUserProfiles = useCallback(async () => {
+        const token = AuthService.getToken();
+        const decodedToken = JwtTokenDecoder.decode(token);
+
+        setUsername(decodedToken.username);
+
+        try {
+            const response = await fetch(`${AppConstants.API_GATEWAY_HOST}/api/v1/profiles`, {
+                method: "GET",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error("An error occurred while loading profiles. Please try again later or contact support if the issue persists.");
+            }
+
+            const data = await response.json();
+            setProfiles(data);
+            setIsLoaded(true);
+        } catch (error) {
+            setError(error);
+        }
+    }, []);
+
+    const changeStatus = useCallback(async (e, profileId) => {
+        const status = e.target.value;
+        const token = AuthService.getToken();
+
+        try {
+            const response = await fetch(`${AppConstants.API_GATEWAY_HOST}/api/v1/profiles/${profileId}/status?isActive=${status}`, {
+                method: "PUT",
+                headers: {
+                    Authorization: `Bearer ${token}`
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error("An error occurred while changing status. Please try again later or contact support if the issue persists.");
+            }
+
+            // Update the status locally
+            setProfiles((prevProfiles) =>
+                prevProfiles.map((profile) =>
+                    profile.id === profileId ? { ...profile, isActive: status === 'true' } : profile
+                )
+            );
+        } catch (error) {
+            setError(error);
+        }
+    }, []);
 
     useEffect(() => {
         loadUserProfiles();
-    }, [])
-
-    const loadUserProfiles = () => {
-
-        const urlFindAllProfile = AppConstants.API_HOST + "/profiles"
-        const token = AuthService.getToken();
-
-        fetch(urlFindAllProfile, {
-            method: "GET",
-            headers: {
-                "Authorization": "Bearer " + token,
-                "Content-Type": "application/json"
-            }
-        }).then(response => {
-
-            if (!response.ok) {
-                throw new Error("Failed load of profiles")
-            }
-
-            return response.json()
-                    
-        }).then(data => {
-            setProfiles(data)
-            setIsLoaded(true)
-        }).catch(error => {
-            serError(true)
-            setErrorMessage(error.message)
-        })
-    }
-
-    const changeStatus = (e, username) => {
-        
-        const status = e.target.value
-
-        const token = AuthService.getToken()
-
-        const urlChangeStatusProfile = AppConstants.API_HOST + `/profiles?username=${username}&isActive=${status}`
-
-        fetch(urlChangeStatusProfile, {
-            method: "PUT",
-            headers: {
-                "Authorization": "Bearer " + token,
-                "Content-Type": "application/json"
-            }
-        }).then(response => {
-
-            if (!response.ok) {
-                throw new Error("Failed change of status")
-            }
-
-            return response.json()
-
-        }).then(data => {
-            console.log(data.message);
-        }).catch(error => {
-            setErrorMessage(error.message)
-        })
-    }
+    }, [loadUserProfiles]);
 
     if (error) {
-        return <div>{errorMessage}</div>
-    } else if (!isLoaded) {
-        return <div>Loading...</div>
-    } else {
-
-        return (
-
-            <div className="profile-table">
-                <table className="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">Username</th>
-                            <th scope="col">First Name</th>
-                            <th scope="col">Last Name</th>
-                            <th scope="col">Active Status</th>
-                            <th scope="col">Profile Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {profiles.map((profile) => {
-                            return (
-                                <tr key={profile.id}>
-                                    <th scope="row">{profile.id}</th>
-                                    <th>{profile.user.username}</th>
-                                    <th>{profile.user.firstName}</th>
-                                    <th>{profile.user.lastName}</th>
-                                    <th>{profile.isActive ? 
-                                        <img className="status" src={process.env.PUBLIC_URL + "/images/profile/status/active.png"} /> 
-                                        : 
-                                        <img className="status" src={process.env.PUBLIC_URL + "/images/profile/status/inactive.png"} />}
-                                    </th>
-                                    <th>
-                                        <select onChange={e => changeStatus(e, profile.user.username)} className="custom-select custom-select-sm">
-                                            <option hidden>-- Select --</option>
-                                            <option value="true">ACTIVE</option>
-                                            <option value="false">INACTIVE</option>
-                                        </select>
-                                    </th>
-                                </tr>
-                            )
-                        })}
-                    </tbody>
-                </table>
-            </div>
-
-        )
+        return <Typography color="error">{error.message}</Typography>;
     }
-}
+
+    if (!isLoaded) {
+        return <Box display="flex" justifyContent="center" alignItems="center" height="100vh"><CircularProgress /></Box>;
+    }
+
+    return (
+        <div className="profile-table">
+            <TableContainer component={Paper}>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>#</TableCell>
+                            <TableCell>Username</TableCell>
+                            <TableCell>Active Status</TableCell>
+                            <TableCell>Profile Status</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {profiles.map((profile) => (
+                            <TableRow key={profile.id}>
+                                <TableCell>{profile.id}</TableCell>
+                                <TableCell>{username}</TableCell>
+                                <TableCell>
+                                    <img
+                                        className="status"
+                                        src={
+                                            profile.isActive
+                                                ? `${process.env.PUBLIC_URL}/images/profile/status/active.png`
+                                                : `${process.env.PUBLIC_URL}/images/profile/status/inactive.png`
+                                        }
+                                        alt={profile.isActive ? "Active" : "Inactive"}
+                                    />
+                                </TableCell>
+                                <TableCell>
+                                    <Select
+                                        value={profile.isActive ? 'true' : 'false'}
+                                        onChange={(e) => changeStatus(e, profile.id)}
+                                        displayEmpty
+                                    >
+                                        <MenuItem value="true">ACTIVE</MenuItem>
+                                        <MenuItem value="false">INACTIVE</MenuItem>
+                                    </Select>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        </div>
+    );
+};
 
 export default ProfileList;

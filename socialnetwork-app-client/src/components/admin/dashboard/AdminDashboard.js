@@ -1,43 +1,41 @@
 import React, { useEffect } from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+
+import { Container, Box, Typography } from "@mui/material";
 
 import "./AdminDashboard.css";
 
 import AuthService from "../../../service/auth/AuthService";
-
-import DecodeJwtToken from "../../../util/jwt/DecodeJwtToken";
+import JwtTokenDecoder from "../../../util/jwt/JwtTokenDecoder";
 
 import AdminHeader from "../header/AdminHeader";
 import ProfileList from "./profile/ProfileList";
 
 const AdminDashboard = () => {
-        
-    const history = useHistory();
+    const navigate = useNavigate();
 
     useEffect(() => {
-        
-        const decodedToken = DecodeJwtToken.decode(AuthService.getToken());
+        const token = AuthService.getToken();
+        const decodedToken = JwtTokenDecoder.decode(token);
 
         if (!decodedToken.isAdmin) {
-            history.push("/profile/" + decodedToken.username)
+            navigate(`/profile/${decodedToken.username}`);
         }
-    }, [history]);
+    }, [navigate]);
 
     return (
-
-        <div>
+        <Container>
             <AdminHeader />
-            <div className="dashboard">
-                <div className="monthly-registered-users">
-                </div>
-                <div className="profile-panel">
+            <Box className="dashboard">
+                <Box className="monthly-registered-users">
+                    <Typography variant="h5">Monthly Registered Users</Typography>
+                </Box>
+                <Box className="profile-panel">
                     <ProfileList />
-                </div>
-            </div>
-        </div>
-        
-    )
-
-}
+                </Box>
+            </Box>
+        </Container>
+    );
+};
 
 export default AdminDashboard;

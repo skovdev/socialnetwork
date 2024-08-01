@@ -1,11 +1,28 @@
 .profile-table {
-    display: block;
-    margin: 10px auto;
-    width: 60%;
+    width: 100%;
+    margin-top: 20px;
 }
 
-.profile-table .table .status {
-    display: block;
-    margin: 0 auto;
-    width: 25px;
+.profile-table .MuiTableContainer-root {
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+.profile-table .MuiTableHead-root {
+    background-color: #000; /* Black header */
+}
+
+.profile-table .MuiTableCell-head {
+    font-weight: bold;
+    text-align: center;
+    color: #fff; /* White text */
+}
+
+.profile-table .MuiTableCell-body {
+    text-align: center;
+}
+
+.profile-table .status {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
 }
