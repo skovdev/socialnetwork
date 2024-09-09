@@ -1,5 +1,7 @@
 package local.socialnetwork.authserver.dto;
 
+import local.socialnetwork.authserver.type.FamilyStatus;
+
 public record SignUpDto(
         String username,
         String password,
@@ -10,5 +12,5 @@ public record SignUpDto(
         String address,
         String phone,
         String birthDay,
-        String familyStatus
+        FamilyStatus familyStatus
 ) {}
