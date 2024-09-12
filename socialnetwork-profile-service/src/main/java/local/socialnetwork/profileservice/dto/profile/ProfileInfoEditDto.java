@@ -1,5 +1,7 @@
 package local.socialnetwork.profileservice.dto.profile;
 
+import local.socialnetwork.profileservice.type.FamilyStatus;
+
 import java.util.UUID;
 
 public record ProfileInfoEditDto(
@@ -11,5 +13,5 @@ public record ProfileInfoEditDto(
         String address,
         String phone,
         String birthDay,
-        String familyStatus
+        FamilyStatus familyStatus
 ) {}
