@@ -1,7 +1,10 @@
 package local.socialnetwork.userservice.entity.user;
 
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import local.socialnetwork.userservice.entity.AbstractBaseModel;
 
+import local.socialnetwork.userservice.type.FamilyStatus;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.AccessLevel;
@@ -43,7 +46,8 @@ public class User extends AbstractBaseModel {
     String birthDay;
 
     @Column(name = "family_status")
-    String familyStatus;
+    @Enumerated(EnumType.STRING)
+    FamilyStatus familyStatus;
 
     @Column(name = "auth_user_id", nullable = false, unique = true)
     UUID authUserId;

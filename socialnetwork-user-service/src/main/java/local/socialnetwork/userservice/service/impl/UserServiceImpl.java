@@ -89,7 +89,7 @@ public class UserServiceImpl implements UserService {
                 userRequestUpdateDto.phone() : user.getPhone());
         user.setBirthDay(userRequestUpdateDto.birthDay() != null && !userRequestUpdateDto.birthDay().isEmpty() ?
                 userRequestUpdateDto.birthDay() : user.getBirthDay());
-        user.setFamilyStatus(userRequestUpdateDto.familyStatus() != null && !userRequestUpdateDto.familyStatus().isEmpty() ?
+        user.setFamilyStatus(userRequestUpdateDto.familyStatus() != null && !userRequestUpdateDto.familyStatus().name().isEmpty() ?
                 userRequestUpdateDto.familyStatus() : user.getFamilyStatus());
     }
 

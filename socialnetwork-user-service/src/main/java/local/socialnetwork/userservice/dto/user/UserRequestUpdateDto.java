@@ -1,5 +1,7 @@
 package local.socialnetwork.userservice.dto.user;
 
+import local.socialnetwork.userservice.type.FamilyStatus;
+
 public record UserRequestUpdateDto(
         String firstName,
         String lastName,
@@ -8,5 +10,5 @@ public record UserRequestUpdateDto(
         String address,
         String phone,
         String birthDay,
-        String familyStatus) {
+        FamilyStatus familyStatus) {
 }

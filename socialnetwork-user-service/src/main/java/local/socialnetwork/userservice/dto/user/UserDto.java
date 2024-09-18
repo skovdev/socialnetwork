@@ -1,5 +1,7 @@
 package local.socialnetwork.userservice.dto.user;
 
+import local.socialnetwork.userservice.type.FamilyStatus;
+
 import java.util.UUID;
 
 public record UserDto(
@@ -11,6 +13,6 @@ public record UserDto(
         String address,
         String phone,
         String birthDay,
-        String familyStatus,
+        FamilyStatus familyStatus,
         UUID authUserId
 ) {}
