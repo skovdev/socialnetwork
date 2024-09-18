@@ -12,6 +12,7 @@ import local.socialnetwork.userservice.dto.user.UserDto;
 
 import local.socialnetwork.userservice.service.UserService;
 
+import local.socialnetwork.userservice.type.FamilyStatus;
 import local.socialnetwork.userservice.util.MapUtil;
 import local.socialnetwork.userservice.util.UUIDUtil;
 
@@ -82,7 +83,7 @@ public class UserDetailsCreationConsumer {
                 MapUtil.getValue(dataMap, "address", String.class),
                 MapUtil.getValue(dataMap, "phone", String.class),
                 MapUtil.getValue(dataMap, "birthDay", String.class),
-                MapUtil.getValue(dataMap, "familyStatus", String.class),
+                FamilyStatus.valueOf(MapUtil.getValue(dataMap, "familyStatus", String.class)),
                 UUIDUtil.getUUIDValueFromMap("authUserId", dataMap));
     }
 
