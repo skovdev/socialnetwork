@@ -19,7 +19,7 @@ VALUES
         '01-01-2000',
         'testCity',
         'testCountry',
-        'testStatus',
+        'SINGLE',
         'testFirstName',
         'testLastName',
         '0500000000'

@@ -284,11 +284,10 @@ public class ProfileRestController {
     @PutMapping(value = "/{profileId}/status", produces = MediaType.TEXT_PLAIN_VALUE)
     public ResponseEntity<?> changeStatus(@Parameter(description = "This parameter represents id of profile") @PathVariable("profileId") UUID profileId,
                                                @Parameter(description = "This parameter represents whether the profile is active or not") @RequestParam("isActive") boolean isActive) {
-
-        try {
-            profileService.changeStatus(profileId, isActive);
+        boolean changed = profileService.changeStatus(profileId, isActive);
+        if (changed) {
             return ResponseEntity.ok("Status is changed successfully");
-        } catch (Exception e) {
+        } else {
             return ResponseEntity.badRequest().body("Status is not changed");
         }
     }

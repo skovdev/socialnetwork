@@ -2,12 +2,18 @@ package local.socialnetwork.authserver.controller;
 
 import local.socialnetwork.authserver.SpringBootRunAuthServer;
 
+import local.socialnetwork.authserver.client.UserFeignClient;
+import local.socialnetwork.authserver.client.ProfileFeignClient;
+
 import local.socialnetwork.authserver.dto.SignInDto;
 import local.socialnetwork.authserver.dto.SignUpDto;
 
 import local.socialnetwork.authserver.kafka.saga.signup.producer.user.UserDetailsCreationProducer;
 
+import local.socialnetwork.authserver.type.FamilyStatus;
+
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
 
 import org.mockito.Mockito;
 
@@ -63,6 +69,18 @@ public class AuthenticationControllerTest {
     @MockBean
     private UserDetailsCreationProducer userDetailsCreationProducer;
 
+    @MockBean
+    private UserFeignClient userFeignClient;
+
+    @MockBean
+    private ProfileFeignClient profileFeignClient;
+
+    @BeforeEach
+    void setUp() {
+        Mockito.when(userFeignClient.findUserIdByAuthUserId(Mockito.any())).thenReturn(UUID.fromString("8874f8ec-66ce-489d-a14f-3ad58f5daabe"));
+        Mockito.when(profileFeignClient.findProfileIdByUserId(Mockito.any())).thenReturn(UUID.fromString("662483d4-4df3-4d05-8a2a-9635e713b4ac"));
+    }
+
     @Test
     public void shouldRegisterAuthNewUser() {
 
@@ -78,7 +96,7 @@ public class AuthenticationControllerTest {
                 "testNewAddress",
                 "0500000000",
                 "01-01-2000",
-                "testNewStatus");
+                FamilyStatus.MARRIED);
 
         ResponseEntity<String> response = testRestTemplate.postForEntity(createURLWithPort("/auth/sign-up"),
                 signUpDto, String.class);
@@ -100,7 +118,7 @@ public class AuthenticationControllerTest {
                 "testAddress",
                 "0500000000",
                 "01-01-2000",
-                "testStatus");
+                FamilyStatus.IN_A_RELATIONSHIP);
 
         ResponseEntity<String> response = testRestTemplate.postForEntity(createURLWithPort("/auth/sign-up"),
                 signUpDto, String.class);

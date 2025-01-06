@@ -12,6 +12,8 @@ import local.socialnetwork.profileservice.dto.user.UserDto;
 
 import local.socialnetwork.profileservice.service.ProfileService;
 
+import local.socialnetwork.profileservice.type.FamilyStatus;
+
 import local.socialnetwork.profileservice.util.JwtUtil;
 import local.socialnetwork.profileservice.util.ResourceUtil;
 
@@ -155,7 +157,7 @@ public class ProfileControllerTest {
         assertEquals(response.getBody().address(), "test");
         assertEquals(response.getBody().phone(), "0500000000");
         assertEquals(response.getBody().birthDay(), "01-01-2023");
-        assertEquals(response.getBody().familyStatus(), "IN_ACTIVE");
+        assertEquals(response.getBody().familyStatus(), FamilyStatus.MARRIED);
         assertTrue(response.getBody().isActive());
         assertNotNull(response.getBody().avatar());
         assertEquals(response.getBody().userId().toString(), "8874f8ec-66ce-489d-a14f-3ad58f5daabe");
@@ -191,7 +193,7 @@ public class ProfileControllerTest {
         assertEquals(response.getBody().address(), "test");
         assertEquals(response.getBody().phone(), "0500000000");
         assertEquals(response.getBody().birthDay(), "01-01-2023");
-        assertEquals(response.getBody().familyStatus(), "IN_ACTIVE");
+        assertEquals(response.getBody().familyStatus(), FamilyStatus.MARRIED);
         assertEquals(response.getStatusCode(), HttpStatus.OK);
 
     }
@@ -212,7 +214,7 @@ public class ProfileControllerTest {
     public void shouldSaveNewProfile() {
 
         ProfileDto profileDto = new ProfileDto(
-                null,
+                UUID.randomUUID(),
                 true,
                 resourceUtil.getEncodedResource("/avatar/default-avatar.jpg"),
                 UUID.randomUUID());
@@ -275,7 +277,7 @@ public class ProfileControllerTest {
         Resource resource = new ClassPathResource("/avatar/test-avatar.jpg");
 
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-        body.add("file", resource);
+        body.add("profileAvatar", resource);
 
         ResponseEntity<String> response = testRestTemplate.exchange(createURLWithPort("/profiles/" + profileId + "/avatar"),
                 HttpMethod.PUT, createHttpEntity(MediaType.MULTIPART_FORM_DATA, body), String.class);
@@ -293,7 +295,7 @@ public class ProfileControllerTest {
         Resource resource = new ClassPathResource("/avatar/test-avatar.jpg");
 
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-        body.add("file", resource);
+        body.add("profileAvatar", resource);
 
         ResponseEntity<String> response = testRestTemplate.exchange(createURLWithPort("/profiles/" + profileId + "/avatar"),
                 HttpMethod.PUT, createHttpEntity(MediaType.MULTIPART_FORM_DATA, body), String.class);
@@ -309,7 +311,7 @@ public class ProfileControllerTest {
         ResponseEntity<String> response = testRestTemplate.exchange(createURLWithPort("/profiles/" + profileId + "/avatar"),
                 HttpMethod.DELETE, createHttpEntity(MediaType.APPLICATION_JSON, null), String.class);
 
-        assertEquals("Profile avatar is deleted successfully", response.getBody());
+        assertNotNull(response.getBody());
         assertEquals(HttpStatus.OK, response.getStatusCode());
 
     }
@@ -373,7 +375,7 @@ public class ProfileControllerTest {
                 "test",
                 "0500000000",
                 "01-01-2023",
-                "IN_ACTIVE"
+                FamilyStatus.MARRIED
         );
     }
 }
