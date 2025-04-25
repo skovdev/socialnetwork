@@ -27,7 +27,7 @@ It demonstrates user authentication, profile management, real-time notifications
 - Java 21
 - Spring Boot
 - Spring Cloud
-- Spring Security (OAuth2, JWT)
+- Spring Security (JWT)
 - PostgreSQL
 - Apache Kafka
 - Docker, Docker Compose
