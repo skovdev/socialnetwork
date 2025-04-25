@@ -1,6 +1,6 @@
 # SocialNetwork
 
-Pet project for self-education, designed to simulate a basic social media application built with modern Java and Spring Cloud technologies.
+Pet-project for self-education, designed to simulate a basic social media application built with modern Java and Spring Cloud technologies.
 
 ## Overview
 
