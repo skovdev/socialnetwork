@@ -53,6 +53,7 @@
         <junit.jupiter.version>5.10.0</junit.jupiter.version>
         <mockito.core.version>5.5.0</mockito.core.version>
         <slf4j.version>2.0.9</slf4j.version>
+        <liquibase.version>5.0.1</liquibase.version>
         <!-- Plugin versions -->
         <spring.boot.maven.plugin.version>3.0.2</spring.boot.maven.plugin.version>
         <maven.surefire.plugin.version>3.0.0-M9</maven.surefire.plugin.version>
@@ -225,6 +226,12 @@
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-simple</artifactId>
                 <version>${slf4j.version}</version>
+            </dependency>
+            <!-- Liquibase -->
+            <dependency>
+                <groupId>org.liquibase</groupId>
+                <artifactId>liquibase-core</artifactId>
+                <version>${liquibase.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
