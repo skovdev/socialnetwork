@@ -9,16 +9,7 @@
     <groupId>local.socialnetwork</groupId>
     <artifactId>socialnetwork</artifactId>
     <version>1.0</version>
-    <packaging>pom</packaging>
-
-    <modules>
-        <module>socialnetwork-config-server</module>
-        <module>socialnetwork-auth-server</module>
-        <module>socialnetwork-profile-service</module>
-        <module>socialnetwork-api-gateway</module>
-        <module>socialnetwork-service-discovery</module>
-        <module>socialnetwork-user-service</module>
-    </modules>
+    <packaging>jar</packaging>
 
     <properties>
         <!-- Java version -->
@@ -33,14 +24,6 @@
         <spring.boot.aop.version>3.2.0</spring.boot.aop.version>
         <spring.boot.actuator.version>3.2.3</spring.boot.actuator.version>
         <spring.boot.test.version>3.2.0</spring.boot.test.version>
-        <spring.cloud.netflix.eureka.server.version>4.1.0</spring.cloud.netflix.eureka.server.version>
-        <spring.cloud.netflix.eureka.client.version>4.1.0</spring.cloud.netflix.eureka.client.version>
-        <spring.cloud.config.server.version>4.1.0</spring.cloud.config.server.version>
-        <spring.cloud.config.client.version>4.1.0</spring.cloud.config.client.version>
-        <spring.cloud.gateway.version>4.1.0</spring.cloud.gateway.version>
-        <spring.cloud.loadbalancer.version>4.1.0</spring.cloud.loadbalancer.version>
-        <spring.cloud.openfeign.version>4.1.0</spring.cloud.openfeign.version>
-        <spring.cloud.kafka.version>4.1.0</spring.cloud.kafka.version>
         <jakarta.persistence.api.version>3.1.0</jakarta.persistence.api.version>
         <jjwt.version>0.11.5</jjwt.version>
         <postgresql.version>42.5.5</postgresql.version>
@@ -98,47 +81,6 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-test</artifactId>
                 <version>${spring.boot.test.version}</version>
-            </dependency>
-            <!-- Spring Cloud -->
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
-                <version>${spring.cloud.netflix.eureka.server.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
-                <version>${spring.cloud.netflix.eureka.client.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-config-server</artifactId>
-                <version>${spring.cloud.config.server.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-config-client</artifactId>
-                <version>${spring.cloud.config.client.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-starter-gateway</artifactId>
-                <version>${spring.cloud.gateway.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-starter-loadbalancer</artifactId>
-                <version>${spring.cloud.loadbalancer.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-starter-openfeign</artifactId>
-                <version>${spring.cloud.openfeign.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-starter-stream-kafka</artifactId>
-                <version>${spring.cloud.kafka.version}</version>
             </dependency>
             <!-- Jakarta Persistence API -->
             <dependency>
