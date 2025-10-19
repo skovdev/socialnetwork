@@ -1,0 +1,9 @@
+databaseChangeLog:
+  - changeSet:
+      id: init-schema
+      author: stanislav.kovalenko
+      changes:
+        - sqlFile:
+            path: db/changelog/1.0/001-init.sql
+            relativeToChangelogFile: false
+            encoding: UTF-8
