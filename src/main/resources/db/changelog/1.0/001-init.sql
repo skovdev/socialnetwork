@@ -11,9 +11,10 @@ CREATE TABLE auth_users (
 );
 
 CREATE TABLE auth_user_roles (
+    id UUID PRIMARY KEY,
     user_id UUID NOT NULL,
     authority TEXT NOT NULL,
-    PRIMARY KEY (user_id, authority),
+    PRIMARY KEY (id),
     CONSTRAINT fk_auth_user_roles_user
         FOREIGN KEY (user_id) REFERENCES auth_users (id) ON DELETE CASCADE
 );
