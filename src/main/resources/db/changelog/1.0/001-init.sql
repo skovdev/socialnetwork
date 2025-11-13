@@ -20,7 +20,8 @@ CREATE TABLE auth_user_roles (
 );
 
 CREATE TABLE auth_email_verification_tokens (
-    token TEXT PRIMARY KEY,
+    id UUID PRIMARY KEY,
+    token TEXT NOT NULL,
     user_id UUID NOT NULL,
     expires_at TIMESTAMPTZ NOT NULL,
     used_at TIMESTAMPTZ,
@@ -29,13 +30,11 @@ CREATE TABLE auth_email_verification_tokens (
 );
 
 CREATE TABLE auth_refresh_tokens (
-    jti UUID PRIMARY KEY,
+    id UUID PRIMARY KEY,
+    jti UUID NOT NULL,
     user_id UUID NOT NULL,
     issued_at TIMESTAMPTZ NOT NULL,
-    expires_at TIMESTAMPTZ NOT NULL,
-    revoked_at TIMESTAMPTZ,
-    user_agent TEXT,
-    ip INET,
+    expires_at TIMESTAMPTZ NOT NULL
     CONSTRAINT fk_auth_refresh_tokens_user
         FOREIGN KEY (user_id) REFERENCES auth_users (id) ON DELETE CASCADE
 );
@@ -45,7 +44,7 @@ CREATE INDEX IF NOT EXISTS idx_auth_refresh_tokens_user ON auth_refresh_tokens (
 CREATE INDEX IF NOT EXISTS idx_auth_email_tokens_user ON auth_email_verification_tokens (user_id);
 
 CREATE TABLE user_profiles (
-    user_id UUID PRIMARY KEY,
+    id UUID PRIMARY KEY,
     username TEXT UNIQUE NOT NULL,
     display_name TEXT NOT NULL,
     first_name TEXT,
@@ -58,9 +57,8 @@ CREATE TABLE user_profiles (
     city TEXT,
     address TEXT,
     family_status TEXT,
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     CONSTRAINT fk_user_profiles_user
-        FOREIGN KEY (user_id) REFERENCES auth_users (id) ON DELETE CASCADE
+        FOREIGN KEY (id) REFERENCES auth_users (id) ON DELETE CASCADE
 );
 
 CREATE INDEX IF NOT EXISTS idx_user_profiles_username ON user_profiles (username);
