@@ -45,6 +45,7 @@ CREATE INDEX IF NOT EXISTS idx_auth_email_tokens_user ON auth_email_verification
 
 CREATE TABLE user_profiles (
     id UUID PRIMARY KEY,
+    user_id UUID NOT NULL UNIQUE
     username TEXT UNIQUE NOT NULL,
     display_name TEXT NOT NULL,
     first_name TEXT,
@@ -58,7 +59,7 @@ CREATE TABLE user_profiles (
     address TEXT,
     family_status TEXT,
     CONSTRAINT fk_user_profiles_user
-        FOREIGN KEY (id) REFERENCES auth_users (id) ON DELETE CASCADE
+        FOREIGN KEY (user_id) REFERENCES auth_users (id) ON DELETE CASCADE
 );
 
 CREATE INDEX IF NOT EXISTS idx_user_profiles_username ON user_profiles (username);
