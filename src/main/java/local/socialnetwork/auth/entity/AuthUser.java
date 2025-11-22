@@ -4,9 +4,12 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.EnumType;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.CascadeType;
+
+import local.socialnetwork.profiles.entity.UserProfile;
 
 import local.socialnetwork.shared.entity.AbstractBaseModel;
 
@@ -39,6 +42,9 @@ public class AuthUser extends AbstractBaseModel {
 
     @OneToMany(mappedBy = "authUser", cascade = CascadeType.ALL)
     private Set<AuthUserRole> authUserRoles = new HashSet<>();
+
+    @OneToOne(mappedBy = "authUser", cascade = CascadeType.ALL)
+    private UserProfile userProfile;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false,  updatable = false)
