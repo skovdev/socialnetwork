@@ -7,3 +7,12 @@ databaseChangeLog:
             path: db/changelog/1.0/001-init.sql
             relativeToChangelogFile: false
             encoding: UTF-8
+
+  - changeSet:
+      id: change-token-to-bytea
+      author: stanislav.kovalenko
+      changes:
+        - sqlFile:
+            path: db/changelog/1.0/002-change-token-to-bytea.sql
+            relativeToChangelogFile: false
+            encoding: UTF-8
