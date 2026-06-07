@@ -1,6 +1,6 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
-CREATE TABLE auth_users (
+CREATE TABLE IF NOT EXISTS auth_users (
     id UUID PRIMARY KEY,
     email TEXT UNIQUE NOT NULL,
     password_hash TEXT NOT NULL,
@@ -10,16 +10,15 @@ CREATE TABLE auth_users (
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE TABLE auth_user_roles (
+CREATE TABLE IF NOT EXISTS auth_user_roles (
     id UUID PRIMARY KEY,
     user_id UUID NOT NULL,
     authority TEXT NOT NULL,
-    PRIMARY KEY (id),
     CONSTRAINT fk_auth_user_roles_user
         FOREIGN KEY (user_id) REFERENCES auth_users (id) ON DELETE CASCADE
 );
 
-CREATE TABLE auth_email_verification_tokens (
+CREATE TABLE IF NOT EXISTS auth_email_verification_tokens (
     id UUID PRIMARY KEY,
     token TEXT NOT NULL,
     user_id UUID NOT NULL,
@@ -29,12 +28,12 @@ CREATE TABLE auth_email_verification_tokens (
         FOREIGN KEY (user_id) REFERENCES auth_users (id) ON DELETE CASCADE
 );
 
-CREATE TABLE auth_refresh_tokens (
+CREATE TABLE IF NOT EXISTS auth_refresh_tokens (
     id UUID PRIMARY KEY,
     jti UUID NOT NULL,
     user_id UUID NOT NULL,
     issued_at TIMESTAMPTZ NOT NULL,
-    expires_at TIMESTAMPTZ NOT NULL
+    expires_at TIMESTAMPTZ NOT NULL,
     CONSTRAINT fk_auth_refresh_tokens_user
         FOREIGN KEY (user_id) REFERENCES auth_users (id) ON DELETE CASCADE
 );
@@ -43,13 +42,13 @@ CREATE INDEX IF NOT EXISTS idx_auth_users_status ON auth_users (status);
 CREATE INDEX IF NOT EXISTS idx_auth_refresh_tokens_user ON auth_refresh_tokens (user_id);
 CREATE INDEX IF NOT EXISTS idx_auth_email_tokens_user ON auth_email_verification_tokens (user_id);
 
-CREATE TABLE user_profiles (
+CREATE TABLE IF NOT EXISTS user_profiles (
     id UUID PRIMARY KEY,
-    user_id UUID NOT NULL UNIQUE
+    user_id UUID NOT NULL UNIQUE,
     username TEXT UNIQUE NOT NULL,
     display_name TEXT NOT NULL,
-    first_name TEXT,
-    last_name TEXT,
+    first_name TEXT NOT NULL,
+    last_name TEXT NOT NULL,
     bio TEXT,
     avatar_url TEXT,
     birth_date DATE,

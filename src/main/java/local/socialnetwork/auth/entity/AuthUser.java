@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.CascadeType;
@@ -19,7 +20,7 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.util.Set;
-import java.util.HashSet;
+import java.util.Objects;
 
 import java.time.Instant;
 
@@ -41,13 +42,25 @@ public class AuthUser extends AbstractBaseModel {
     private AuthStatus authStatus;
 
     @OneToMany(mappedBy = "authUser", cascade = CascadeType.ALL)
-    private Set<AuthUserRole> authUserRoles = new HashSet<>();
+    private Set<AuthUserRole> authUserRoles;
 
-    @OneToOne(mappedBy = "authUser", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "authUser", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private UserProfile userProfile;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false,  updatable = false)
     private Instant createdAt;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof AuthUser other)) return false;
+        return getId() != null && Objects.equals(getId(), other.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getId() != null ? Objects.hashCode(getId()) : System.identityHashCode(this);
+    }
 
 }

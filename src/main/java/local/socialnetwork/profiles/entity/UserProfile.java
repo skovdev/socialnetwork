@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.CascadeType;
@@ -18,13 +19,15 @@ import lombok.Getter;
 
 import java.time.LocalDate;
 
+import java.util.Objects;
+
 @Setter
 @Getter
 @Table(name = "user_profiles")
 @Entity
 public class UserProfile extends AbstractBaseModel {
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private AuthUser authUser;
 
@@ -52,17 +55,29 @@ public class UserProfile extends AbstractBaseModel {
     @Column(name = "phone")
     private String phoneNumber;
 
-    @Column(name = "birth_date")
+    @Column(name = "country")
     private String country;
 
-    @Column(name = "birth_date")
+    @Column(name = "city")
     private String city;
 
-    @Column(name = "birth_date")
+    @Column(name = "address")
     private String address;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "family_status")
     private FamilyStatus familyStatus;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof UserProfile other)) return false;
+        return getId() != null && Objects.equals(getId(), other.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getId() != null ? Objects.hashCode(getId()) : System.identityHashCode(this);
+    }
 
 }

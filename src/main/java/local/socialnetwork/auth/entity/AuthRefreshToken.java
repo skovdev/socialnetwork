@@ -13,6 +13,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.UUID;
+import java.util.Objects;
 
 import java.time.Instant;
 
@@ -34,5 +35,17 @@ public class AuthRefreshToken extends AbstractBaseModel {
 
     @Column(name = "expires_at")
     private Instant expiresAt;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof AuthRefreshToken other)) return false;
+        return getId() != null && Objects.equals(getId(), other.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getId() != null ? Objects.hashCode(getId()) : System.identityHashCode(this);
+    }
 
 }

@@ -12,6 +12,7 @@ import local.socialnetwork.shared.entity.AbstractBaseModel;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Objects;
 import java.time.Instant;
 
 @Setter
@@ -20,8 +21,8 @@ import java.time.Instant;
 @Entity
 public class AuthEmailVerificationToken extends AbstractBaseModel {
 
-    @Column(name = "token", nullable = false)
-    private String token;
+    @Column(name = "token", nullable = false, length = 32)
+    private byte[] token;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -30,7 +31,19 @@ public class AuthEmailVerificationToken extends AbstractBaseModel {
     @Column(name = "expires_at", nullable = false)
     private Instant expiresAt;
 
-    @Column(name = "used_at", nullable = false)
+    @Column(name = "used_at")
     private Instant usedAt;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof AuthEmailVerificationToken other)) return false;
+        return getId() != null && Objects.equals(getId(), other.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getId() != null ? Objects.hashCode(getId()) : System.identityHashCode(this);
+    }
 
 }
