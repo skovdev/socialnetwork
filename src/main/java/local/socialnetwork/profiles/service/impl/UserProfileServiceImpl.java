@@ -31,5 +31,4 @@ public class UserProfileServiceImpl implements UserProfileService {
     public Optional<UserProfile> findByUsername(String username) {
         return userProfileRepository.findByUsername(username);
     }
-
 }

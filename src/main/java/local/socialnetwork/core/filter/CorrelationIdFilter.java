@@ -37,9 +37,7 @@ public class CorrelationIdFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-        var correlationId = Optional.ofNullable(request.getHeader(CORRELATION_ID_HEADER))
-                .filter(h -> !h.isBlank())
-                .orElse(UUID.randomUUID().toString());
+        var correlationId = getCorrelationId(request);
         MDC.put(MDC_KEY, correlationId);
         response.setHeader(CORRELATION_ID_HEADER, correlationId);
         try {
@@ -49,4 +47,9 @@ public class CorrelationIdFilter extends OncePerRequestFilter {
         }
     }
 
+    private String getCorrelationId(HttpServletRequest request) {
+        return Optional.ofNullable(request.getHeader(CORRELATION_ID_HEADER))
+                .filter(h -> !h.isBlank())
+                .orElse(UUID.randomUUID().toString());
+    }
 }

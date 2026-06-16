@@ -28,6 +28,6 @@ public interface AuthRefreshTokenRepository extends CrudRepository<AuthRefreshTo
      *
      * @param userId the auth user's primary key
      */
-    void deleteByUser_Id(UUID userId);
+    void deleteByUserId(UUID userId);
 
 }

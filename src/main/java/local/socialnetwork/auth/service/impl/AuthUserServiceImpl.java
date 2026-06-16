@@ -145,7 +145,7 @@ public class AuthUserServiceImpl implements AuthUserService {
         var authUser = storedToken.getUser();
         refreshTokenRepository.delete(storedToken);
 
-        var username = userProfileRepository.findByAuthUser_Id(authUser.getId())
+        var username = userProfileRepository.findByAuthUserId(authUser.getId())
                 .map(UserProfile::getUsername)
                 .orElseThrow(() -> new UserNotFoundException("Profile not found for user id: " + authUser.getId()));
         var accessToken = createAccessToken(username);
@@ -157,7 +157,7 @@ public class AuthUserServiceImpl implements AuthUserService {
     @Override
     @Transactional
     public void logout(UUID userId) {
-        refreshTokenRepository.deleteByUser_Id(userId);
+        refreshTokenRepository.deleteByUserId(userId);
         log.info("All refresh tokens deleted for user id: {}", userId);
     }
 

@@ -15,6 +15,6 @@ import java.util.Optional;
 public interface UserProfileRepository extends CrudRepository<UserProfile, UUID> {
     @EntityGraph(attributePaths = {"authUser", "authUser.authUserRoles"})
     Optional<UserProfile> findByUsername(String username);
-    Optional<UserProfile> findByAuthUser_Id(UUID authUserId);
+    Optional<UserProfile> findByAuthUserId(UUID authUserId);
     boolean existsByUsername(String username);
 }
