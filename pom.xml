@@ -38,7 +38,7 @@
         <aws.sdk.secret.manager.version>2.36.1</aws.sdk.secret.manager.version>
         <aws.sdk.sesv2.version>2.41.4</aws.sdk.sesv2.version>
         <spring.retry.version>2.0.12</spring.retry.version>
-        <testcontainers.version>1.20.4</testcontainers.version>
+        <testcontainers.version>1.21.4</testcontainers.version>
         <openai.java.version>2.12.0</openai.java.version>
         <!-- Plugin versions -->
         <spring.boot.maven.plugin.version>3.5.6</spring.boot.maven.plugin.version>
@@ -48,6 +48,18 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>testcontainers-bom</artifactId>
+                <version>${testcontainers.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <!-- Spring Boot Starters -->
@@ -149,13 +161,6 @@
             <artifactId>lombok</artifactId>
             <version>${projectlombok.version}</version>
         </dependency>
-        <!-- jUnit Jupiter -->
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <version>${junit.jupiter.version}</version>
-            <scope>test</scope>
-        </dependency>
         <!-- Mockito -->
         <dependency>
             <groupId>org.mockito</groupId>
@@ -235,6 +240,17 @@
                             <version>${projectlombok.version}</version>
                         </path>
                     </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven.surefire.plugin.version}</version>
+                <configuration>
+                    <includes>
+                        <include>**/*Test.java</include>
+                        <include>**/*IT.java</include>
+                    </includes>
                 </configuration>
             </plugin>
         </plugins>
