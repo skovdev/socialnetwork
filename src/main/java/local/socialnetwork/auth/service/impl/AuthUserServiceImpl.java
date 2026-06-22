@@ -4,6 +4,9 @@ import local.socialnetwork.auth.dto.http.request.LoginRequest;
 import local.socialnetwork.auth.dto.http.request.VerifyRequest;
 import local.socialnetwork.auth.dto.http.request.RefreshRequest;
 import local.socialnetwork.auth.dto.http.request.RegisterRequest;
+import local.socialnetwork.auth.dto.http.request.DeleteAccountRequest;
+import local.socialnetwork.auth.dto.http.request.ChangePasswordRequest;
+import local.socialnetwork.auth.dto.http.request.ResendVerificationRequest;
 
 import local.socialnetwork.auth.dto.http.response.TokenResponse;
 
@@ -27,13 +30,15 @@ import local.socialnetwork.profiles.entity.UserProfile;
 
 import local.socialnetwork.profiles.repository.UserProfileRepository;
 
-import local.socialnetwork.shared.exception.TokenExpiredException;
 import local.socialnetwork.shared.exception.UserNotFoundException;
+import local.socialnetwork.shared.exception.TokenExpiredException;
 import local.socialnetwork.shared.exception.TokenNotFoundException;
 import local.socialnetwork.shared.exception.TokenAlreadyUsedException;
-import local.socialnetwork.shared.exception.AccountNotVerifiedException;
 import local.socialnetwork.shared.exception.EmailAlreadyExistsException;
+import local.socialnetwork.shared.exception.AccountNotVerifiedException;
 import local.socialnetwork.shared.exception.UsernameAlreadyExistsException;
+import local.socialnetwork.shared.exception.AccountAlreadyVerifiedException;
+import local.socialnetwork.shared.exception.InvalidCurrentPasswordException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -159,6 +164,46 @@ public class AuthUserServiceImpl implements AuthUserService {
     public void logout(UUID userId) {
         refreshTokenRepository.deleteByUserId(userId);
         log.info("All refresh tokens deleted for user id: {}", userId);
+    }
+
+    @Override
+    @Transactional
+    public void resendVerification(ResendVerificationRequest request) {
+        var authUser = authUserRepository.findByEmail(request.email())
+                .orElseThrow(() -> new UserNotFoundException("No account found for email: " + request.email()));
+        if (authUser.getAuthStatus() == AuthStatus.ACTIVE) {
+            throw new AccountAlreadyVerifiedException("Account is already verified");
+        }
+        emailTokenRepository.deleteByAuthUser(authUser);
+        issueAndSendVerificationToken(authUser);
+        log.info("Verification email resent for user id: {}", authUser.getId());
+    }
+
+    @Override
+    @Transactional
+    public void changePassword(UUID userId, ChangePasswordRequest request) {
+        var authUser = authUserRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found: " + userId));
+        if (!passwordEncoder.matches(request.currentPassword(), authUser.getPasswordHash())) {
+            throw new InvalidCurrentPasswordException("Current password is incorrect");
+        }
+        authUser.setPasswordHash(passwordEncoder.encode(request.newPassword()));
+        refreshTokenRepository.deleteByUserId(userId);
+        log.info("Password changed for user id: {}", userId);
+    }
+
+    @Override
+    @Transactional
+    public void deleteAccount(UUID userId, DeleteAccountRequest request) {
+        var authUser = authUserRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found: " + userId));
+        if (!passwordEncoder.matches(request.password(), authUser.getPasswordHash())) {
+            throw new InvalidCurrentPasswordException("Password is incorrect");
+        }
+        refreshTokenRepository.deleteByUserId(userId);
+        emailTokenRepository.deleteByAuthUser(authUser);
+        authUserRepository.delete(authUser);
+        log.info("Account deleted for user id: {}", userId);
     }
 
     private void issueAndSendVerificationToken(AuthUser authUser) {

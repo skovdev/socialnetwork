@@ -8,6 +8,8 @@ import local.socialnetwork.shared.exception.TokenAlreadyUsedException;
 import local.socialnetwork.shared.exception.EmailAlreadyExistsException;
 import local.socialnetwork.shared.exception.AccountNotVerifiedException;
 import local.socialnetwork.shared.exception.UsernameAlreadyExistsException;
+import local.socialnetwork.shared.exception.InvalidCurrentPasswordException;
+import local.socialnetwork.shared.exception.AccountAlreadyVerifiedException;
 import local.socialnetwork.shared.exception.InvalidJwtAuthenticationException;
 
 import lombok.extern.slf4j.Slf4j;
@@ -78,6 +80,18 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ProblemDetail> handleAccountNotVerified(AccountNotVerifiedException ex) {
         log.warn("Account not verified: {}", ex.getMessage(), ex);
         return problem(HttpStatus.FORBIDDEN, "ACCOUNT_NOT_VERIFIED", ex.getMessage());
+    }
+
+    @ExceptionHandler(AccountAlreadyVerifiedException.class)
+    public ResponseEntity<ProblemDetail> handleAccountAlreadyVerified(AccountAlreadyVerifiedException ex) {
+        log.warn("Account already verified: {}", ex.getMessage(), ex);
+        return problem(HttpStatus.CONFLICT, "ACCOUNT_ALREADY_VERIFIED", ex.getMessage());
+    }
+
+    @ExceptionHandler(InvalidCurrentPasswordException.class)
+    public ResponseEntity<ProblemDetail> handleInvalidCurrentPassword(InvalidCurrentPasswordException ex) {
+        log.warn("Invalid current password: {}", ex.getMessage(), ex);
+        return problem(HttpStatus.BAD_REQUEST, "INVALID_CURRENT_PASSWORD", ex.getMessage());
     }
 
     @ExceptionHandler(UserNotFoundException.class)

@@ -47,7 +47,7 @@ public class UserProfileRestController {
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/{username}")
     public ApiResponseDto<UserProfileResponse> getProfile(
-            @Parameter(description = "Username to retrieve") @PathVariable String username) {
+            @Parameter(description = "Username to retrieve") @PathVariable("username") String username) {
         var profile = userProfileService.findByUsername(username)
                 .map(UserProfileResponse::from)
                 .orElseThrow(() -> new UserNotFoundException("User '" + username + "' not found"));

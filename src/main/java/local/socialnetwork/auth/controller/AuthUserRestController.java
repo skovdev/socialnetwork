@@ -1,5 +1,6 @@
 package local.socialnetwork.auth.controller;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Operation;
 
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -15,6 +16,9 @@ import local.socialnetwork.auth.dto.http.request.LoginRequest;
 import local.socialnetwork.auth.dto.http.request.VerifyRequest;
 import local.socialnetwork.auth.dto.http.request.RefreshRequest;
 import local.socialnetwork.auth.dto.http.request.RegisterRequest;
+import local.socialnetwork.auth.dto.http.request.DeleteAccountRequest;
+import local.socialnetwork.auth.dto.http.request.ChangePasswordRequest;
+import local.socialnetwork.auth.dto.http.request.ResendVerificationRequest;
 
 import local.socialnetwork.auth.dto.http.response.TokenResponse;
 
@@ -36,13 +40,15 @@ import org.springframework.security.access.prepost.PreAuthorize;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * REST controller for authentication and account lifecycle operations.
@@ -135,6 +141,61 @@ public class AuthUserRestController {
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(@AuthenticationPrincipal UserPrincipal principal) {
         authUserService.logout(principal.getId());
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Re-sends the verification email for an unverified account.
+     */
+    @Operation(summary = "Resend verification email")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Verification email resent"),
+            @ApiResponse(responseCode = "400", description = "Validation error"),
+            @ApiResponse(responseCode = "404", description = "No account found for this email"),
+            @ApiResponse(responseCode = "409", description = "Account is already verified")
+    })
+    @PreAuthorize("permitAll()")
+    @PostMapping(value = "/resend-verification", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ApiResponseDto<Void> resendVerification(@RequestBody @Valid ResendVerificationRequest request) {
+        authUserService.resendVerification(request);
+        return ApiResponseDto.buildSuccessResponse(null);
+    }
+
+    /**
+     * Changes the password for the currently authenticated user.
+     * All existing sessions are invalidated after a successful change.
+     */
+    @Operation(summary = "Change password", security = @SecurityRequirement(name = "bearerAuth"))
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Password changed — all sessions invalidated"),
+            @ApiResponse(responseCode = "400", description = "Validation error or wrong current password"),
+            @ApiResponse(responseCode = "401", description = "Not authenticated")
+    })
+    @PreAuthorize("isAuthenticated()")
+    @PutMapping(value = "/password", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> changePassword(
+            @Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal principal,
+            @RequestBody @Valid ChangePasswordRequest request) {
+        authUserService.changePassword(principal.getId(), request);
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Permanently deletes the authenticated user's account and all associated data.
+     * Password confirmation is required.
+     */
+    @Operation(summary = "Delete account", security = @SecurityRequirement(name = "bearerAuth"))
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Account deleted"),
+            @ApiResponse(responseCode = "400", description = "Validation error or wrong password"),
+            @ApiResponse(responseCode = "401", description = "Not authenticated")
+    })
+    @PreAuthorize("isAuthenticated()")
+    @DeleteMapping(value = "/account", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> deleteAccount(
+            @Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal principal,
+            @RequestBody @Valid DeleteAccountRequest request) {
+        authUserService.deleteAccount(principal.getId(), request);
         return ResponseEntity.noContent().build();
     }
 
