@@ -49,7 +49,7 @@ class AuthUserRestControllerIT extends BaseIntegrationTest {
     void register_withValidData_returns201() throws Exception {
         var request = new RegisterRequest(
                 "Jane", "Doe", "janedoe", "jane@example.com",
-                "Secret1234", null, LocalDate.of(1995, 6, 15));
+                "Test@Password1", null, LocalDate.of(1995, 6, 15));
 
         mockMvc.perform(post(BASE_URL + "/register")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -65,7 +65,7 @@ class AuthUserRestControllerIT extends BaseIntegrationTest {
 
         var request = new RegisterRequest(
                 "John", "Smith", "existinguser", "other@example.com",
-                "Secret1234", null, LocalDate.of(1990, 1, 1));
+                "Test@Password1", null, LocalDate.of(1990, 1, 1));
 
         mockMvc.perform(post(BASE_URL + "/register")
                         .contentType(MediaType.APPLICATION_JSON)

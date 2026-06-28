@@ -36,7 +36,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        var userProfile = userProfileRepository.findByUsername(username)
+        var normalized = username != null ? username.toLowerCase() : null;
+        var userProfile = userProfileRepository.findByUsername(normalized)
                 .orElseThrow(() -> {
                     log.warn("User not found for username: {}", username);
                     return new UsernameNotFoundException(username + " is not found");
@@ -46,8 +47,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             log.warn("UserProfile '{}' has no linked AuthUser", username);
             throw new UsernameNotFoundException("Auth record missing for username: " + username);
         }
-        log.debug("Loaded user details for username: {}", username);
-        return new UserPrincipal(authUser.getId(), username, authUser.getPasswordHash(), getAuthorities(authUser));
+        log.debug("Loaded user details for username: {}", normalized);
+        return new UserPrincipal(authUser.getId(), normalized, authUser.getPasswordHash(), getAuthorities(authUser));
     }
 
     private List<GrantedAuthority> getAuthorities(AuthUser authUser) {

@@ -116,27 +116,25 @@ class AuthUserAccountRestControllerIT extends BaseIntegrationTest {
     }
 
     @Test
-    void resendVerification_whenAccountAlreadyActive_returns409WithProblemJson() throws Exception {
+    void resendVerification_whenAccountAlreadyActive_returns200() throws Exception {
+        // Returns 200 (silent success) to prevent revealing that this email is already verified.
         var request = new ResendVerificationRequest(TEST_EMAIL);
 
         mockMvc.perform(post(BASE_URL + "/resend-verification")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isConflict())
-                .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
-                .andExpect(jsonPath("$.errorCode").value("ACCOUNT_ALREADY_VERIFIED"));
+                .andExpect(status().isOk());
     }
 
     @Test
-    void resendVerification_withUnknownEmail_returns404WithProblemJson() throws Exception {
+    void resendVerification_withUnknownEmail_returns200() throws Exception {
+        // Returns 200 (silent success) to prevent email enumeration.
         var request = new ResendVerificationRequest("nobody@example.com");
 
         mockMvc.perform(post(BASE_URL + "/resend-verification")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isNotFound())
-                .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
-                .andExpect(jsonPath("$.errorCode").value("USER_NOT_FOUND"));
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -155,7 +153,7 @@ class AuthUserAccountRestControllerIT extends BaseIntegrationTest {
 
     @Test
     void changePassword_withValidCurrentPassword_returns204() throws Exception {
-        var request = new ChangePasswordRequest(RAW_PASSWORD, "NewPassword99");
+        var request = new ChangePasswordRequest(RAW_PASSWORD, "NewPa$$word99!");
 
         mockMvc.perform(put(BASE_URL + "/password")
                         .header("Authorization", "Bearer " + bearerToken)
@@ -166,7 +164,7 @@ class AuthUserAccountRestControllerIT extends BaseIntegrationTest {
 
     @Test
     void changePassword_withWrongCurrentPassword_returns400WithProblemJson() throws Exception {
-        var request = new ChangePasswordRequest("WrongPassword", "NewPassword99");
+        var request = new ChangePasswordRequest("WrongPassword", "NewPa$$word99!");
 
         mockMvc.perform(put(BASE_URL + "/password")
                         .header("Authorization", "Bearer " + bearerToken)
@@ -192,7 +190,7 @@ class AuthUserAccountRestControllerIT extends BaseIntegrationTest {
 
     @Test
     void changePassword_whenUnauthenticated_returns401() throws Exception {
-        var request = new ChangePasswordRequest(RAW_PASSWORD, "NewPassword99");
+        var request = new ChangePasswordRequest(RAW_PASSWORD, "NewPa$$word99!");
 
         mockMvc.perform(put(BASE_URL + "/password")
                         .contentType(MediaType.APPLICATION_JSON)

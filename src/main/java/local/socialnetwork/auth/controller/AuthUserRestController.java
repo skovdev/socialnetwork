@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 
 import local.socialnetwork.auth.dto.http.request.LoginRequest;
 import local.socialnetwork.auth.dto.http.request.VerifyRequest;
@@ -40,6 +41,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
+import org.springframework.validation.annotation.Validated;
+
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -54,6 +57,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
  * REST controller for authentication and account lifecycle operations.
  * Public endpoints are explicitly permitted in {@code SecurityConfig}.
  */
+@Validated
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(VersionApi.API_V1 + "/auth")
@@ -92,7 +96,7 @@ public class AuthUserRestController {
     })
     @PreAuthorize("permitAll()")
     @GetMapping("/verify")
-    public ApiResponseDto<Void> verify(@RequestParam("token") String token) {
+    public ApiResponseDto<Void> verify(@NotBlank @RequestParam("token") String token) {
         authUserService.verify(new VerifyRequest(token));
         return ApiResponseDto.buildSuccessResponse(null);
     }
@@ -146,13 +150,14 @@ public class AuthUserRestController {
 
     /**
      * Re-sends the verification email for an unverified account.
+     * Always returns 200 regardless of whether the email is registered or already verified,
+     * to prevent account enumeration.
      */
     @Operation(summary = "Resend verification email")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Verification email resent"),
+            @ApiResponse(responseCode = "200", description = "Request accepted — if the email is registered and unverified, a verification email has been sent"),
             @ApiResponse(responseCode = "400", description = "Validation error"),
-            @ApiResponse(responseCode = "404", description = "No account found for this email"),
-            @ApiResponse(responseCode = "409", description = "Account is already verified")
+            @ApiResponse(responseCode = "503", description = "Email delivery failed")
     })
     @PreAuthorize("permitAll()")
     @PostMapping(value = "/resend-verification", consumes = MediaType.APPLICATION_JSON_VALUE)

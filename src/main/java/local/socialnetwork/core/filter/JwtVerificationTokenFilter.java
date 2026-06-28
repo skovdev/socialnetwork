@@ -16,6 +16,8 @@ import org.springframework.security.core.Authentication;
 
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+
 import org.springframework.stereotype.Component;
 
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -33,10 +35,17 @@ public class JwtVerificationTokenFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-        String token = jwtTokenProvider.resolveToken(request);
+        var token = jwtTokenProvider.resolveToken(request);
         if (token != null && jwtTokenProvider.validateToken(token)) {
-            Authentication authentication = jwtTokenProvider.authentication(token);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            try {
+                var authentication = jwtTokenProvider.authentication(token);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            } catch (UsernameNotFoundException e) {
+                // Token is cryptographically valid but the referenced user no longer exists
+                // (e.g. account deleted while token still live). Treat as unauthenticated.
+                log.warn("JWT references a non-existent user — treating request as unauthenticated: {}", e.getMessage());
+                SecurityContextHolder.clearContext();
+            }
         }
         filterChain.doFilter(request, response);
     }

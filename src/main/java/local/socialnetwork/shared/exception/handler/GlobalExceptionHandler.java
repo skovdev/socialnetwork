@@ -2,6 +2,9 @@ package local.socialnetwork.shared.exception.handler;
 
 import local.socialnetwork.shared.exception.UserNotFoundException;
 import local.socialnetwork.shared.exception.TokenExpiredException;
+
+import org.springframework.dao.DataIntegrityViolationException;
+
 import local.socialnetwork.shared.exception.TokenNotFoundException;
 import local.socialnetwork.shared.exception.EmailDeliveryException;
 import local.socialnetwork.shared.exception.TokenAlreadyUsedException;
@@ -38,6 +41,12 @@ import java.util.List;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ProblemDetail> handleDataIntegrity(DataIntegrityViolationException ex) {
+        log.warn("Data integrity violation: {}", ex.getMostSpecificCause().getMessage());
+        return problem(HttpStatus.CONFLICT, "CONFLICT", "A resource with the same unique field already exists.");
+    }
 
     @ExceptionHandler(UsernameAlreadyExistsException.class)
     public ResponseEntity<ProblemDetail> handleUsernameAlreadyExists(UsernameAlreadyExistsException ex) {

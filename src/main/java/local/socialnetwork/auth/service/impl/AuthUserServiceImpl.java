@@ -37,7 +37,6 @@ import local.socialnetwork.shared.exception.TokenAlreadyUsedException;
 import local.socialnetwork.shared.exception.EmailAlreadyExistsException;
 import local.socialnetwork.shared.exception.AccountNotVerifiedException;
 import local.socialnetwork.shared.exception.UsernameAlreadyExistsException;
-import local.socialnetwork.shared.exception.AccountAlreadyVerifiedException;
 import local.socialnetwork.shared.exception.InvalidCurrentPasswordException;
 
 import lombok.RequiredArgsConstructor;
@@ -169,14 +168,13 @@ public class AuthUserServiceImpl implements AuthUserService {
     @Override
     @Transactional
     public void resendVerification(ResendVerificationRequest request) {
-        var authUser = authUserRepository.findByEmail(request.email())
-                .orElseThrow(() -> new UserNotFoundException("No account found for email: " + request.email()));
-        if (authUser.getAuthStatus() == AuthStatus.ACTIVE) {
-            throw new AccountAlreadyVerifiedException("Account is already verified");
-        }
-        emailTokenRepository.deleteByAuthUser(authUser);
-        issueAndSendVerificationToken(authUser);
-        log.info("Verification email resent for user id: {}", authUser.getId());
+        authUserRepository.findByEmail(normalizeEmail(request.email())).ifPresent(authUser -> {
+            if (authUser.getAuthStatus() != AuthStatus.ACTIVE) {
+                emailTokenRepository.deleteByAuthUser(authUser);
+                issueAndSendVerificationToken(authUser);
+                log.info("Verification email resent for user id: {}", authUser.getId());
+            }
+        });
     }
 
     @Override
@@ -223,7 +221,7 @@ public class AuthUserServiceImpl implements AuthUserService {
     }
 
     private AuthUser resolveAuthUser(String username) {
-        return userProfileRepository.findByUsername(username)
+        return userProfileRepository.findByUsername(normalizeUsername(username))
                 .map(UserProfile::getAuthUser)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
     }
@@ -253,20 +251,20 @@ public class AuthUserServiceImpl implements AuthUserService {
     }
 
     private void validateUsernameNotExists(String username) {
-        if (userProfileRepository.existsByUsername(username)) {
+        if (userProfileRepository.existsByUsername(normalizeUsername(username))) {
             throw new UsernameAlreadyExistsException("Username '" + username + "' already exists");
         }
     }
 
     private void validateEmailNotExists(String email) {
-        if (authUserRepository.existsByEmail(email)) {
+        if (authUserRepository.existsByEmail(normalizeEmail(email))) {
             throw new EmailAlreadyExistsException("Email '" + email + "' already exists");
         }
     }
 
     private AuthUser buildAuthUser(RegisterRequest request) {
         var authUser = new AuthUser();
-        authUser.setEmail(request.email());
+        authUser.setEmail(normalizeEmail(request.email()));
         authUser.setAuthStatus(AuthStatus.PENDING_VERIFICATION);
         authUser.setPasswordHash(passwordEncoder.encode(request.password()));
         return authUser;
@@ -284,11 +282,19 @@ public class AuthUserServiceImpl implements AuthUserService {
         userProfile.setFirstName(request.firstName());
         userProfile.setLastName(request.lastName());
         userProfile.setDisplayName(request.firstName() + " " + request.lastName());
-        userProfile.setUsername(request.username());
+        userProfile.setUsername(normalizeUsername(request.username()));
         userProfile.setBirthDate(request.birthDate());
         userProfile.setPhoneNumber(request.phoneNumber());
         userProfile.setAuthUser(authUser);
         return userProfile;
+    }
+
+    private static String normalizeEmail(String email) {
+        return email == null ? null : email.toLowerCase();
+    }
+
+    private static String normalizeUsername(String username) {
+        return username == null ? null : username.toLowerCase();
     }
 
 }
