@@ -20,10 +20,19 @@ Pet-project for self-education, designed to simulate a basic social media applic
 | Testing | JUnit Jupiter 6, Mockito 5, Testcontainers 1.20 |
 | Build | Maven 3, Lombok |
 
+## Repository Structure
+
+```
+socialnetwork-api/     # Backend — this Spring Boot REST API
+socialnetwork-web/     # Frontend — React + TypeScript SPA
+docs/                  # Shared API docs and scenarios
+CI/                    # Jenkins pipeline
+```
+
 ## Project Structure
 
 ```
-src/main/java/local/socialnetwork/
+socialnetwork-api/src/main/java/local/socialnetwork/
 ├── auth/          # Registration, email verification, login, token refresh, logout
 ├── profiles/      # User profile read endpoints
 ├── core/          # JWT provider, security config, filters, AWS clients
@@ -104,6 +113,7 @@ spring.datasource.password=socialnetwork_password
 ## Running the Application
 
 ```bash
+cd socialnetwork-api
 mvn spring-boot:run
 ```
 
@@ -112,6 +122,7 @@ The server starts on port `8080`.
 ## Running Tests
 
 ```bash
+cd socialnetwork-api
 mvn test
 ```
 

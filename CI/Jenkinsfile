@@ -1,7 +1,7 @@
 pipeline {
     agent any
     tools {
-        jdk 'jdk-20'
+        jdk 'jdk-25'
     }
     stages {
         stage("Clone the project from GitHub") {
@@ -11,15 +11,19 @@ pipeline {
         }
         stage("Compilation") {
             steps {
-                withMaven(jdk: 'jdk-20', maven: 'apache-maven-3.9.3') {
-                    sh "mvn clean install -DskipTests"
+                dir('socialnetwork-api') {
+                    withMaven(jdk: 'jdk-25', maven: 'apache-maven-3.9.3') {
+                        sh "mvn clean install -DskipTests"
+                    }
                 }
             }
         }
         stage ("Tests") {
             steps {
-                withMaven(jdk: 'jdk-20', maven: 'apache-maven-3.9.3') {
-                    sh "mvn test"
+                dir('socialnetwork-api') {
+                    withMaven(jdk: 'jdk-25', maven: 'apache-maven-3.9.3') {
+                        sh "mvn test"
+                    }
                 }
             }
         }
