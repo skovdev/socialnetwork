@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 import { useAuth } from "../hooks/AuthContext";
 import { ApiError } from "../../core/api/httpClient";
+import { AuthLayout } from "../../shared/components/AuthLayout";
 
 export function LoginPage() {
     const { login } = useAuth();
@@ -29,23 +30,30 @@ export function LoginPage() {
     }
 
     return (
-        <form onSubmit={handleSubmit}>
+        <AuthLayout>
             <h1>Log in</h1>
-            {error && <p role="alert">{error}</p>}
-            <label>
-                Username
-                <input value={username} onChange={(e) => setUsername(e.target.value)} required />
-            </label>
-            <label>
-                Password
-                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-            </label>
-            <button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? "Logging in…" : "Log in"}
-            </button>
-            <p>
+            <form onSubmit={handleSubmit}>
+                {error && <p className="alert" role="alert">{error}</p>}
+                <label className="field">
+                    <span>Username</span>
+                    <input value={username} onChange={(e) => setUsername(e.target.value)} required />
+                </label>
+                <label className="field">
+                    <span>Password</span>
+                    <input
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                    />
+                </label>
+                <button type="submit" className="btn" disabled={isSubmitting}>
+                    {isSubmitting ? "Logging in…" : "Log in"}
+                </button>
+            </form>
+            <p className="form-footer">
                 No account? <Link to="/register">Register</Link>
             </p>
-        </form>
+        </AuthLayout>
     );
 }

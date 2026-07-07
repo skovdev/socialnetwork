@@ -19,31 +19,54 @@ export function ProfilePage() {
     }, []);
 
     if (error) {
-        return <p role="alert">{error}</p>;
+        return (
+            <div className="page-center">
+                <p className="alert" role="alert">
+                    {error}
+                </p>
+            </div>
+        );
     }
 
     if (!profile) {
-        return <p>Loading…</p>;
+        return (
+            <div className="page-center">
+                <p className="hint">Loading…</p>
+            </div>
+        );
     }
 
+    const initials = `${profile.firstName?.[0] ?? ""}${profile.lastName?.[0] ?? ""}`.toUpperCase();
+
     return (
-        <div>
-            <h1>{profile.displayName}</h1>
-            <p>@{profile.username}</p>
-            {profile.bio && <p>{profile.bio}</p>}
-            <dl>
-                <dt>Name</dt>
-                <dd>
-                    {profile.firstName} {profile.lastName}
-                </dd>
-                {profile.city && <dt>City</dt>}
-                {profile.city && <dd>{profile.city}</dd>}
-                {profile.country && <dt>Country</dt>}
-                {profile.country && <dd>{profile.country}</dd>}
-            </dl>
-            <button type="button" onClick={() => void logout()}>
-                Log out
-            </button>
-        </div>
+        <>
+            <header className="topbar">
+                <div className="brand">
+                    <span className="brand-mark">S</span>
+                    <span className="brand-name">SocialNetwork</span>
+                </div>
+                <button type="button" className="btn btn-secondary" onClick={() => void logout()}>
+                    Log out
+                </button>
+            </header>
+            <main className="profile-main">
+                <div className="profile-card">
+                    <div className="avatar">{initials || "?"}</div>
+                    <h1>{profile.displayName}</h1>
+                    <p className="username">@{profile.username}</p>
+                    {profile.bio && <p className="bio">{profile.bio}</p>}
+                    <dl>
+                        <dt>Name</dt>
+                        <dd>
+                            {profile.firstName} {profile.lastName}
+                        </dd>
+                        {profile.city && <dt>City</dt>}
+                        {profile.city && <dd>{profile.city}</dd>}
+                        {profile.country && <dt>Country</dt>}
+                        {profile.country && <dd>{profile.country}</dd>}
+                    </dl>
+                </div>
+            </main>
+        </>
     );
 }
