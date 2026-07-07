@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 
 import { useAuth } from "../hooks/AuthContext";
 import { ApiError } from "../../core/api/httpClient";
+import { AuthLayout } from "../../shared/components/AuthLayout";
 import type { RegisterRequest } from "../types";
 
 const emptyForm: RegisterRequest = {
@@ -43,62 +44,76 @@ export function RegisterPage() {
 
     if (isRegistered) {
         return (
-            <div>
+            <AuthLayout>
                 <h1>Check your email</h1>
-                <p>We sent a verification link to {form.email}.</p>
-            </div>
+                <p className="hint">We sent a verification link to {form.email}.</p>
+            </AuthLayout>
         );
     }
 
     return (
-        <form onSubmit={handleSubmit}>
+        <AuthLayout>
             <h1>Register</h1>
-            {error && <p role="alert">{error}</p>}
-            <label>
-                First name
-                <input value={form.firstName} onChange={(e) => updateField("firstName", e.target.value)} required />
-            </label>
-            <label>
-                Last name
-                <input value={form.lastName} onChange={(e) => updateField("lastName", e.target.value)} required />
-            </label>
-            <label>
-                Username
-                <input value={form.username} onChange={(e) => updateField("username", e.target.value)} required />
-            </label>
-            <label>
-                Email
-                <input
-                    type="email"
-                    value={form.email}
-                    onChange={(e) => updateField("email", e.target.value)}
-                    required
-                />
-            </label>
-            <label>
-                Password
-                <input
-                    type="password"
-                    value={form.password}
-                    onChange={(e) => updateField("password", e.target.value)}
-                    required
-                />
-            </label>
-            <label>
-                Date of birth
-                <input
-                    type="date"
-                    value={form.birthDate}
-                    onChange={(e) => updateField("birthDate", e.target.value)}
-                    required
-                />
-            </label>
-            <button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? "Registering…" : "Register"}
-            </button>
-            <p>
+            <form onSubmit={handleSubmit}>
+                {error && <p className="alert" role="alert">{error}</p>}
+                <label className="field">
+                    <span>First name</span>
+                    <input
+                        value={form.firstName}
+                        onChange={(e) => updateField("firstName", e.target.value)}
+                        required
+                    />
+                </label>
+                <label className="field">
+                    <span>Last name</span>
+                    <input
+                        value={form.lastName}
+                        onChange={(e) => updateField("lastName", e.target.value)}
+                        required
+                    />
+                </label>
+                <label className="field">
+                    <span>Username</span>
+                    <input
+                        value={form.username}
+                        onChange={(e) => updateField("username", e.target.value)}
+                        required
+                    />
+                </label>
+                <label className="field">
+                    <span>Email</span>
+                    <input
+                        type="email"
+                        value={form.email}
+                        onChange={(e) => updateField("email", e.target.value)}
+                        required
+                    />
+                </label>
+                <label className="field">
+                    <span>Password</span>
+                    <input
+                        type="password"
+                        value={form.password}
+                        onChange={(e) => updateField("password", e.target.value)}
+                        required
+                    />
+                </label>
+                <label className="field">
+                    <span>Date of birth</span>
+                    <input
+                        type="date"
+                        value={form.birthDate}
+                        onChange={(e) => updateField("birthDate", e.target.value)}
+                        required
+                    />
+                </label>
+                <button type="submit" className="btn" disabled={isSubmitting}>
+                    {isSubmitting ? "Registering…" : "Register"}
+                </button>
+            </form>
+            <p className="form-footer">
                 Already have an account? <Link to="/login">Log in</Link>
             </p>
-        </form>
+        </AuthLayout>
     );
 }
