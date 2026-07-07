@@ -7,7 +7,11 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
     const { isAuthenticated, isInitializing } = useAuth();
 
     if (isInitializing) {
-        return <p>Loading…</p>;
+        return (
+            <div className="page-center">
+                <p className="hint">Loading…</p>
+            </div>
+        );
     }
 
     if (!isAuthenticated) {
