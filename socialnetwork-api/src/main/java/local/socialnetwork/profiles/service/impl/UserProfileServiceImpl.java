@@ -7,8 +7,10 @@ import local.socialnetwork.profiles.entity.UserProfile;
 import local.socialnetwork.profiles.repository.UserProfileRepository;
 
 import local.socialnetwork.profiles.service.UserProfileService;
+import local.socialnetwork.profiles.service.AvatarStorageService;
 
 import local.socialnetwork.shared.exception.UserNotFoundException;
+import local.socialnetwork.shared.exception.AvatarNotFoundException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -17,6 +19,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import org.springframework.transaction.annotation.Transactional;
+
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
 import java.util.Optional;
@@ -30,6 +34,7 @@ import java.util.Optional;
 public class UserProfileServiceImpl implements UserProfileService {
 
     private final UserProfileRepository userProfileRepository;
+    private final AvatarStorageService avatarStorageService;
 
     /**
      * {@inheritDoc}
@@ -71,10 +76,43 @@ public class UserProfileServiceImpl implements UserProfileService {
         return userProfileRepository.save(profile);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional
+    public UserProfile updateAvatar(UUID authUserId, MultipartFile file) {
+        var profile = userProfileRepository.findByAuthUserId(authUserId)
+                .orElseThrow(() -> new UserNotFoundException("Profile not found for user id: " + authUserId));
+        if (profile.getAvatarUrl() != null) {
+            avatarStorageService.delete(profile.getAvatarUrl());
+        }
+        var key = avatarStorageService.upload(authUserId, file);
+        profile.setAvatarUrl(key);
+        log.info("Avatar updated for auth user id: {}", authUserId);
+        return userProfileRepository.save(profile);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional
+    public void deleteAvatar(UUID authUserId) {
+        var profile = userProfileRepository.findByAuthUserId(authUserId)
+                .orElseThrow(() -> new UserNotFoundException("Profile not found for user id: " + authUserId));
+        if (profile.getAvatarUrl() == null) {
+            throw new AvatarNotFoundException("No avatar set for user id: " + authUserId);
+        }
+        avatarStorageService.delete(profile.getAvatarUrl());
+        profile.setAvatarUrl(null);
+        userProfileRepository.save(profile);
+        log.info("Avatar removed for auth user id: {}", authUserId);
+    }
+
     private void buildProfile(UpdateProfileRequestDto request, UserProfile profile) {
         profile.setDisplayName(request.displayName());
         profile.setBiography(request.bio());
-        profile.setAvatarUrl(request.avatarUrl());
         profile.setBirthDate(request.birthDate());
         profile.setPhoneNumber(request.phoneNumber());
         profile.setCountry(request.country());

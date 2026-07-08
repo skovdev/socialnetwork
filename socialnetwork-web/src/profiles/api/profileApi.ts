@@ -16,4 +16,15 @@ export const profileApi = {
         const response = await apiRequest<UserProfile>(`/api/v1/users/${encodeURIComponent(username)}`);
         return response.data;
     },
+
+    async uploadAvatar(file: File): Promise<UserProfile> {
+        const body = new FormData();
+        body.append("file", file);
+        const response = await apiRequest<UserProfile>("/api/v1/profiles/avatar", { method: "POST", body });
+        return response.data;
+    },
+
+    async deleteAvatar(): Promise<void> {
+        await apiRequest<void>("/api/v1/profiles/avatar", { method: "DELETE" });
+    },
 };

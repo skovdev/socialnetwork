@@ -23,7 +23,6 @@ export interface UserProfile {
 export interface UpdateProfileRequest {
     displayName: string;
     bio?: string;
-    avatarUrl?: string;
     birthDate?: string;
     phoneNumber?: string;
     country?: string;
