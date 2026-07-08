@@ -34,7 +34,8 @@ interface RequestOptions {
 }
 
 async function rawRequest<T>(path: string, options: RequestOptions): Promise<ApiResponse<T>> {
-    const headers: Record<string, string> = { "Content-Type": "application/json" };
+    const isFormData = options.body instanceof FormData;
+    const headers: Record<string, string> = isFormData ? {} : { "Content-Type": "application/json" };
     if (options.auth !== false) {
         const accessToken = tokenManager.getAccessToken();
         if (accessToken) {
@@ -45,7 +46,7 @@ async function rawRequest<T>(path: string, options: RequestOptions): Promise<Api
     const response = await fetch(`${env.apiBaseUrl}${path}`, {
         method: options.method ?? "GET",
         headers,
-        body: options.body !== undefined ? JSON.stringify(options.body) : undefined,
+        body: options.body === undefined ? undefined : isFormData ? (options.body as FormData) : JSON.stringify(options.body),
     });
 
     if (response.status === 204) {

@@ -20,6 +20,8 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.sesv2.SesV2Client;
 
 /**
@@ -27,7 +29,7 @@ import software.amazon.awssdk.services.sesv2.SesV2Client;
  *
  * <ul>
  *   <li>Loads the full Spring application context with a real PostgreSQL Testcontainer.</li>
- *   <li>AWS-dependent beans (Secrets Manager, SES) are replaced by lightweight test doubles.</li>
+ *   <li>AWS-dependent beans (Secrets Manager, SES, S3) are replaced by lightweight test doubles.</li>
  *   <li>{@code @Transactional} rolls back each test so the database stays clean between runs.</li>
  * </ul>
  */
@@ -47,4 +49,11 @@ public abstract class BaseIntegrationTest {
     /** Replaces the real SesV2Client so registration tests never attempt live email delivery. */
     @MockitoBean
     SesV2Client sesV2Client;
+
+    /** Replaces the real S3Client/S3Presigner so avatar tests never attempt live S3 calls. */
+    @MockitoBean
+    protected S3Client s3Client;
+
+    @MockitoBean
+    protected S3Presigner s3Presigner;
 }

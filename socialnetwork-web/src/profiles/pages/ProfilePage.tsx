@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { profileApi } from "../api/profileApi";
+import { AvatarUpload } from "../components/AvatarUpload";
 import { ApiError } from "../../core/api/httpClient";
 import type { UserProfile } from "../types";
 import { useAuth } from "../../auth/hooks/AuthContext";
@@ -51,7 +52,11 @@ export function ProfilePage() {
             </header>
             <main className="profile-main">
                 <div className="profile-card">
-                    <div className="avatar">{initials || "?"}</div>
+                    <AvatarUpload
+                        avatarUrl={profile.avatarUrl}
+                        initials={initials}
+                        onChange={(avatarUrl) => setProfile({ ...profile, avatarUrl })}
+                    />
                     <h1>{profile.displayName}</h1>
                     <p className="username">@{profile.username}</p>
                     {profile.bio && <p className="bio">{profile.bio}</p>}
