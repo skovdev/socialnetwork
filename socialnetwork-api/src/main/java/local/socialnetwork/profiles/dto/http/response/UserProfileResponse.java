@@ -19,6 +19,14 @@ public record UserProfileResponse(
         String city) {
 
     public static UserProfileResponse from(UserProfile profile) {
+        return from(profile, profile == null ? null : profile.getAvatarUrl());
+    }
+
+    /**
+     * Builds a response with the given {@code avatarUrl} in place of the profile's stored value.
+     * Used to substitute the raw S3 storage key with a presigned, browser-usable URL.
+     */
+    public static UserProfileResponse from(UserProfile profile, String avatarUrl) {
         if (profile == null) {
             throw new IllegalArgumentException("UserProfile must not be null");
         }
@@ -28,7 +36,7 @@ public record UserProfileResponse(
                 profile.getFirstName(),
                 profile.getLastName(),
                 profile.getBiography(),
-                profile.getAvatarUrl(),
+                avatarUrl,
                 profile.getBirthDate(),
                 profile.getCountry(),
                 profile.getCity()

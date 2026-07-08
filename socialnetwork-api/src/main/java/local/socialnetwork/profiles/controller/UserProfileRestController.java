@@ -18,6 +18,7 @@ import local.socialnetwork.dto.api.response.ApiResponseDto;
 import local.socialnetwork.profiles.dto.http.response.UserProfileResponse;
 
 import local.socialnetwork.profiles.service.UserProfileService;
+import local.socialnetwork.profiles.service.AvatarStorageService;
 
 import local.socialnetwork.shared.constant.VersionApi;
 
@@ -37,6 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserProfileRestController {
 
     private final UserProfileService userProfileService;
+    private final AvatarStorageService avatarStorageService;
 
     @Operation(summary = "Get user profile by username", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses({
@@ -49,9 +51,9 @@ public class UserProfileRestController {
     public ApiResponseDto<UserProfileResponse> getProfile(
             @Parameter(description = "Username to retrieve") @PathVariable("username") String username) {
         var profile = userProfileService.findByUsername(username)
-                .map(UserProfileResponse::from)
                 .orElseThrow(() -> new UserNotFoundException("User '" + username + "' not found"));
-        return ApiResponseDto.buildSuccessResponse(profile);
+        var avatarUrl = avatarStorageService.presign(profile.getAvatarUrl());
+        return ApiResponseDto.buildSuccessResponse(UserProfileResponse.from(profile, avatarUrl));
     }
 
 }

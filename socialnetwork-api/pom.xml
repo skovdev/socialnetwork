@@ -163,6 +163,11 @@
             <artifactId>sesv2</artifactId>
             <version>${aws.sdk.sesv2.version}</version>
         </dependency>
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>s3</artifactId>
+            <version>${aws.sdk.s3.version}</version>
+        </dependency>
 
     </dependencies>
 

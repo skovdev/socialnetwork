@@ -7,7 +7,9 @@ import org.springframework.dao.DataIntegrityViolationException;
 
 import local.socialnetwork.shared.exception.TokenNotFoundException;
 import local.socialnetwork.shared.exception.EmailDeliveryException;
+import local.socialnetwork.shared.exception.AvatarNotFoundException;
 import local.socialnetwork.shared.exception.TokenAlreadyUsedException;
+import local.socialnetwork.shared.exception.InvalidAvatarFileException;
 import local.socialnetwork.shared.exception.EmailAlreadyExistsException;
 import local.socialnetwork.shared.exception.AccountNotVerifiedException;
 import local.socialnetwork.shared.exception.UsernameAlreadyExistsException;
@@ -125,6 +127,18 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ProblemDetail> handleTokenAlreadyUsed(TokenAlreadyUsedException ex) {
         log.warn("Token already used: {}", ex.getMessage(), ex);
         return problem(HttpStatus.GONE, "TOKEN_ALREADY_USED", ex.getMessage());
+    }
+
+    @ExceptionHandler(InvalidAvatarFileException.class)
+    public ResponseEntity<ProblemDetail> handleInvalidAvatarFile(InvalidAvatarFileException ex) {
+        log.warn("Invalid avatar file: {}", ex.getMessage(), ex);
+        return problem(HttpStatus.UNPROCESSABLE_ENTITY, "INVALID_AVATAR_FILE", ex.getMessage());
+    }
+
+    @ExceptionHandler(AvatarNotFoundException.class)
+    public ResponseEntity<ProblemDetail> handleAvatarNotFound(AvatarNotFoundException ex) {
+        log.warn("Avatar not found: {}", ex.getMessage(), ex);
+        return problem(HttpStatus.NOT_FOUND, "AVATAR_NOT_FOUND", ex.getMessage());
     }
 
     /**
