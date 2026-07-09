@@ -109,7 +109,8 @@ public class AuthUserRestController {
             @ApiResponse(responseCode = "200", description = "Authenticated successfully"),
             @ApiResponse(responseCode = "400", description = "Validation error"),
             @ApiResponse(responseCode = "401", description = "Invalid credentials"),
-            @ApiResponse(responseCode = "403", description = "Account not verified")
+            @ApiResponse(responseCode = "403", description = "Account not verified"),
+            @ApiResponse(responseCode = "429", description = "Too many failed login attempts — retry after the Retry-After header duration")
     })
     @PreAuthorize("permitAll()")
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)

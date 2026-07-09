@@ -108,7 +108,7 @@ public class ProfileRestController {
             @ApiResponse(responseCode = "200", description = "Avatar uploaded"),
             @ApiResponse(responseCode = "401", description = "Not authenticated"),
             @ApiResponse(responseCode = "404", description = "Profile not found"),
-            @ApiResponse(responseCode = "422", description = "Invalid file type or size")
+            @ApiResponse(responseCode = "422", description = "Invalid file type, size, or content does not match the declared type")
     })
     @PreAuthorize("isAuthenticated()")
     @PostMapping(value = "/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

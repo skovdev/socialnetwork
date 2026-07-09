@@ -45,7 +45,8 @@ public class AWSS3AvatarStorageServiceImpl implements AvatarStorageService {
 
     @Override
     public String upload(UUID authUserId, MultipartFile file) {
-        validate(file);
+        var content = readContent(file);
+        validate(file, content);
         var key = buildKey(authUserId, file.getContentType());
         try {
             var request = PutObjectRequest.builder()
@@ -53,15 +54,12 @@ public class AWSS3AvatarStorageServiceImpl implements AvatarStorageService {
                     .key(key)
                     .contentType(file.getContentType())
                     .build();
-            s3Client.putObject(request, RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
+            s3Client.putObject(request, RequestBody.fromBytes(content));
             log.info("Avatar uploaded for user {}: key={}", authUserId, key);
             return key;
         } catch (S3Exception e) {
             log.error("S3 upload failed for user {}: {}", authUserId, e.awsErrorDetails());
             throw new InvalidAvatarFileException("Avatar upload failed due to a storage error");
-        } catch (IOException e) {
-            log.error("Failed to read avatar file for user {}: {}", authUserId, e.getMessage());
-            throw new InvalidAvatarFileException("Avatar upload failed: could not read the provided file");
         }
     }
 
@@ -91,17 +89,30 @@ public class AWSS3AvatarStorageServiceImpl implements AvatarStorageService {
         return s3Presigner.presignGetObject(presignRequest).url().toString();
     }
 
-    private void validate(MultipartFile file) {
+    private byte[] readContent(MultipartFile file) {
         if (file == null || file.isEmpty()) {
             throw new InvalidAvatarFileException("Avatar file must not be null or empty");
         }
+        try {
+            return file.getBytes();
+        } catch (IOException e) {
+            log.error("Failed to read avatar file: {}", e.getMessage());
+            throw new InvalidAvatarFileException("Avatar upload failed: could not read the provided file");
+        }
+    }
+
+    private void validate(MultipartFile file, byte[] content) {
         var contentType = file.getContentType();
         if (!ALLOWED_CONTENT_TYPES.contains(contentType)) {
             throw new InvalidAvatarFileException(
                     "Unsupported file type '" + contentType + "'. Allowed: " + ALLOWED_CONTENT_TYPES);
         }
-        if (file.getSize() > MAX_FILE_SIZE_BYTES) {
-            throw new InvalidAvatarFileException("File size " + file.getSize() + " bytes exceeds the 5 MB limit");
+        if (content.length > MAX_FILE_SIZE_BYTES) {
+            throw new InvalidAvatarFileException("File size " + content.length + " bytes exceeds the 5 MB limit");
+        }
+        if (!AvatarImageSignatureValidator.matches(contentType, content)) {
+            throw new InvalidAvatarFileException(
+                    "File content does not match the declared type '" + contentType + "'");
         }
     }
 

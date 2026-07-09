@@ -12,6 +12,7 @@ import local.socialnetwork.shared.exception.TokenAlreadyUsedException;
 import local.socialnetwork.shared.exception.InvalidAvatarFileException;
 import local.socialnetwork.shared.exception.EmailAlreadyExistsException;
 import local.socialnetwork.shared.exception.AccountNotVerifiedException;
+import local.socialnetwork.shared.exception.TooManyLoginAttemptsException;
 import local.socialnetwork.shared.exception.UsernameAlreadyExistsException;
 import local.socialnetwork.shared.exception.InvalidCurrentPasswordException;
 import local.socialnetwork.shared.exception.AccountAlreadyVerifiedException;
@@ -21,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 
@@ -85,6 +87,17 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ProblemDetail> handleUsernameNotFound(UsernameNotFoundException ex) {
         log.warn("Username not found: {}", ex.getMessage(), ex);
         return problem(HttpStatus.UNAUTHORIZED, "INVALID_CREDENTIALS", "Invalid username or password.");
+    }
+
+    @ExceptionHandler(TooManyLoginAttemptsException.class)
+    public ResponseEntity<ProblemDetail> handleTooManyLoginAttempts(TooManyLoginAttemptsException ex) {
+        log.warn("Login rate limit exceeded: {}", ex.getMessage());
+        var problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.TOO_MANY_REQUESTS, ex.getMessage());
+        problemDetail.setProperty("errorCode", "TOO_MANY_LOGIN_ATTEMPTS");
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                .header(HttpHeaders.RETRY_AFTER, String.valueOf(ex.getRetryAfterSeconds()))
+                .contentType(MediaType.APPLICATION_PROBLEM_JSON)
+                .body(problemDetail);
     }
 
     @ExceptionHandler(AccountNotVerifiedException.class)

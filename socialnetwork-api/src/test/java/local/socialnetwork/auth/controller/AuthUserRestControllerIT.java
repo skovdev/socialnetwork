@@ -29,6 +29,7 @@ import java.util.Set;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
@@ -119,6 +120,51 @@ class AuthUserRestControllerIT extends BaseIntegrationTest {
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
                 .andExpect(jsonPath("$.errorCode").value("INVALID_CREDENTIALS"));
+    }
+
+    @Test
+    void login_afterExceedingFailedAttemptLimit_returns429WithRetryAfter() throws Exception {
+        createActiveUser("loginuser3", "login3@example.com");
+        var badRequest = new LoginRequest("loginuser3", "WrongPassword");
+
+        for (int i = 0; i < 5; i++) {
+            mockMvc.perform(post(BASE_URL + "/login")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(badRequest)))
+                    .andExpect(status().isUnauthorized());
+        }
+
+        mockMvc.perform(post(BASE_URL + "/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(badRequest)))
+                .andExpect(status().isTooManyRequests())
+                .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(jsonPath("$.errorCode").value("TOO_MANY_LOGIN_ATTEMPTS"))
+                .andExpect(header().exists("Retry-After"));
+    }
+
+    @Test
+    void login_afterSuccessfulLogin_resetsFailedAttemptCounter() throws Exception {
+        createActiveUser("loginuser4", "login4@example.com");
+        var badRequest = new LoginRequest("loginuser4", "WrongPassword");
+        var goodRequest = new LoginRequest("loginuser4", "Secret1234");
+
+        for (int i = 0; i < 4; i++) {
+            mockMvc.perform(post(BASE_URL + "/login")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(badRequest)))
+                    .andExpect(status().isUnauthorized());
+        }
+
+        mockMvc.perform(post(BASE_URL + "/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(goodRequest)))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(post(BASE_URL + "/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(badRequest)))
+                .andExpect(status().isUnauthorized());
     }
 
     private void createActiveUser(String username, String email) {

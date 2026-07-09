@@ -23,6 +23,7 @@ import local.socialnetwork.auth.repository.AuthEmailVerificationTokenRepository;
 import local.socialnetwork.auth.service.EmailService;
 import local.socialnetwork.auth.service.TokenService;
 import local.socialnetwork.auth.service.AuthUserService;
+import local.socialnetwork.auth.service.LoginRateLimiterService;
 
 import local.socialnetwork.core.config.jwt.JwtTokenProvider;
 
@@ -48,6 +49,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
@@ -78,6 +80,7 @@ public class AuthUserServiceImpl implements AuthUserService {
     private final UserProfileRepository userProfileRepository;
     private final AuthEmailVerificationTokenRepository emailTokenRepository;
     private final AuthRefreshTokenRepository refreshTokenRepository;
+    private final LoginRateLimiterService loginRateLimiterService;
     private final TokenService tokenService;
     private final EmailService emailService;
     private final JwtTokenProvider jwtTokenProvider;
@@ -121,13 +124,23 @@ public class AuthUserServiceImpl implements AuthUserService {
     @Override
     @Transactional
     public TokenResponse login(LoginRequest request) {
-        var authentication = authenticate(request.username(), request.password());
+        var rateLimitKey = normalizeUsername(request.username());
+        loginRateLimiterService.checkAllowed(rateLimitKey);
+
+        Authentication authentication;
+        try {
+            authentication = authenticate(request.username(), request.password());
+        } catch (AuthenticationException e) {
+            loginRateLimiterService.recordFailedAttempt(rateLimitKey);
+            throw e;
+        }
         var authUser = resolveAuthUser(request.username());
 
         if (authUser.getAuthStatus() != AuthStatus.ACTIVE) {
             throw new AccountNotVerifiedException("Account is not verified. Please check your email.");
         }
 
+        loginRateLimiterService.reset(rateLimitKey);
         var accessToken = createAccessToken(authentication.getName());
         var refreshToken = createAndPersistRefreshToken(authUser);
         log.info("User logged in: id={}", authUser.getId());

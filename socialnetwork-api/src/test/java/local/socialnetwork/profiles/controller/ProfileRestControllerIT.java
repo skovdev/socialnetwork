@@ -58,6 +58,10 @@ class ProfileRestControllerIT extends BaseIntegrationTest {
     private static final String TEST_USERNAME = "meuser";
     private static final String PRESIGNED_URL = "https://test-avatar-bucket.s3.eu-north-1.amazonaws.com/avatars/test.png";
 
+    /** Minimal valid PNG magic-byte signature, required since uploads are now content-verified. */
+    private static final byte[] PNG_CONTENT =
+            {(byte) 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, 0x00};
+
     @Autowired
     private AuthUserRepository authUserRepository;
 
@@ -158,7 +162,7 @@ class ProfileRestControllerIT extends BaseIntegrationTest {
 
     @Test
     void uploadAvatar_withValidImage_returns200WithPresignedUrl() throws Exception {
-        var file = new MockMultipartFile("file", "avatar.png", MediaType.IMAGE_PNG_VALUE, "content".getBytes());
+        var file = new MockMultipartFile("file", "avatar.png", MediaType.IMAGE_PNG_VALUE, PNG_CONTENT);
         var presigned = presignedRequest();
         when(s3Presigner.presignGetObject(any(GetObjectPresignRequest.class))).thenReturn(presigned);
 
@@ -182,6 +186,20 @@ class ProfileRestControllerIT extends BaseIntegrationTest {
     }
 
     @Test
+    void uploadAvatar_withSpoofedContentType_returns422() throws Exception {
+        var file = new MockMultipartFile("file", "malicious.png", MediaType.IMAGE_PNG_VALUE,
+                "<script>alert(1)</script>".getBytes());
+
+        mockMvc.perform(multipart(BASE_URL + "/avatar").file(file)
+                        .header("Authorization", "Bearer " + bearerToken))
+                .andExpect(status().isUnprocessableEntity())
+                .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(jsonPath("$.errorCode").value("INVALID_AVATAR_FILE"));
+
+        verify(s3Client, org.mockito.Mockito.never()).putObject(any(PutObjectRequest.class), any(RequestBody.class));
+    }
+
+    @Test
     void uploadAvatar_whenUnauthenticated_returns401() throws Exception {
         var file = new MockMultipartFile("file", "avatar.png", MediaType.IMAGE_PNG_VALUE, "content".getBytes());
 
@@ -191,7 +209,7 @@ class ProfileRestControllerIT extends BaseIntegrationTest {
 
     @Test
     void deleteAvatar_whenAvatarSet_returns204() throws Exception {
-        var file = new MockMultipartFile("file", "avatar.png", MediaType.IMAGE_PNG_VALUE, "content".getBytes());
+        var file = new MockMultipartFile("file", "avatar.png", MediaType.IMAGE_PNG_VALUE, PNG_CONTENT);
         var presigned = presignedRequest();
         when(s3Presigner.presignGetObject(any(GetObjectPresignRequest.class))).thenReturn(presigned);
         mockMvc.perform(multipart(BASE_URL + "/avatar").file(file)
