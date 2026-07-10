@@ -7,14 +7,14 @@
 
 
 ## API
-- [ ] API v1 documented
+- [x] API v1 documented ([APIv1.md](APIv1.md))
 
 ## Data
-- [ ] Flyway V1 migration applied (users, tokens, profiles tables)
+- [x] Liquibase 1.0 changelog applied (auth_users, auth_user_roles, auth_email_verification_tokens, auth_refresh_tokens, user_profiles tables)
 
 ## Tests
-- [ ] Integration tests are green
-- [ ] Errors use application/problem+json
+- [x] Integration tests are green
+- [x] Errors use application/problem+json
 
 ## Architecture
-- [ ] Component diagram: socialnetwork-monolith-architecture-diagram.xml
+- [x] Component diagram: socialnetwork-monolith-architecture-diagram.xml

@@ -1,6 +1,6 @@
-<mxfile host="Electron" modified="2025-10-11T11:56:05.517Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.5.1 Chrome/112.0.5615.204 Electron/24.6.0 Safari/537.36" etag="FiucurL-IfmsCTafNjhC" version="21.5.1" type="device">
+<mxfile host="Electron" modified="2026-07-10T12:56:49.003Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.5.1 Chrome/112.0.5615.204 Electron/24.6.0 Safari/537.36" etag="Nv8vqxrMgMPPQgWo2fU5" version="21.5.1" type="device">
   <diagram name="Page-1" id="VTXLrLUcfP1QNnNmuyVy">
-    <mxGraphModel dx="1434" dy="821" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="1434" dy="821" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="950" pageHeight="900" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -95,6 +95,30 @@
           <mxGeometry relative="1" as="geometry">
             <mxPoint y="41" as="offset" />
           </mxGeometry>
+        </mxCell>
+        <mxCell id="arch2026-1" value="Login Rate Limiter" style="whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="70" y="610" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="arch2026-2" value="" style="endArrow=classic;html=1;rounded=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="lcuGgF9oNnP51pK1c9tI-2" target="arch2026-1" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arch2026-3" value="AWS Secrets Manager&lt;br&gt;&lt;font style=&quot;font-size: 10px;&quot;&gt;(RS256 key pair)&lt;/font&gt;" style="whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="710" y="410" width="140" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="arch2026-4" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="lcuGgF9oNnP51pK1c9tI-2" target="arch2026-3" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arch2026-5" value="AWS S3&lt;br&gt;&lt;font style=&quot;font-size: 10px;&quot;&gt;(avatar storage, presigned URLs)&lt;/font&gt;" style="whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="720" y="630" width="140" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="arch2026-6" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="lcuGgF9oNnP51pK1c9tI-5" target="arch2026-5" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arch2026-7" value="AWS SES v2" style="whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="70" y="800" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="arch2026-8" value="" style="endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="lcuGgF9oNnP51pK1c9tI-25" target="arch2026-7" edge="1">
+          <mxGeometry relative="1" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>

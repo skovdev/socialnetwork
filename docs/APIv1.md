@@ -1,30 +1,41 @@
 # API v1
 
-## Authentication
+Base path: `/api/v1`. Swagger UI: `http://localhost:8080/swagger-ui.html`.
 
-- **Register a new user**  
-  `POST /api/v1/auth/register`
+## Auth (`/auth`)
 
-- **Verify a new user**  
-  `POST /api/v1/auth/verify`
+- **Register a new user**
+  `POST /auth/register` — Public. Sends a verification email.
 
-- **Log in a new user**  
-  `POST /api/v1/auth/login`
+- **Verify email**
+  `GET /auth/verify?token=<token>` — Public.
 
-- **Refresh token**  
-  `POST /api/v1/auth/refresh`
+- **Log in**
+  `POST /auth/login` — Public. Returns an access + refresh token pair.
 
-- **Log out**  
-  `POST /api/v1/auth/logout`
+- **Refresh token**
+  `POST /auth/refresh` — Public. Rotates the refresh token, issues a new pair.
 
+- **Log out**
+  `POST /auth/logout` — Bearer. Invalidates all refresh tokens for the current user.
 
-## Profile
+## Profiles (`/profiles`) — the authenticated user's own profile
 
-- **Get my profile**  
-  `GET /api/v1/me/profile`
+- **Get my profile**
+  `GET /profiles` — Bearer.
 
-- **Update my profile**  
-  `PUT /api/v1/me/profile`
+- **Update my profile**
+  `PUT /profiles` — Bearer.
 
-- **Get another user's profile**  
-  `GET /api/v1/users/{userId}/profile`
+- **Upload avatar**
+  `POST /profiles/avatar` — Bearer. JPEG, PNG, or WebP; max 5 MB. Replaces any existing avatar.
+
+- **Delete avatar**
+  `DELETE /profiles/avatar` — Bearer.
+
+## Users (`/users`)
+
+- **Get a user's profile by username**
+  `GET /users/{username}` — Bearer.
+
+Avatar URLs returned in profile responses are short-lived, presigned S3 URLs (valid for 1 hour by default).
