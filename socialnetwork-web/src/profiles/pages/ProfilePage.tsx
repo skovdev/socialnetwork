@@ -1,15 +1,17 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 import { profileApi } from "../api/profileApi";
 import { AvatarUpload } from "../components/AvatarUpload";
+import { formatFamilyStatus } from "../familyStatus";
 import { ApiError } from "../../core/api/httpClient";
-import type { UserProfile } from "../types";
+import type { MyProfile } from "../types";
 import { useAuth } from "../../auth/hooks/AuthContext";
 
 export function ProfilePage() {
     const { logout } = useAuth();
 
-    const [profile, setProfile] = useState<UserProfile | null>(null);
+    const [profile, setProfile] = useState<MyProfile | null>(null);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
@@ -38,6 +40,7 @@ export function ProfilePage() {
     }
 
     const initials = `${profile.firstName?.[0] ?? ""}${profile.lastName?.[0] ?? ""}`.toUpperCase();
+    const familyStatusLabel = formatFamilyStatus(profile.familyStatus);
 
     return (
         <>
@@ -60,15 +63,26 @@ export function ProfilePage() {
                     <h1>{profile.displayName}</h1>
                     <p className="username">@{profile.username}</p>
                     {profile.bio && <p className="bio">{profile.bio}</p>}
+                    <Link to="/profile/edit" className="btn btn-secondary">
+                        Edit profile
+                    </Link>
                     <dl>
                         <dt>Name</dt>
                         <dd>
                             {profile.firstName} {profile.lastName}
                         </dd>
-                        {profile.city && <dt>City</dt>}
-                        {profile.city && <dd>{profile.city}</dd>}
+                        {profile.birthDate && <dt>Birth date</dt>}
+                        {profile.birthDate && <dd>{profile.birthDate}</dd>}
+                        {familyStatusLabel && <dt>Relationship status</dt>}
+                        {familyStatusLabel && <dd>{familyStatusLabel}</dd>}
+                        {profile.phoneNumber && <dt>Phone</dt>}
+                        {profile.phoneNumber && <dd>{profile.phoneNumber}</dd>}
                         {profile.country && <dt>Country</dt>}
                         {profile.country && <dd>{profile.country}</dd>}
+                        {profile.city && <dt>City</dt>}
+                        {profile.city && <dd>{profile.city}</dd>}
+                        {profile.address && <dt>Address</dt>}
+                        {profile.address && <dd>{profile.address}</dd>}
                     </dl>
                 </div>
             </main>

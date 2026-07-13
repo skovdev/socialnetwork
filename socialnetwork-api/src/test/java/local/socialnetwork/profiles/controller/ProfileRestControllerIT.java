@@ -12,6 +12,7 @@ import local.socialnetwork.core.config.jwt.JwtTokenProvider;
 
 import local.socialnetwork.profiles.dto.http.request.UpdateProfileRequestDto;
 
+import local.socialnetwork.profiles.entity.FamilyStatus;
 import local.socialnetwork.profiles.entity.UserProfile;
 
 import org.junit.jupiter.api.Test;
@@ -107,7 +108,8 @@ class ProfileRestControllerIT extends BaseIntegrationTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.data.username").value(TEST_USERNAME))
                 .andExpect(jsonPath("$.data.firstName").value("Me"))
-                .andExpect(jsonPath("$.data.lastName").value("User"));
+                .andExpect(jsonPath("$.data.lastName").value("User"))
+                .andExpect(jsonPath("$.data.birthDate").value("1992-03-20"));
     }
 
     @Test
@@ -120,8 +122,8 @@ class ProfileRestControllerIT extends BaseIntegrationTest {
     void updateProfile_withValidData_returns200WithUpdatedProfile() throws Exception {
         var request = new UpdateProfileRequestDto(
                 "Updated Name", "My new bio",
-                LocalDate.of(1992, 3, 20), null,
-                "Germany", "Berlin", null, null);
+                LocalDate.of(1992, 3, 20), "+491234567",
+                "Germany", "Berlin", "Alexanderplatz 1", FamilyStatus.SINGLE);
 
         mockMvc.perform(put(BASE_URL)
                         .header("Authorization", "Bearer " + bearerToken)
@@ -131,7 +133,10 @@ class ProfileRestControllerIT extends BaseIntegrationTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.data.displayName").value("Updated Name"))
                 .andExpect(jsonPath("$.data.country").value("Germany"))
-                .andExpect(jsonPath("$.data.city").value("Berlin"));
+                .andExpect(jsonPath("$.data.city").value("Berlin"))
+                .andExpect(jsonPath("$.data.phoneNumber").value("+491234567"))
+                .andExpect(jsonPath("$.data.address").value("Alexanderplatz 1"))
+                .andExpect(jsonPath("$.data.familyStatus").value("SINGLE"));
     }
 
     @Test

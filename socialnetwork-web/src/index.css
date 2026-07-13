@@ -164,7 +164,9 @@ form {
   margin-bottom: 6px;
 }
 
-.field input {
+.field input,
+.field textarea,
+.field select {
   width: 100%;
   padding: 10px 12px;
   border-radius: var(--radius-sm);
@@ -175,7 +177,13 @@ form {
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 
-.field input:focus {
+.field textarea {
+  resize: vertical;
+}
+
+.field input:focus,
+.field textarea:focus,
+.field select:focus {
   outline: none;
   border-color: var(--accent);
   box-shadow: 0 0 0 3px var(--accent-bg);
@@ -385,6 +393,10 @@ form {
 .bio {
   color: var(--text-h);
   margin-bottom: 8px;
+}
+
+.profile-card > .btn-secondary {
+  margin: 4px 0 8px;
 }
 
 .profile-card dl {

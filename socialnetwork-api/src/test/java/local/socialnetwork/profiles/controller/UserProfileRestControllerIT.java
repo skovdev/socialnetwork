@@ -86,6 +86,17 @@ class UserProfileRestControllerIT extends BaseIntegrationTest {
     }
 
     @Test
+    void getProfile_doesNotExposePrivateFields() throws Exception {
+        mockMvc.perform(get(BASE_URL + "/" + TEST_USERNAME)
+                        .header("Authorization", "Bearer " + bearerToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.birthDate").doesNotExist())
+                .andExpect(jsonPath("$.data.phoneNumber").doesNotExist())
+                .andExpect(jsonPath("$.data.address").doesNotExist())
+                .andExpect(jsonPath("$.data.familyStatus").doesNotExist());
+    }
+
+    @Test
     void getProfile_whenUnauthenticated_returns401() throws Exception {
         mockMvc.perform(get(BASE_URL + "/" + TEST_USERNAME))
                 .andExpect(status().isUnauthorized());

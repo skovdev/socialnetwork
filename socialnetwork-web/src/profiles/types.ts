@@ -8,16 +8,22 @@ export type FamilyStatus =
     | "IN_A_RELATIONSHIP"
     | "COHABITATING";
 
-export interface UserProfile {
+export interface PublicUserProfile {
     username: string;
     displayName: string;
     firstName: string;
     lastName: string;
     bio: string | null;
     avatarUrl: string | null;
-    birthDate: string | null;
     country: string | null;
     city: string | null;
+}
+
+export interface MyProfile extends PublicUserProfile {
+    birthDate: string | null;
+    phoneNumber: string | null;
+    address: string | null;
+    familyStatus: FamilyStatus | null;
 }
 
 export interface UpdateProfileRequest {

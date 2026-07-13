@@ -18,7 +18,7 @@ import local.socialnetwork.dto.api.response.ApiResponseDto;
 
 import local.socialnetwork.profiles.dto.http.request.UpdateProfileRequestDto;
 
-import local.socialnetwork.profiles.dto.http.response.UserProfileResponse;
+import local.socialnetwork.profiles.dto.http.response.MyProfileResponse;
 
 import local.socialnetwork.profiles.entity.UserProfile;
 
@@ -74,7 +74,7 @@ public class ProfileRestController {
     })
     @PreAuthorize("isAuthenticated()")
     @GetMapping
-    public ApiResponseDto<UserProfileResponse> getProfile(
+    public ApiResponseDto<MyProfileResponse> getProfile(
             @Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal principal) {
         var profile = userProfileService.findByAuthUserId(principal.getId())
                 .orElseThrow(() -> new UserNotFoundException("Profile not found for user: " + principal.getUsername()));
@@ -93,7 +93,7 @@ public class ProfileRestController {
     })
     @PreAuthorize("isAuthenticated()")
     @PutMapping
-    public ApiResponseDto<UserProfileResponse> updateProfile(
+    public ApiResponseDto<MyProfileResponse> updateProfile(
             @Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal principal,
             @Parameter(description = "Profile fields to update") @RequestBody @Valid UpdateProfileRequestDto request) {
         var updated = userProfileService.update(principal.getId(), request);
@@ -112,7 +112,7 @@ public class ProfileRestController {
     })
     @PreAuthorize("isAuthenticated()")
     @PostMapping(value = "/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ApiResponseDto<UserProfileResponse> uploadAvatar(
+    public ApiResponseDto<MyProfileResponse> uploadAvatar(
             @Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal principal,
             @Parameter(description = "Avatar image file (JPEG, PNG, or WebP; max 5 MB)") @RequestParam("file") MultipartFile file) {
         var updated = userProfileService.updateAvatar(principal.getId(), file);
@@ -135,7 +135,7 @@ public class ProfileRestController {
         userProfileService.deleteAvatar(principal.getId());
     }
 
-    private UserProfileResponse toResponse(UserProfile profile) {
-        return UserProfileResponse.from(profile, avatarStorageService.presign(profile.getAvatarUrl()));
+    private MyProfileResponse toResponse(UserProfile profile) {
+        return MyProfileResponse.from(profile, avatarStorageService.presign(profile.getAvatarUrl()));
     }
 }
