@@ -34,9 +34,14 @@ export function UserProfilePage() {
                     <span className="brand-mark">S</span>
                     <span className="brand-name">SocialNetwork</span>
                 </div>
-                <Link to="/profile" className="btn btn-secondary">
-                    My profile
-                </Link>
+                <div>
+                    <Link to="/posts" className="btn btn-secondary">
+                        Posts
+                    </Link>
+                    <Link to="/profile" className="btn btn-secondary">
+                        My profile
+                    </Link>
+                </div>
             </header>
             <main className="profile-main">
                 {error && (

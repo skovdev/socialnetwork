@@ -16,3 +16,12 @@ databaseChangeLog:
             path: db/changelog/1.0/002-change-token-to-bytea.sql
             relativeToChangelogFile: false
             encoding: UTF-8
+
+  - changeSet:
+      id: create-posts-table
+      author: stanislav.kovalenko
+      changes:
+        - sqlFile:
+            path: db/changelog/1.0/003-create-posts.sql
+            relativeToChangelogFile: false
+            encoding: UTF-8

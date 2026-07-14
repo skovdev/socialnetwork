@@ -2,6 +2,8 @@ package local.socialnetwork.shared.exception.handler;
 
 import local.socialnetwork.shared.exception.UserNotFoundException;
 import local.socialnetwork.shared.exception.TokenExpiredException;
+import local.socialnetwork.shared.exception.PostNotFoundException;
+import local.socialnetwork.shared.exception.PostAccessDeniedException;
 
 import org.springframework.dao.DataIntegrityViolationException;
 
@@ -152,6 +154,18 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ProblemDetail> handleAvatarNotFound(AvatarNotFoundException ex) {
         log.warn("Avatar not found: {}", ex.getMessage(), ex);
         return problem(HttpStatus.NOT_FOUND, "AVATAR_NOT_FOUND", ex.getMessage());
+    }
+
+    @ExceptionHandler(PostNotFoundException.class)
+    public ResponseEntity<ProblemDetail> handlePostNotFound(PostNotFoundException ex) {
+        log.warn("Post not found: {}", ex.getMessage(), ex);
+        return problem(HttpStatus.NOT_FOUND, "POST_NOT_FOUND", ex.getMessage());
+    }
+
+    @ExceptionHandler(PostAccessDeniedException.class)
+    public ResponseEntity<ProblemDetail> handlePostAccessDenied(PostAccessDeniedException ex) {
+        log.warn("Post access denied: {}", ex.getMessage(), ex);
+        return problem(HttpStatus.FORBIDDEN, "POST_ACCESS_DENIED", ex.getMessage());
     }
 
     /**
