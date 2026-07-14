@@ -4,7 +4,7 @@ Pet-project for self-education, designed to simulate a basic social media applic
 
 ## Overview
 
-**SocialNetwork** is a monolith REST API built with Java 25 and Spring Boot 3. It covers user registration with email verification, JWT-based authentication with token rotation, and user profile management, including avatar upload. Secrets are stored in AWS Secrets Manager; transactional emails are sent via AWS SES v2; avatar images are stored in AWS S3 and served via presigned URLs.
+**SocialNetwork** is a monolith REST API built with Java 25 and Spring Boot 3. It covers user registration with email verification, JWT-based authentication with token rotation, user profile management including avatar upload, and post creation/browsing. Secrets are stored in AWS Secrets Manager; transactional emails are sent via AWS SES v2; avatar images are stored in AWS S3 and served via presigned URLs.
 
 ## Tech Stack
 
@@ -17,7 +17,7 @@ Pet-project for self-education, designed to simulate a basic social media applic
 | Migrations | Liquibase 5 |
 | Cloud | AWS Secrets Manager, AWS SES v2, AWS S3 |
 | API Docs | SpringDoc OpenAPI / Swagger UI |
-| Testing | JUnit Jupiter 6, Mockito 5, Testcontainers 1.20 |
+| Testing | JUnit Jupiter 6, Mockito 5, Testcontainers 1.21 |
 | Build | Maven 3, Lombok |
 
 ## Repository Structure
@@ -35,6 +35,7 @@ CI/                    # Jenkins pipeline
 socialnetwork-api/src/main/java/local/socialnetwork/
 ├── auth/          # Registration, email verification, login, token refresh, logout
 ├── profiles/      # User profile read/update endpoints, avatar upload/delete
+├── posts/         # Post creation, feed, and management endpoints
 ├── core/          # JWT provider, security config, filters, AWS clients
 ├── shared/        # Base entity, exceptions, API version constant
 └── dto/           # Shared API response wrapper
@@ -71,6 +72,18 @@ Base path: `/api/v1`
 
 Avatar URLs returned in profile responses are short-lived, presigned S3 URLs (valid for 1 hour by default).
 
+### Posts (`/posts`)
+
+| Method | Path | Auth | Description |
+|---|---|---|---|
+| `POST` | `/posts` | Bearer | Create a new post authored by the current user |
+| `GET` | `/posts` | Bearer | Retrieve a paginated feed of posts, newest first |
+| `GET` | `/posts/{id}` | Bearer | Retrieve a single post by ID |
+| `PUT` | `/posts/{id}` | Bearer | Update a post's content — author only |
+| `DELETE` | `/posts/{id}` | Bearer | Delete a post — author only |
+
+Post content is limited to 5000 characters. Each post response includes a minimal author summary (username, display name).
+
 Swagger UI is available at `http://localhost:8080/swagger-ui.html`.
 
 ## Database Schema
@@ -84,6 +97,7 @@ Migrations are managed by Liquibase and run automatically on startup.
 | `auth_email_verification_tokens` | One-time tokens sent by email on registration |
 | `auth_refresh_tokens` | Issued refresh tokens (JTI-based, supports full logout) |
 | `user_profiles` | Public profile data — username, display name, bio, avatar (S3 storage key), etc. |
+| `posts` | User-authored posts — content, author reference, timestamps |
 
 ## Prerequisites
 
