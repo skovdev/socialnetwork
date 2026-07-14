@@ -6,6 +6,8 @@ import { VerifyEmailPage } from "../../auth/pages/VerifyEmailPage";
 import { EditProfilePage } from "../../profiles/pages/EditProfilePage";
 import { ProfilePage } from "../../profiles/pages/ProfilePage";
 import { UserProfilePage } from "../../profiles/pages/UserProfilePage";
+import { FeedPage } from "../../posts/pages/FeedPage";
+import { PostDetailPage } from "../../posts/pages/PostDetailPage";
 import { ProtectedRoute } from "../../shared/components/ProtectedRoute";
 
 export function AppRouter() {
@@ -35,6 +37,22 @@ export function AppRouter() {
                 element={
                     <ProtectedRoute>
                         <UserProfilePage />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/posts"
+                element={
+                    <ProtectedRoute>
+                        <FeedPage />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/posts/:id"
+                element={
+                    <ProtectedRoute>
+                        <PostDetailPage />
                     </ProtectedRoute>
                 }
             />

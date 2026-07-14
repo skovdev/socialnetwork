@@ -419,3 +419,73 @@ form {
   margin: 0;
   color: var(--text-h);
 }
+
+/* Posts */
+
+.topbar div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.topbar .btn-secondary {
+  width: auto;
+}
+
+.post-composer {
+  text-align: left;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.post-composer form {
+  margin: 0;
+}
+
+.post-composer .btn {
+  width: auto;
+  margin-top: 4px;
+}
+
+.post-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.post-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 24px;
+  text-align: left;
+}
+
+.post-header {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.post-content {
+  color: var(--text-h);
+  white-space: pre-wrap;
+  margin-bottom: 12px;
+}
+
+.post-meta {
+  color: var(--text);
+  font-size: 13px;
+}
+
+.post-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.post-actions .btn-secondary {
+  width: auto;
+}
