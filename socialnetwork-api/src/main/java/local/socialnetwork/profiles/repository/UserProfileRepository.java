@@ -8,13 +8,16 @@ import org.springframework.data.repository.CrudRepository;
 
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.UUID;
 import java.util.Optional;
+import java.util.Collection;
 
 @Repository
 public interface UserProfileRepository extends CrudRepository<UserProfile, UUID> {
     @EntityGraph(attributePaths = {"authUser", "authUser.authUserRoles"})
     Optional<UserProfile> findByUsername(String username);
     Optional<UserProfile> findByAuthUserId(UUID authUserId);
+    List<UserProfile> findByAuthUserIdIn(Collection<UUID> authUserIds);
     boolean existsByUsername(String username);
 }

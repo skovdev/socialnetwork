@@ -49,9 +49,14 @@ export function ProfilePage() {
                     <span className="brand-mark">S</span>
                     <span className="brand-name">SocialNetwork</span>
                 </div>
-                <button type="button" className="btn btn-secondary" onClick={() => void logout()}>
-                    Log out
-                </button>
+                <div>
+                    <Link to="/posts" className="btn btn-secondary">
+                        Posts
+                    </Link>
+                    <button type="button" className="btn btn-secondary" onClick={() => void logout()}>
+                        Log out
+                    </button>
+                </div>
             </header>
             <main className="profile-main">
                 <div className="profile-card">
