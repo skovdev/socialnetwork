@@ -26,12 +26,17 @@ import lombok.RequiredArgsConstructor;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.CacheEvict;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import org.springframework.stereotype.Service;
 
 import org.springframework.transaction.annotation.Transactional;
+
+import static local.socialnetwork.core.config.RedisCacheConfig.POSTS_CACHE_NAME;
 
 import java.time.Instant;
 
@@ -74,6 +79,7 @@ public class PostServiceImpl implements PostService {
      */
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(cacheNames = POSTS_CACHE_NAME, key = "#postId")
     public PostResponse getPost(UUID postId) {
         var post = findPostOrThrow(postId);
         return PostResponse.from(post, resolveAuthor(post.getAuthor().getId()));
@@ -97,6 +103,7 @@ public class PostServiceImpl implements PostService {
      */
     @Override
     @Transactional
+    @CacheEvict(cacheNames = POSTS_CACHE_NAME, key = "#postId")
     public PostResponse updatePost(UUID authUserId, UUID postId, UpdatePostRequestDto request) {
         var post = findPostOrThrow(postId);
         requireOwner(post, authUserId);
@@ -112,6 +119,7 @@ public class PostServiceImpl implements PostService {
      */
     @Override
     @Transactional
+    @CacheEvict(cacheNames = POSTS_CACHE_NAME, key = "#postId")
     public void deletePost(UUID authUserId, UUID postId) {
         var post = findPostOrThrow(postId);
         requireOwner(post, authUserId);
