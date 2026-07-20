@@ -14,6 +14,7 @@ Pet-project for self-education, designed to simulate a basic social media applic
 | Framework | Spring Boot 3.5.6 |
 | Security | Spring Security 6, JWT (RS256 via jjwt 0.13) |
 | Database | PostgreSQL 42.7 |
+| Caching | Redis (Spring Cache abstraction) |
 | Migrations | Liquibase 5 |
 | Cloud | AWS Secrets Manager, AWS SES v2, AWS S3 |
 | API Docs | SpringDoc OpenAPI / Swagger UI |
@@ -104,6 +105,7 @@ Migrations are managed by Liquibase and run automatically on startup.
 - Java 25
 - Maven 3.9+
 - PostgreSQL 14+ running locally (or via Docker)
+- Redis 7+ running locally (or via Docker), e.g. `docker run -p 6379:6379 redis:7-alpine`
 - AWS credentials with access to Secrets Manager, SES, and S3
 
 ## Configuration
@@ -123,6 +125,9 @@ The application reads its configuration from `application.properties`. Sensitive
 |---|---|---|
 | `CORS_ALLOWED_ORIGINS` | `*` | Comma-separated list of allowed CORS origins |
 | `SN_AWS_S3_AVATAR_BUCKET_NAME` | `socialnetwork-user-avatar-upload` | S3 bucket used to store uploaded avatar images |
+| `SN_REDIS_HOST` | `localhost` | Redis host used for the posts cache |
+| `SN_REDIS_PORT` | `6379` | Redis port used for the posts cache |
+| `SN_REDIS_PASSWORD` | *(empty)* | Redis password, if authentication is enabled |
 
 ### AWS Secrets Manager
 
@@ -139,6 +144,15 @@ spring.datasource.url=jdbc:postgresql://localhost:5432/socialnetwork_db
 spring.datasource.username=socialnetwork_user
 spring.datasource.password=socialnetwork_password
 ```
+
+### Local Redis (posts cache)
+
+```properties
+spring.data.redis.host=localhost
+spring.data.redis.port=6379
+```
+
+`GET /posts/{id}` responses are cached in Redis for 10 minutes (`socialnetwork.cache.posts.ttl`). Cache entries are evicted immediately on update or delete of the corresponding post.
 
 ## Running the Application
 

@@ -193,6 +193,28 @@ class PostRestControllerIT extends BaseIntegrationTest {
     }
 
     @Test
+    void getPost_afterUpdate_returnsUpdatedContentNotStaleCachedValue() throws Exception {
+        var postId = createPostAndGetId(authorToken, "Original content");
+
+        mockMvc.perform(get(BASE_URL + "/" + postId)
+                        .header("Authorization", "Bearer " + authorToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.content").value("Original content"));
+
+        var request = new UpdatePostRequestDto("Edited content");
+        mockMvc.perform(put(BASE_URL + "/" + postId)
+                        .header("Authorization", "Bearer " + authorToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get(BASE_URL + "/" + postId)
+                        .header("Authorization", "Bearer " + authorToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.content").value("Edited content"));
+    }
+
+    @Test
     void deletePost_byOwner_returns204() throws Exception {
         var postId = createPostAndGetId(authorToken, "To be deleted");
 
