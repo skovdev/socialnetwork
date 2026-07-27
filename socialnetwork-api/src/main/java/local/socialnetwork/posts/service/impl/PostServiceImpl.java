@@ -6,7 +6,6 @@ import local.socialnetwork.posts.dto.http.request.CreatePostRequestDto;
 import local.socialnetwork.posts.dto.http.request.UpdatePostRequestDto;
 
 import local.socialnetwork.posts.dto.http.response.PostResponse;
-import local.socialnetwork.posts.dto.http.response.PostAuthorSummary;
 
 import local.socialnetwork.posts.entity.Post;
 
@@ -17,6 +16,8 @@ import local.socialnetwork.posts.service.PostService;
 import local.socialnetwork.profiles.entity.UserProfile;
 
 import local.socialnetwork.profiles.repository.UserProfileRepository;
+
+import local.socialnetwork.shared.dto.response.AuthorSummary;
 
 import local.socialnetwork.shared.exception.UserNotFoundException;
 import local.socialnetwork.shared.exception.PostNotFoundException;
@@ -138,17 +139,17 @@ public class PostServiceImpl implements PostService {
         }
     }
 
-    private PostAuthorSummary resolveAuthor(UUID authUserId) {
+    private AuthorSummary resolveAuthor(UUID authUserId) {
         var profile = userProfileRepository.findByAuthUserId(authUserId)
                 .orElseThrow(() -> new UserNotFoundException("Profile not found for user id: " + authUserId));
-        return PostAuthorSummary.from(profile);
+        return AuthorSummary.from(profile);
     }
 
-    private PostAuthorSummary toAuthorSummary(Map<UUID, UserProfile> authorsById, UUID authUserId) {
+    private AuthorSummary toAuthorSummary(Map<UUID, UserProfile> authorsById, UUID authUserId) {
         var profile = authorsById.get(authUserId);
         if (profile == null) {
             throw new UserNotFoundException("Profile not found for user id: " + authUserId);
         }
-        return PostAuthorSummary.from(profile);
+        return AuthorSummary.from(profile);
     }
 }
