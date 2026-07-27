@@ -6,6 +6,7 @@ import { postApi } from "../api/postApi";
 import type { Post } from "../types";
 import { profileApi } from "../../profiles/api/profileApi";
 import { ApiError } from "../../core/api/httpClient";
+import { CommentSection } from "../../comments/components/CommentSection";
 
 export function PostDetailPage() {
     const { id } = useParams<{ id: string }>();
@@ -139,6 +140,8 @@ export function PostDetailPage() {
                         )}
                     </div>
                 )}
+
+                {!error && post && id && <CommentSection postId={id} currentUsername={myUsername} />}
             </main>
         </>
     );

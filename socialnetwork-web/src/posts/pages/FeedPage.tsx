@@ -111,16 +111,16 @@ export function FeedPage() {
                                 <span>{new Date(post.createdAt).toLocaleString()}</span>
                                 {post.updatedAt && <span> · edited</span>}
                             </div>
-                            {myUsername === post.author.username && (
-                                <div className="post-actions">
-                                    <Link to={`/posts/${post.id}`} className="btn-secondary">
-                                        Edit
-                                    </Link>
+                            <div className="post-actions">
+                                <Link to={`/posts/${post.id}`} className="btn-secondary">
+                                    {myUsername === post.author.username ? "Edit" : "View"}
+                                </Link>
+                                {myUsername === post.author.username && (
                                     <button type="button" className="btn-secondary" onClick={() => void handleDelete(post.id)}>
                                         Delete
                                     </button>
-                                </div>
-                            )}
+                                )}
+                            </div>
                         </article>
                     ))}
                 </div>
