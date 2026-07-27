@@ -3,7 +3,10 @@ package local.socialnetwork.shared.exception.handler;
 import local.socialnetwork.shared.exception.UserNotFoundException;
 import local.socialnetwork.shared.exception.TokenExpiredException;
 import local.socialnetwork.shared.exception.PostNotFoundException;
+import local.socialnetwork.shared.exception.CommentNotFoundException;
 import local.socialnetwork.shared.exception.PostAccessDeniedException;
+import local.socialnetwork.shared.exception.CommentAccessDeniedException;
+import local.socialnetwork.shared.exception.InvalidCommentParentException;
 
 import org.springframework.dao.DataIntegrityViolationException;
 
@@ -166,6 +169,24 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ProblemDetail> handlePostAccessDenied(PostAccessDeniedException ex) {
         log.warn("Post access denied: {}", ex.getMessage(), ex);
         return problem(HttpStatus.FORBIDDEN, "POST_ACCESS_DENIED", ex.getMessage());
+    }
+
+    @ExceptionHandler(CommentNotFoundException.class)
+    public ResponseEntity<ProblemDetail> handleCommentNotFound(CommentNotFoundException ex) {
+        log.warn("Comment not found: {}", ex.getMessage(), ex);
+        return problem(HttpStatus.NOT_FOUND, "COMMENT_NOT_FOUND", ex.getMessage());
+    }
+
+    @ExceptionHandler(CommentAccessDeniedException.class)
+    public ResponseEntity<ProblemDetail> handleCommentAccessDenied(CommentAccessDeniedException ex) {
+        log.warn("Comment access denied: {}", ex.getMessage(), ex);
+        return problem(HttpStatus.FORBIDDEN, "COMMENT_ACCESS_DENIED", ex.getMessage());
+    }
+
+    @ExceptionHandler(InvalidCommentParentException.class)
+    public ResponseEntity<ProblemDetail> handleInvalidCommentParent(InvalidCommentParentException ex) {
+        log.warn("Invalid comment parent: {}", ex.getMessage(), ex);
+        return problem(HttpStatus.BAD_REQUEST, "INVALID_COMMENT_PARENT", ex.getMessage());
     }
 
     /**
