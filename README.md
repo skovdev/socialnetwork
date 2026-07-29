@@ -4,7 +4,7 @@ Pet-project for self-education, designed to simulate a basic social media applic
 
 ## Overview
 
-**SocialNetwork** is a monolith REST API built with Java 25 and Spring Boot 3. It covers user registration with email verification, JWT-based authentication with token rotation, user profile management including avatar upload, and post creation/browsing. Secrets are stored in AWS Secrets Manager; transactional emails are sent via AWS SES v2; avatar images are stored in AWS S3 and served via presigned URLs.
+**SocialNetwork** is a monolith REST API built with Java 25 and Spring Boot 3. It covers user registration with email verification, JWT-based authentication with token rotation, user profile management including avatar upload, post creation/browsing, and threaded comments on posts. Secrets are stored in AWS Secrets Manager; transactional emails are sent via AWS SES v2; avatar images are stored in AWS S3 and served via presigned URLs.
 
 ## Tech Stack
 
@@ -37,6 +37,7 @@ socialnetwork-api/src/main/java/local/socialnetwork/
 ├── auth/          # Registration, email verification, login, token refresh, logout
 ├── profiles/      # User profile read/update endpoints, avatar upload/delete
 ├── posts/         # Post creation, feed, and management endpoints
+├── comments/      # Comment creation, browsing, and management endpoints
 ├── core/          # JWT provider, security config, filters, AWS clients
 ├── shared/        # Base entity, exceptions, API version constant
 └── dto/           # Shared API response wrapper
@@ -85,6 +86,17 @@ Avatar URLs returned in profile responses are short-lived, presigned S3 URLs (va
 
 Post content is limited to 5000 characters. Each post response includes a minimal author summary (username, display name).
 
+### Comments (`/posts/{postId}/comments`, `/comments`)
+
+| Method | Path | Auth | Description |
+|---|---|---|---|
+| `POST` | `/posts/{postId}/comments` | Bearer | Create a new comment (or reply) on a post |
+| `GET` | `/posts/{postId}/comments` | Bearer | Retrieve a paginated page of top-level comments (oldest first), with replies nested inline |
+| `PUT` | `/comments/{id}` | Bearer | Update a comment's content — author only |
+| `DELETE` | `/comments/{id}` | Bearer | Delete a comment and its replies — author only |
+
+Comment content is limited to 2000 characters.
+
 Swagger UI is available at `http://localhost:8080/swagger-ui.html`.
 
 ## Database Schema
@@ -99,6 +111,7 @@ Migrations are managed by Liquibase and run automatically on startup.
 | `auth_refresh_tokens` | Issued refresh tokens (JTI-based, supports full logout) |
 | `user_profiles` | Public profile data — username, display name, bio, avatar (S3 storage key), etc. |
 | `posts` | User-authored posts — content, author reference, timestamps |
+| `comments` | User-authored comments on posts — content, post/author references, optional parent comment (for replies), timestamps |
 
 ## Prerequisites
 
