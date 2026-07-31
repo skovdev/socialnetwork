@@ -7,6 +7,8 @@ import { formatFamilyStatus } from "../familyStatus";
 import { ApiError } from "../../core/api/httpClient";
 import type { MyProfile } from "../types";
 import { useAuth } from "../../auth/hooks/AuthContext";
+import { PostList } from "../../posts/components/PostList";
+import type { CurrentUser } from "../../shared/types";
 
 export function ProfilePage() {
     const { logout } = useAuth();
@@ -42,6 +44,12 @@ export function ProfilePage() {
     const initials = `${profile.firstName?.[0] ?? ""}${profile.lastName?.[0] ?? ""}`.toUpperCase();
     const familyStatusLabel = formatFamilyStatus(profile.familyStatus);
 
+    const currentUser: CurrentUser = {
+        username: profile.username,
+        displayName: profile.displayName,
+        avatarUrl: profile.avatarUrl,
+    };
+
     return (
         <>
             <header className="topbar">
@@ -50,9 +58,6 @@ export function ProfilePage() {
                     <span className="brand-name">SocialNetwork</span>
                 </div>
                 <div>
-                    <Link to="/posts" className="btn btn-secondary">
-                        Posts
-                    </Link>
                     <button type="button" className="btn btn-secondary" onClick={() => void logout()}>
                         Log out
                     </button>
@@ -60,17 +65,24 @@ export function ProfilePage() {
             </header>
             <main className="profile-main">
                 <div className="profile-card">
-                    <AvatarUpload
-                        avatarUrl={profile.avatarUrl}
-                        initials={initials}
-                        onChange={(avatarUrl) => setProfile({ ...profile, avatarUrl })}
-                    />
-                    <h1>{profile.displayName}</h1>
-                    <p className="username">@{profile.username}</p>
-                    {profile.bio && <p className="bio">{profile.bio}</p>}
-                    <Link to="/profile/edit" className="btn btn-secondary">
-                        Edit profile
-                    </Link>
+                    <div className="identity-row">
+                        <AvatarUpload
+                            avatarUrl={profile.avatarUrl}
+                            initials={initials}
+                            onChange={(avatarUrl) => setProfile({ ...profile, avatarUrl })}
+                        />
+                        <div className="identity-text">
+                            <div className="name-row">
+                                <h1>{profile.displayName}</h1>
+                                <Link to="/profile/edit" className="btn btn-secondary">
+                                    Edit profile
+                                </Link>
+                            </div>
+                            <p className="username">@{profile.username}</p>
+                            {profile.bio && <p className="bio">{profile.bio}</p>}
+                        </div>
+                    </div>
+
                     <dl>
                         <dt>Name</dt>
                         <dd>
@@ -90,6 +102,8 @@ export function ProfilePage() {
                         {profile.address && <dd>{profile.address}</dd>}
                     </dl>
                 </div>
+
+                <PostList username={profile.username} currentUser={currentUser} showComposer />
             </main>
         </>
     );

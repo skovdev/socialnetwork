@@ -1,6 +1,7 @@
 export interface PostAuthor {
     username: string;
     displayName: string;
+    avatarUrl: string | null;
 }
 
 export interface Post {

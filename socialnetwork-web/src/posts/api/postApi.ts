@@ -7,8 +7,10 @@ export const postApi = {
         return response.data;
     },
 
-    async getFeed(page = 0, size = 20): Promise<PostPage> {
-        const response = await apiRequest<PostPage>(`/api/v1/posts?page=${page}&size=${size}`);
+    async getPostsByUsername(username: string, page = 0, size = 20): Promise<PostPage> {
+        const response = await apiRequest<PostPage>(
+            `/api/v1/users/${encodeURIComponent(username)}/posts?page=${page}&size=${size}`,
+        );
         return response.data;
     },
 

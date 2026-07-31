@@ -15,4 +15,6 @@ import java.util.UUID;
 @Repository
 public interface PostRepository extends CrudRepository<Post, UUID>, PagingAndSortingRepository<Post, UUID> {
     Page<Post> findAllByOrderByCreatedAtDesc(Pageable pageable);
+
+    Page<Post> findByAuthorIdOrderByCreatedAtDesc(UUID authorId, Pageable pageable);
 }
