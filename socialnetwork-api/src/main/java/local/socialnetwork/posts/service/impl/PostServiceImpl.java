@@ -17,6 +17,8 @@ import local.socialnetwork.profiles.entity.UserProfile;
 
 import local.socialnetwork.profiles.repository.UserProfileRepository;
 
+import local.socialnetwork.profiles.service.AvatarStorageService;
+
 import local.socialnetwork.shared.dto.response.AuthorSummary;
 
 import local.socialnetwork.shared.exception.UserNotFoundException;
@@ -57,6 +59,7 @@ public class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
     private final AuthUserRepository authUserRepository;
     private final UserProfileRepository userProfileRepository;
+    private final AvatarStorageService avatarStorageService;
 
     /**
      * {@inheritDoc}
@@ -103,6 +106,19 @@ public class PostServiceImpl implements PostService {
      * {@inheritDoc}
      */
     @Override
+    @Transactional(readOnly = true)
+    public Page<PostResponse> getPostsByUsername(String username, Pageable pageable) {
+        var profile = userProfileRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("User '" + username + "' not found"));
+        var page = postRepository.findByAuthorIdOrderByCreatedAtDesc(profile.getAuthUser().getId(), pageable);
+        var author = AuthorSummary.from(profile, avatarStorageService.presign(profile.getAvatarUrl()));
+        return page.map(post -> PostResponse.from(post, author));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     @Transactional
     @CacheEvict(cacheNames = POSTS_CACHE_NAME, key = "#postId")
     public PostResponse updatePost(UUID authUserId, UUID postId, UpdatePostRequestDto request) {
@@ -142,7 +158,7 @@ public class PostServiceImpl implements PostService {
     private AuthorSummary resolveAuthor(UUID authUserId) {
         var profile = userProfileRepository.findByAuthUserId(authUserId)
                 .orElseThrow(() -> new UserNotFoundException("Profile not found for user id: " + authUserId));
-        return AuthorSummary.from(profile);
+        return AuthorSummary.from(profile, avatarStorageService.presign(profile.getAvatarUrl()));
     }
 
     private AuthorSummary toAuthorSummary(Map<UUID, UserProfile> authorsById, UUID authUserId) {
@@ -150,6 +166,6 @@ public class PostServiceImpl implements PostService {
         if (profile == null) {
             throw new UserNotFoundException("Profile not found for user id: " + authUserId);
         }
-        return AuthorSummary.from(profile);
+        return AuthorSummary.from(profile, avatarStorageService.presign(profile.getAvatarUrl()));
     }
 }

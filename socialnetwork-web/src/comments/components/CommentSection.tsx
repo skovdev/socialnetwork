@@ -5,6 +5,8 @@ import { Link } from "react-router-dom";
 import { commentApi } from "../api/commentApi";
 import type { Comment } from "../types";
 import { ApiError } from "../../core/api/httpClient";
+import { Avatar } from "../../shared/components/Avatar";
+import type { CurrentUser } from "../../shared/types";
 
 function addReply(comments: Comment[], parentId: string, reply: Comment): Comment[] {
     return comments.map((comment) =>
@@ -28,7 +30,17 @@ function removeComment(comments: Comment[], id: string): Comment[] {
         .map((comment) => ({ ...comment, replies: comment.replies.filter((reply) => reply.id !== id) }));
 }
 
+function formatTimestamp(iso: string): string {
+    return new Date(iso).toLocaleString(undefined, {
+        month: "short",
+        day: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+    });
+}
+
 interface CommentFormProps {
+    currentUser: CurrentUser | null;
     initialValue?: string;
     placeholder: string;
     submitLabel: string;
@@ -36,7 +48,7 @@ interface CommentFormProps {
     onCancel?: () => void;
 }
 
-function CommentForm({ initialValue = "", placeholder, submitLabel, onSubmit, onCancel }: CommentFormProps) {
+function CommentForm({ currentUser, initialValue = "", placeholder, submitLabel, onSubmit, onCancel }: CommentFormProps) {
     const [content, setContent] = useState(initialValue);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -53,33 +65,30 @@ function CommentForm({ initialValue = "", placeholder, submitLabel, onSubmit, on
     }
 
     return (
-        <form onSubmit={handleSubmit} className="comment-form">
-            <label className="field">
-                <textarea
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)}
-                    rows={2}
-                    maxLength={2000}
-                    placeholder={placeholder}
-                />
-            </label>
-            <div className="comment-form-actions">
-                <button type="submit" className="btn-secondary" disabled={isSubmitting || !content.trim()}>
-                    {isSubmitting ? "Saving…" : submitLabel}
+        <form onSubmit={handleSubmit} className="comment-form-row">
+            <Avatar avatarUrl={currentUser?.avatarUrl} displayName={currentUser?.displayName ?? ""} />
+            <input
+                type="text"
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                maxLength={2000}
+                placeholder={placeholder}
+            />
+            <button type="submit" className="comment-submit" disabled={isSubmitting || !content.trim()}>
+                {isSubmitting ? "…" : submitLabel}
+            </button>
+            {onCancel && (
+                <button type="button" className="comment-submit" onClick={onCancel}>
+                    Cancel
                 </button>
-                {onCancel && (
-                    <button type="button" className="btn-secondary" onClick={onCancel}>
-                        Cancel
-                    </button>
-                )}
-            </div>
+            )}
         </form>
     );
 }
 
 interface CommentCardProps {
     comment: Comment;
-    currentUsername: string | null;
+    currentUser: CurrentUser | null;
     isReply: boolean;
     onReply?: (content: string) => Promise<void>;
     onEdit: (content: string) => Promise<void>;
@@ -91,7 +100,7 @@ interface CommentCardProps {
 
 function CommentCard({
     comment,
-    currentUsername,
+    currentUser,
     isReply,
     onReply,
     onEdit,
@@ -101,92 +110,95 @@ function CommentCard({
 }: CommentCardProps) {
     const [isReplying, setIsReplying] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
-    const isOwner = currentUsername === comment.author.username;
+    const isOwner = currentUser?.username === comment.author.username;
 
     return (
-        <div className={isReply ? "comment-card reply-card" : "comment-card"}>
-            <div className="comment-header">
-                <Link to={`/users/${comment.author.username}`}>{comment.author.displayName}</Link>
-                <span className="username">@{comment.author.username}</span>
-            </div>
-
-            {isEditing ? (
-                <CommentForm
-                    initialValue={comment.content}
-                    placeholder="Edit your comment"
-                    submitLabel="Save"
-                    onCancel={() => setIsEditing(false)}
-                    onSubmit={async (content) => {
-                        await onEdit(content);
-                        setIsEditing(false);
-                    }}
-                />
-            ) : (
-                <>
-                    <p className="comment-content">{comment.content}</p>
-                    <div className="comment-meta">
-                        <span>{new Date(comment.createdAt).toLocaleString()}</span>
-                        {comment.updatedAt && <span> · edited</span>}
+        <div className="comment-row">
+            <Link to={`/users/${comment.author.username}`}>
+                <Avatar avatarUrl={comment.author.avatarUrl} displayName={comment.author.displayName} />
+            </Link>
+            <div className="comment-body-col">
+                {isEditing ? (
+                    <CommentForm
+                        currentUser={currentUser}
+                        initialValue={comment.content}
+                        placeholder="Edit your comment"
+                        submitLabel="Save"
+                        onCancel={() => setIsEditing(false)}
+                        onSubmit={async (content) => {
+                            await onEdit(content);
+                            setIsEditing(false);
+                        }}
+                    />
+                ) : (
+                    <div className="comment-bubble">
+                        <Link to={`/users/${comment.author.username}`} className="comment-author">
+                            {comment.author.displayName}
+                        </Link>
+                        <span className="comment-text">{comment.content}</span>
                     </div>
-                </>
-            )}
+                )}
 
-            {!isEditing && (
-                <div className="comment-actions">
-                    {!isReply && onReply && (
-                        <button type="button" className="btn-secondary" onClick={() => setIsReplying((v) => !v)}>
-                            Reply
-                        </button>
-                    )}
-                    {isOwner && (
-                        <>
-                            <button type="button" className="btn-secondary" onClick={() => setIsEditing(true)}>
-                                Edit
+                {!isEditing && (
+                    <div className="comment-sub">
+                        <span>{formatTimestamp(comment.createdAt)}</span>
+                        {comment.updatedAt && <span>edited</span>}
+                        {!isReply && onReply && (
+                            <button type="button" onClick={() => setIsReplying((v) => !v)}>
+                                Reply
                             </button>
-                            <button type="button" className="btn-secondary" onClick={() => void onDelete()}>
-                                Delete
-                            </button>
-                        </>
-                    )}
-                </div>
-            )}
+                        )}
+                        {isOwner && (
+                            <>
+                                <button type="button" onClick={() => setIsEditing(true)}>
+                                    Edit
+                                </button>
+                                <button type="button" onClick={() => void onDelete()}>
+                                    Delete
+                                </button>
+                            </>
+                        )}
+                    </div>
+                )}
 
-            {isReplying && onReply && (
-                <CommentForm
-                    placeholder={`Reply to @${comment.author.username}`}
-                    submitLabel="Reply"
-                    onCancel={() => setIsReplying(false)}
-                    onSubmit={async (content) => {
-                        await onReply(content);
-                        setIsReplying(false);
-                    }}
-                />
-            )}
+                {isReplying && onReply && (
+                    <CommentForm
+                        currentUser={currentUser}
+                        placeholder={`Reply to @${comment.author.username}`}
+                        submitLabel="Reply"
+                        onCancel={() => setIsReplying(false)}
+                        onSubmit={async (content) => {
+                            await onReply(content);
+                            setIsReplying(false);
+                        }}
+                    />
+                )}
 
-            {!isReply && comment.replies.length > 0 && (
-                <div className="comment-replies">
-                    {comment.replies.map((reply) => (
-                        <CommentCard
-                            key={reply.id}
-                            comment={reply}
-                            currentUsername={currentUsername}
-                            isReply
-                            onEdit={(content) => onEditReply!(reply.id, content)}
-                            onDelete={() => onDeleteReply!(reply.id)}
-                        />
-                    ))}
-                </div>
-            )}
+                {!isReply && comment.replies.length > 0 && (
+                    <div className="replies">
+                        {comment.replies.map((reply) => (
+                            <CommentCard
+                                key={reply.id}
+                                comment={reply}
+                                currentUser={currentUser}
+                                isReply
+                                onEdit={(content) => onEditReply!(reply.id, content)}
+                                onDelete={() => onDeleteReply!(reply.id)}
+                            />
+                        ))}
+                    </div>
+                )}
+            </div>
         </div>
     );
 }
 
 interface CommentSectionProps {
     postId: string;
-    currentUsername: string | null;
+    currentUser: CurrentUser | null;
 }
 
-export function CommentSection({ postId, currentUsername }: CommentSectionProps) {
+export function CommentSection({ postId, currentUser }: CommentSectionProps) {
     const [comments, setComments] = useState<Comment[]>([]);
     const [page, setPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
@@ -245,11 +257,7 @@ export function CommentSection({ postId, currentUsername }: CommentSectionProps)
     }
 
     return (
-        <section className="comment-section">
-            <h2>Comments</h2>
-
-            <CommentForm placeholder="Add a comment…" submitLabel="Comment" onSubmit={handleCreateComment} />
-
+        <section className="comments">
             {error && (
                 <p className="alert" role="alert">
                     {error}
@@ -258,32 +266,27 @@ export function CommentSection({ postId, currentUsername }: CommentSectionProps)
             {isLoading && <p className="hint">Loading comments…</p>}
             {!isLoading && comments.length === 0 && !error && <p className="hint">No comments yet.</p>}
 
-            <div className="comment-list">
-                {comments.map((comment) => (
-                    <CommentCard
-                        key={comment.id}
-                        comment={comment}
-                        currentUsername={currentUsername}
-                        isReply={false}
-                        onReply={(content) => handleCreateReply(comment.id, content)}
-                        onEdit={(content) => handleEditComment(comment.id, content)}
-                        onDelete={() => handleDeleteComment(comment.id)}
-                        onEditReply={handleEditComment}
-                        onDeleteReply={handleDeleteComment}
-                    />
-                ))}
-            </div>
+            {comments.map((comment) => (
+                <CommentCard
+                    key={comment.id}
+                    comment={comment}
+                    currentUser={currentUser}
+                    isReply={false}
+                    onReply={(content) => handleCreateReply(comment.id, content)}
+                    onEdit={(content) => handleEditComment(comment.id, content)}
+                    onDelete={() => handleDeleteComment(comment.id)}
+                    onEditReply={handleEditComment}
+                    onDeleteReply={handleDeleteComment}
+                />
+            ))}
 
             {page + 1 < totalPages && (
-                <button
-                    type="button"
-                    className="btn-secondary"
-                    onClick={() => void handleLoadMore()}
-                    disabled={isLoadingMore}
-                >
-                    {isLoadingMore ? "Loading…" : "Load more comments"}
+                <button className="view-more" type="button" onClick={() => void handleLoadMore()} disabled={isLoadingMore}>
+                    {isLoadingMore ? "Loading…" : "View more comments"}
                 </button>
             )}
+
+            <CommentForm currentUser={currentUser} placeholder="Write a comment…" submitLabel="Post" onSubmit={handleCreateComment} />
         </section>
     );
 }
