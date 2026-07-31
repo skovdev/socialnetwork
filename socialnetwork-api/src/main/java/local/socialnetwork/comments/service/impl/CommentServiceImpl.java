@@ -19,6 +19,8 @@ import local.socialnetwork.profiles.entity.UserProfile;
 
 import local.socialnetwork.profiles.repository.UserProfileRepository;
 
+import local.socialnetwork.profiles.service.AvatarStorageService;
+
 import local.socialnetwork.shared.dto.response.AuthorSummary;
 
 import local.socialnetwork.shared.exception.UserNotFoundException;
@@ -62,6 +64,7 @@ public class CommentServiceImpl implements CommentService {
     private final PostRepository postRepository;
     private final AuthUserRepository authUserRepository;
     private final UserProfileRepository userProfileRepository;
+    private final AvatarStorageService avatarStorageService;
 
     /**
      * {@inheritDoc}
@@ -177,7 +180,7 @@ public class CommentServiceImpl implements CommentService {
     private AuthorSummary resolveAuthor(UUID authUserId) {
         var profile = userProfileRepository.findByAuthUserId(authUserId)
                 .orElseThrow(() -> new UserNotFoundException("Profile not found for user id: " + authUserId));
-        return AuthorSummary.from(profile);
+        return AuthorSummary.from(profile, avatarStorageService.presign(profile.getAvatarUrl()));
     }
 
     private AuthorSummary toAuthorSummary(Map<UUID, UserProfile> authorsById, UUID authUserId) {
@@ -185,6 +188,6 @@ public class CommentServiceImpl implements CommentService {
         if (profile == null) {
             throw new UserNotFoundException("Profile not found for user id: " + authUserId);
         }
-        return AuthorSummary.from(profile);
+        return AuthorSummary.from(profile, avatarStorageService.presign(profile.getAvatarUrl()));
     }
 }

@@ -15,6 +15,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 import local.socialnetwork.dto.api.response.ApiResponseDto;
 
+import local.socialnetwork.posts.dto.http.response.PostResponse;
+
+import local.socialnetwork.posts.service.PostService;
+
 import local.socialnetwork.profiles.dto.http.response.UserProfileResponse;
 
 import local.socialnetwork.profiles.service.UserProfileService;
@@ -25,6 +29,10 @@ import local.socialnetwork.shared.constant.VersionApi;
 import local.socialnetwork.shared.exception.UserNotFoundException;
 
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.data.domain.Pageable;
+
+import org.springframework.data.web.PagedModel;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -39,6 +47,7 @@ public class UserProfileRestController {
 
     private final UserProfileService userProfileService;
     private final AvatarStorageService avatarStorageService;
+    private final PostService postService;
 
     @Operation(summary = "Get user profile by username", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses({
@@ -54,6 +63,20 @@ public class UserProfileRestController {
                 .orElseThrow(() -> new UserNotFoundException("User '" + username + "' not found"));
         var avatarUrl = avatarStorageService.presign(profile.getAvatarUrl());
         return ApiResponseDto.buildSuccessResponse(UserProfileResponse.from(profile, avatarUrl));
+    }
+
+    @Operation(summary = "Get posts authored by a user", security = @SecurityRequirement(name = "bearerAuth"))
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Posts retrieved"),
+            @ApiResponse(responseCode = "401", description = "Not authenticated"),
+            @ApiResponse(responseCode = "404", description = "User not found")
+    })
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/{username}/posts")
+    public ApiResponseDto<PagedModel<PostResponse>> getPosts(
+            @Parameter(description = "Username to retrieve posts for") @PathVariable("username") String username,
+            Pageable pageable) {
+        return ApiResponseDto.buildSuccessResponse(new PagedModel<>(postService.getPostsByUsername(username, pageable)));
     }
 
 }

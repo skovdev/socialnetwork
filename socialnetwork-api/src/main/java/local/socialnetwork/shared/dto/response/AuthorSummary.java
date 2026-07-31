@@ -5,9 +5,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import local.socialnetwork.profiles.entity.UserProfile;
 
 @Schema(description = "Minimal public author info attached to user-generated content")
-public record AuthorSummary(String username, String displayName) {
+public record AuthorSummary(String username, String displayName, String avatarUrl) {
 
-    public static AuthorSummary from(UserProfile profile) {
-        return new AuthorSummary(profile.getUsername(), profile.getDisplayName());
+    /**
+     * @param avatarUrl a presigned, publicly reachable avatar URL, or {@code null} if the author has no avatar
+     */
+    public static AuthorSummary from(UserProfile profile, String avatarUrl) {
+        return new AuthorSummary(profile.getUsername(), profile.getDisplayName(), avatarUrl);
     }
 }

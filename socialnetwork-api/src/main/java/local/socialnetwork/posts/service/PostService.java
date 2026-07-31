@@ -33,6 +33,13 @@ public interface PostService {
     Page<PostResponse> getFeed(Pageable pageable);
 
     /**
+     * Returns a page of posts authored by the user with the given username, ordered from newest to oldest.
+     *
+     * @throws local.socialnetwork.shared.exception.UserNotFoundException if no user exists with the given username
+     */
+    Page<PostResponse> getPostsByUsername(String username, Pageable pageable);
+
+    /**
      * Updates the content of the post belonging to {@code postId}, provided {@code authUserId} is the author.
      *
      * @throws local.socialnetwork.shared.exception.PostNotFoundException     if no post exists with the given ID

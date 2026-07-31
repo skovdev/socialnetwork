@@ -4,11 +4,15 @@ import { Link, useParams } from "react-router-dom";
 import { profileApi } from "../api/profileApi";
 import { ApiError } from "../../core/api/httpClient";
 import type { PublicUserProfile } from "../types";
+import { PostList } from "../../posts/components/PostList";
+import { Avatar } from "../../shared/components/Avatar";
+import type { CurrentUser } from "../../shared/types";
 
 export function UserProfilePage() {
     const { username } = useParams<{ username: string }>();
 
     const [profile, setProfile] = useState<PublicUserProfile | null>(null);
+    const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
@@ -23,9 +27,14 @@ export function UserProfilePage() {
             );
     }, [username]);
 
-    const initials = profile
-        ? `${profile.firstName?.[0] ?? ""}${profile.lastName?.[0] ?? ""}`.toUpperCase()
-        : "";
+    useEffect(() => {
+        profileApi
+            .getMyProfile()
+            .then((profile) =>
+                setCurrentUser({ username: profile.username, displayName: profile.displayName, avatarUrl: profile.avatarUrl }),
+            )
+            .catch(() => {});
+    }, []);
 
     return (
         <>
@@ -35,9 +44,6 @@ export function UserProfilePage() {
                     <span className="brand-name">SocialNetwork</span>
                 </div>
                 <div>
-                    <Link to="/posts" className="btn btn-secondary">
-                        Posts
-                    </Link>
                     <Link to="/profile" className="btn btn-secondary">
                         My profile
                     </Link>
@@ -51,28 +57,31 @@ export function UserProfilePage() {
                 )}
                 {!error && !profile && <p className="hint">Loading…</p>}
                 {!error && profile && (
-                    <div className="profile-card">
-                        <div className="avatar">
-                            {profile.avatarUrl ? (
-                                <img src={profile.avatarUrl} alt="Profile avatar" className="avatar-img" />
-                            ) : (
-                                <span>{initials || "?"}</span>
-                            )}
+                    <>
+                        <div className="profile-card">
+                            <div className="identity-row">
+                                <Avatar avatarUrl={profile.avatarUrl} displayName={profile.displayName} size="lg" />
+                                <div className="identity-text">
+                                    <h1>{profile.displayName}</h1>
+                                    <p className="username">@{profile.username}</p>
+                                    {profile.bio && <p className="bio">{profile.bio}</p>}
+                                </div>
+                            </div>
+
+                            <dl>
+                                <dt>Name</dt>
+                                <dd>
+                                    {profile.firstName} {profile.lastName}
+                                </dd>
+                                {profile.city && <dt>City</dt>}
+                                {profile.city && <dd>{profile.city}</dd>}
+                                {profile.country && <dt>Country</dt>}
+                                {profile.country && <dd>{profile.country}</dd>}
+                            </dl>
                         </div>
-                        <h1>{profile.displayName}</h1>
-                        <p className="username">@{profile.username}</p>
-                        {profile.bio && <p className="bio">{profile.bio}</p>}
-                        <dl>
-                            <dt>Name</dt>
-                            <dd>
-                                {profile.firstName} {profile.lastName}
-                            </dd>
-                            {profile.city && <dt>City</dt>}
-                            {profile.city && <dd>{profile.city}</dd>}
-                            {profile.country && <dt>Country</dt>}
-                            {profile.country && <dd>{profile.country}</dd>}
-                        </dl>
-                    </div>
+
+                        <PostList username={profile.username} currentUser={currentUser} showComposer={false} />
+                    </>
                 )}
             </main>
         </>
