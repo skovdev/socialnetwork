@@ -37,8 +37,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import org.springframework.security.access.prepost.PreAuthorize;
-
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import org.springframework.validation.annotation.Validated;
@@ -76,7 +74,6 @@ public class AuthUserRestController {
             @ApiResponse(responseCode = "409", description = "Username or email already exists"),
             @ApiResponse(responseCode = "503", description = "Email delivery failed")
     })
-    @PreAuthorize("permitAll()")
     @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponseDto<Void> register(@RequestBody @Valid RegisterRequest request) {
@@ -94,7 +91,6 @@ public class AuthUserRestController {
             @ApiResponse(responseCode = "404", description = "Token not found"),
             @ApiResponse(responseCode = "410", description = "Token expired or already used")
     })
-    @PreAuthorize("permitAll()")
     @GetMapping("/verify")
     public ApiResponseDto<Void> verify(@NotBlank @RequestParam("token") String token) {
         authUserService.verify(new VerifyRequest(token));
@@ -112,7 +108,6 @@ public class AuthUserRestController {
             @ApiResponse(responseCode = "403", description = "Account not verified"),
             @ApiResponse(responseCode = "429", description = "Too many failed login attempts — retry after the Retry-After header duration")
     })
-    @PreAuthorize("permitAll()")
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ApiResponseDto<TokenResponse> login(@RequestBody @Valid LoginRequest request) {
         return ApiResponseDto.buildSuccessResponse(authUserService.login(request));
@@ -128,7 +123,6 @@ public class AuthUserRestController {
             @ApiResponse(responseCode = "404", description = "Refresh token not found"),
             @ApiResponse(responseCode = "410", description = "Refresh token expired")
     })
-    @PreAuthorize("permitAll()")
     @PostMapping(value = "/refresh", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ApiResponseDto<TokenResponse> refresh(@RequestBody @Valid RefreshRequest request) {
         return ApiResponseDto.buildSuccessResponse(authUserService.refresh(request));
@@ -159,7 +153,6 @@ public class AuthUserRestController {
             @ApiResponse(responseCode = "400", description = "Validation error"),
             @ApiResponse(responseCode = "503", description = "Email delivery failed")
     })
-    @PreAuthorize("permitAll()")
     @PostMapping(value = "/resend-verification", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ApiResponseDto<Void> resendVerification(@RequestBody @Valid ResendVerificationRequest request) {
         authUserService.resendVerification(request);
