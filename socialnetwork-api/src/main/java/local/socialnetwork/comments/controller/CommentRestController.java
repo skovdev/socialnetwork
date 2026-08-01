@@ -33,8 +33,6 @@ import org.springframework.data.web.PagedModel;
 
 import org.springframework.http.HttpStatus;
 
-import org.springframework.security.access.prepost.PreAuthorize;
-
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import org.springframework.web.bind.annotation.GetMapping;
@@ -71,7 +69,6 @@ public class CommentRestController {
             @ApiResponse(responseCode = "401", description = "Not authenticated"),
             @ApiResponse(responseCode = "404", description = "Post or parent comment not found")
     })
-    @PreAuthorize("isAuthenticated()")
     @PostMapping("/posts/{postId}/comments")
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponseDto<CommentResponse> createComment(
@@ -90,7 +87,6 @@ public class CommentRestController {
             @ApiResponse(responseCode = "401", description = "Not authenticated"),
             @ApiResponse(responseCode = "404", description = "Post not found")
     })
-    @PreAuthorize("isAuthenticated()")
     @GetMapping("/posts/{postId}/comments")
     public ApiResponseDto<PagedModel<CommentResponse>> getComments(
             @Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal principal,
@@ -110,7 +106,6 @@ public class CommentRestController {
             @ApiResponse(responseCode = "403", description = "Not the author of the comment"),
             @ApiResponse(responseCode = "404", description = "Comment not found")
     })
-    @PreAuthorize("isAuthenticated()")
     @PutMapping("/comments/{id}")
     public ApiResponseDto<CommentResponse> updateComment(
             @Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal principal,
@@ -129,7 +124,6 @@ public class CommentRestController {
             @ApiResponse(responseCode = "403", description = "Not the author of the comment"),
             @ApiResponse(responseCode = "404", description = "Comment not found")
     })
-    @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/comments/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteComment(

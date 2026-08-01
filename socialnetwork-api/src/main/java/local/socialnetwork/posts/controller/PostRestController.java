@@ -33,8 +33,6 @@ import org.springframework.data.web.PagedModel;
 
 import org.springframework.http.HttpStatus;
 
-import org.springframework.security.access.prepost.PreAuthorize;
-
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import org.springframework.web.bind.annotation.GetMapping;
@@ -70,7 +68,6 @@ public class PostRestController {
             @ApiResponse(responseCode = "400", description = "Validation error"),
             @ApiResponse(responseCode = "401", description = "Not authenticated")
     })
-    @PreAuthorize("isAuthenticated()")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponseDto<PostResponse> createPost(
@@ -87,7 +84,6 @@ public class PostRestController {
             @ApiResponse(responseCode = "200", description = "Feed retrieved"),
             @ApiResponse(responseCode = "401", description = "Not authenticated")
     })
-    @PreAuthorize("isAuthenticated()")
     @GetMapping
     public ApiResponseDto<PagedModel<PostResponse>> getFeed(
             @Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal principal, Pageable pageable) {
@@ -103,7 +99,6 @@ public class PostRestController {
             @ApiResponse(responseCode = "401", description = "Not authenticated"),
             @ApiResponse(responseCode = "404", description = "Post not found")
     })
-    @PreAuthorize("isAuthenticated()")
     @GetMapping("/{id}")
     public ApiResponseDto<PostResponse> getPost(
             @Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal principal, @PathVariable("id") UUID id) {
@@ -121,7 +116,6 @@ public class PostRestController {
             @ApiResponse(responseCode = "403", description = "Not the author of the post"),
             @ApiResponse(responseCode = "404", description = "Post not found")
     })
-    @PreAuthorize("isAuthenticated()")
     @PutMapping("/{id}")
     public ApiResponseDto<PostResponse> updatePost(
             @Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal principal,
@@ -140,7 +134,6 @@ public class PostRestController {
             @ApiResponse(responseCode = "403", description = "Not the author of the post"),
             @ApiResponse(responseCode = "404", description = "Post not found")
     })
-    @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deletePost(

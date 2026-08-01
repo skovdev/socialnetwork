@@ -34,8 +34,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.HttpStatus;
 
-import org.springframework.security.access.prepost.PreAuthorize;
-
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import org.springframework.web.bind.annotation.GetMapping;
@@ -72,7 +70,6 @@ public class ProfileRestController {
             @ApiResponse(responseCode = "401", description = "Not authenticated"),
             @ApiResponse(responseCode = "404", description = "Profile not found")
     })
-    @PreAuthorize("isAuthenticated()")
     @GetMapping
     public ApiResponseDto<MyProfileResponse> getProfile(
             @Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal principal) {
@@ -91,7 +88,6 @@ public class ProfileRestController {
             @ApiResponse(responseCode = "401", description = "Not authenticated"),
             @ApiResponse(responseCode = "404", description = "Profile not found")
     })
-    @PreAuthorize("isAuthenticated()")
     @PutMapping
     public ApiResponseDto<MyProfileResponse> updateProfile(
             @Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal principal,
@@ -110,7 +106,6 @@ public class ProfileRestController {
             @ApiResponse(responseCode = "404", description = "Profile not found"),
             @ApiResponse(responseCode = "422", description = "Invalid file type, size, or content does not match the declared type")
     })
-    @PreAuthorize("isAuthenticated()")
     @PostMapping(value = "/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponseDto<MyProfileResponse> uploadAvatar(
             @Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal principal,
@@ -128,7 +123,6 @@ public class ProfileRestController {
             @ApiResponse(responseCode = "401", description = "Not authenticated"),
             @ApiResponse(responseCode = "404", description = "Profile or avatar not found")
     })
-    @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/avatar")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteAvatar(@Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal principal) {

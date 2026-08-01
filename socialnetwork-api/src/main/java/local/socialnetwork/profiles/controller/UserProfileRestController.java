@@ -2,8 +2,6 @@ package local.socialnetwork.profiles.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 
-import org.springframework.security.access.prepost.PreAuthorize;
-
 import io.swagger.v3.oas.annotations.Parameter;
 
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -55,7 +53,6 @@ public class UserProfileRestController {
             @ApiResponse(responseCode = "401", description = "Not authenticated"),
             @ApiResponse(responseCode = "404", description = "User not found")
     })
-    @PreAuthorize("isAuthenticated()")
     @GetMapping("/{username}")
     public ApiResponseDto<UserProfileResponse> getProfile(
             @Parameter(description = "Username to retrieve") @PathVariable("username") String username) {
@@ -71,7 +68,6 @@ public class UserProfileRestController {
             @ApiResponse(responseCode = "401", description = "Not authenticated"),
             @ApiResponse(responseCode = "404", description = "User not found")
     })
-    @PreAuthorize("isAuthenticated()")
     @GetMapping("/{username}/posts")
     public ApiResponseDto<PagedModel<PostResponse>> getPosts(
             @Parameter(description = "Username to retrieve posts for") @PathVariable("username") String username,

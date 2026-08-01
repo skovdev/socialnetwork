@@ -142,7 +142,6 @@ public class AuthUserRestController {
             @ApiResponse(responseCode = "204", description = "Logged out successfully"),
             @ApiResponse(responseCode = "401", description = "Not authenticated")
     })
-    @PreAuthorize("isAuthenticated()")
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(@AuthenticationPrincipal UserPrincipal principal) {
         authUserService.logout(principal.getId());
@@ -177,7 +176,6 @@ public class AuthUserRestController {
             @ApiResponse(responseCode = "400", description = "Validation error or wrong current password"),
             @ApiResponse(responseCode = "401", description = "Not authenticated")
     })
-    @PreAuthorize("isAuthenticated()")
     @PutMapping(value = "/password", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> changePassword(
             @Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal principal,
@@ -196,7 +194,6 @@ public class AuthUserRestController {
             @ApiResponse(responseCode = "400", description = "Validation error or wrong password"),
             @ApiResponse(responseCode = "401", description = "Not authenticated")
     })
-    @PreAuthorize("isAuthenticated()")
     @DeleteMapping(value = "/account", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> deleteAccount(
             @Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal principal,
