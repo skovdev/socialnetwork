@@ -37,6 +37,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * REST controller for viewing other users' public profiles and posts.
+ */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(VersionApi.API_V1 + "/users")

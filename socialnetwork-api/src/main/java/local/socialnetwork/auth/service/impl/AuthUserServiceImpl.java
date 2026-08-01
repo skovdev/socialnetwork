@@ -66,6 +66,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+/**
+ * Default {@link AuthUserService} implementation backed by JPA repositories,
+ * Spring Security, and JWT-based access/refresh tokens.
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor

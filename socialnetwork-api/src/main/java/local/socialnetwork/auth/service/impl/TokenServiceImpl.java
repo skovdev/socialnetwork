@@ -18,6 +18,10 @@ import java.security.NoSuchAlgorithmException;
 
 import java.util.Base64;
 
+/**
+ * {@link TokenService} implementation that generates random tokens and hashes
+ * them with SHA-256 before persistence.
+ */
 @Service
 @RequiredArgsConstructor
 public class TokenServiceImpl implements TokenService {

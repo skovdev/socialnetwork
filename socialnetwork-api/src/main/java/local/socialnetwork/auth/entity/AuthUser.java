@@ -25,6 +25,10 @@ import java.util.Objects;
 import java.time.Instant;
 
 
+/**
+ * Authentication record for a user: credentials, account status, granted roles,
+ * and the linked {@link UserProfile}.
+ */
 @Setter
 @Getter
 @Entity

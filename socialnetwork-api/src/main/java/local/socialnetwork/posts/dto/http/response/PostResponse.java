@@ -9,6 +9,9 @@ import local.socialnetwork.shared.dto.response.AuthorSummary;
 import java.time.Instant;
 import java.util.UUID;
 
+/**
+ * A single post, as returned to clients.
+ */
 @Schema(description = "A single post")
 public record PostResponse(
         UUID id,

@@ -12,6 +12,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.UUID;
 
+/**
+ * Repository for {@link Post} entities.
+ */
 @Repository
 public interface PostRepository extends CrudRepository<Post, UUID>, PagingAndSortingRepository<Post, UUID> {
     Page<Post> findAllByOrderByCreatedAtDesc(Pageable pageable);

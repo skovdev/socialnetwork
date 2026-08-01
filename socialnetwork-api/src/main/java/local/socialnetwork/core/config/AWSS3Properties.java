@@ -9,6 +9,9 @@ import org.springframework.validation.annotation.Validated;
 
 import java.time.Duration;
 
+/**
+ * Configuration properties for avatar storage in AWS S3.
+ */
 @Validated
 @ConfigurationProperties(prefix = "socialnetwork.aws.s3")
 public record AWSS3Properties(

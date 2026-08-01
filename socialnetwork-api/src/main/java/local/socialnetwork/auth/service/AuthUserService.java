@@ -12,6 +12,10 @@ import local.socialnetwork.auth.dto.http.response.TokenResponse;
 
 import java.util.UUID;
 
+/**
+ * Service for authentication and account lifecycle operations: registration,
+ * verification, login/refresh, password changes, and account deletion.
+ */
 public interface AuthUserService {
 
     void register(RegisterRequest request);

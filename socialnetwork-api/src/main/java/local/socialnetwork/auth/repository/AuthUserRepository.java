@@ -9,6 +9,9 @@ import org.springframework.stereotype.Repository;
 import java.util.UUID;
 import java.util.Optional;
 
+/**
+ * Repository for {@link AuthUser} entities.
+ */
 @Repository
 public interface AuthUserRepository extends CrudRepository<AuthUser, UUID> {
     boolean existsByEmail(String email);

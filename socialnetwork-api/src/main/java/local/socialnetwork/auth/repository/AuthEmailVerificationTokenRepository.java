@@ -10,6 +10,9 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Repository for {@link AuthEmailVerificationToken} entities.
+ */
 @Repository
 public interface AuthEmailVerificationTokenRepository extends CrudRepository<AuthEmailVerificationToken, UUID> {
     Optional<AuthEmailVerificationToken> findByToken(byte[] token);

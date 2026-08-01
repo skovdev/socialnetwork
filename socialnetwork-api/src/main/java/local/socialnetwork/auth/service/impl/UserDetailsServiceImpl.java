@@ -26,6 +26,10 @@ import java.util.List;
 
 import java.util.stream.Collectors;
 
+/**
+ * Spring Security {@link UserDetailsService} that loads a {@link UserPrincipal}
+ * from the linked {@code UserProfile}/{@link AuthUser} for a given username.
+ */
 @Slf4j
 @Service("userDetailsService")
 @Transactional

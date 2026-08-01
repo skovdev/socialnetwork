@@ -7,6 +7,9 @@ import jakarta.validation.constraints.NotBlank;
 
 import java.util.UUID;
 
+/**
+ * Payload for creating a new comment or reply.
+ */
 @Schema(description = "Payload for creating a new comment or reply")
 public record CreateCommentRequestDto(
         @Schema(description = "Comment text content (required)") @NotBlank @Size(max = 2000) String content,

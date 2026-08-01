@@ -10,6 +10,9 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * A single comment, with its replies (if any) nested inline.
+ */
 @Schema(description = "A single comment, with its replies (if any) nested inline")
 public record CommentResponse(
         UUID id,

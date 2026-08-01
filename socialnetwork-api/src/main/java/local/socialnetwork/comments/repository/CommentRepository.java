@@ -14,6 +14,9 @@ import java.util.List;
 import java.util.UUID;
 import java.util.Collection;
 
+/**
+ * Repository for {@link Comment} entities.
+ */
 @Repository
 public interface CommentRepository extends CrudRepository<Comment, UUID>, PagingAndSortingRepository<Comment, UUID> {
     Page<Comment> findByPostIdAndParentIsNullOrderByCreatedAtAsc(UUID postId, Pageable pageable);

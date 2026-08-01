@@ -7,6 +7,9 @@ import local.socialnetwork.profiles.entity.UserProfile;
 
 import java.time.LocalDate;
 
+/**
+ * The authenticated user's own profile, including private fields.
+ */
 @Schema(description = "The authenticated user's own profile, including private fields")
 public record MyProfileResponse(
         String username,

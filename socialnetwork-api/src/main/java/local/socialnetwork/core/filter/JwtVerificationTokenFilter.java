@@ -24,6 +24,10 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+/**
+ * Servlet filter that authenticates each request by validating a bearer JWT
+ * and populating the security context.
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor

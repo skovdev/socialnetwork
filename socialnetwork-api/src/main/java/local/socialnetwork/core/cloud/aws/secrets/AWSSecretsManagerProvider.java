@@ -16,6 +16,9 @@ import software.amazon.awssdk.services.secretsmanager.model.SecretsManagerExcept
 
 import java.util.Map;
 
+/**
+ * Retrieves and parses key-value secrets stored in AWS Secrets Manager.
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor

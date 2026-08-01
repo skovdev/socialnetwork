@@ -13,6 +13,9 @@ import java.util.UUID;
 import java.util.Optional;
 import java.util.Collection;
 
+/**
+ * Repository for {@link UserProfile} entities.
+ */
 @Repository
 public interface UserProfileRepository extends CrudRepository<UserProfile, UUID> {
     @EntityGraph(attributePaths = {"authUser", "authUser.authUserRoles"})

@@ -42,6 +42,10 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 
+/**
+ * Configures the application's security filter chain: stateless JWT
+ * authentication, CORS, public endpoints, and password encoding.
+ */
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity

@@ -18,6 +18,9 @@ import java.time.Instant;
 
 import java.util.Objects;
 
+/**
+ * A post authored by an {@link AuthUser}.
+ */
 @Setter
 @Getter
 @Table(name = "posts")

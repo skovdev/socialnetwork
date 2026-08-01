@@ -6,6 +6,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import org.springframework.validation.annotation.Validated;
 
+/**
+ * Configuration properties for outgoing account emails.
+ */
 @Validated
 @ConfigurationProperties(prefix = "socialnetwork.email")
 public record EmailProperties(

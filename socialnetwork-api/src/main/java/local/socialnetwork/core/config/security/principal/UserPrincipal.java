@@ -10,6 +10,9 @@ import java.util.Collection;
 
 import java.util.UUID;
 
+/**
+ * Spring Security {@link User} extended with the authenticated user's internal ID.
+ */
 @Getter
 public class UserPrincipal extends User {
 

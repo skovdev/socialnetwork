@@ -10,6 +10,9 @@ import org.springframework.cache.annotation.EnableCaching;
 
 import org.springframework.retry.annotation.EnableRetry;
 
+/**
+ * Spring Boot entry point for the SocialNetwork API.
+ */
 @EnableRetry
 @EnableCaching
 @SpringBootApplication

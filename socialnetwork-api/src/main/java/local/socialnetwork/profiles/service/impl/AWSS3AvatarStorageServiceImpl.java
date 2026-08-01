@@ -31,6 +31,10 @@ import java.io.IOException;
 import java.util.Set;
 import java.util.UUID;
 
+/**
+ * {@link AvatarStorageService} implementation backed by AWS S3: validates,
+ * uploads, deletes, and presigns avatar image objects.
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor

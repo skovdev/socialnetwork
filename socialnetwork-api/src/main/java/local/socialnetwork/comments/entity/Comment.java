@@ -20,6 +20,9 @@ import java.time.Instant;
 
 import java.util.Objects;
 
+/**
+ * A comment on a {@link Post}, optionally nested as a reply to another comment.
+ */
 @Setter
 @Getter
 @Table(name = "comments")

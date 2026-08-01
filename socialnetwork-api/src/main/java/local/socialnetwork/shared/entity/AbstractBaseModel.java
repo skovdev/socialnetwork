@@ -10,6 +10,9 @@ import lombok.Getter;
 
 import java.util.UUID;
 
+/**
+ * Base class for JPA entities, providing a UUID primary key.
+ */
 @Setter
 @Getter
 @MappedSuperclass

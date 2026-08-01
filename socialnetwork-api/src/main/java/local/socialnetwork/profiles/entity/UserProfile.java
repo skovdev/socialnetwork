@@ -21,6 +21,9 @@ import java.time.LocalDate;
 
 import java.util.Objects;
 
+/**
+ * Public and private profile details for an {@link AuthUser}.
+ */
 @Setter
 @Getter
 @Table(name = "user_profiles")

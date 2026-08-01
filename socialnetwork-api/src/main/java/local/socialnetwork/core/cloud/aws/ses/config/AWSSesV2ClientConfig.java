@@ -12,6 +12,9 @@ import software.amazon.awssdk.regions.Region;
 
 import software.amazon.awssdk.services.sesv2.SesV2Client;
 
+/**
+ * Configures the AWS SES v2 client used to send transactional email.
+ */
 @Configuration
 public class AWSSesV2ClientConfig {
 

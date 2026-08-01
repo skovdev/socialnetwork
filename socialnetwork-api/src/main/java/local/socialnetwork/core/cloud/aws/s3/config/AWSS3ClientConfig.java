@@ -14,6 +14,9 @@ import software.amazon.awssdk.services.s3.S3Client;
 
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 
+/**
+ * Configures the AWS S3 client and presigner used for avatar storage.
+ */
 @Configuration
 public class AWSS3ClientConfig {
 

@@ -44,6 +44,10 @@ import java.util.Map;
 import java.util.Base64;
 import java.util.Optional;
 
+/**
+ * Issues and validates RSA-signed JWT access tokens, using key material loaded
+ * from AWS Secrets Manager.
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor

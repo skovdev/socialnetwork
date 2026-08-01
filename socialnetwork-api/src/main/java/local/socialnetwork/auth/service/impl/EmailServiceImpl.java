@@ -26,6 +26,10 @@ import software.amazon.awssdk.services.sesv2.model.EmailContent;
 import software.amazon.awssdk.services.sesv2.model.SesV2Exception;
 import software.amazon.awssdk.services.sesv2.model.SendEmailRequest;
 
+/**
+ * {@link EmailService} implementation that sends email via AWS SES v2, retrying
+ * transient failures before giving up.
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor

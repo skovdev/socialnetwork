@@ -17,6 +17,10 @@ import java.util.Objects;
 
 import java.time.Instant;
 
+/**
+ * Persisted refresh token identifier (JTI) that allows a user to obtain a new
+ * access token without re-authenticating.
+ */
 @Setter
 @Getter
 @Table(name = "auth_refresh_tokens")

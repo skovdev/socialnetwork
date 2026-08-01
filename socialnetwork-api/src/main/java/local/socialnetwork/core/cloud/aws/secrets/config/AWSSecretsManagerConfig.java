@@ -12,6 +12,9 @@ import software.amazon.awssdk.regions.Region;
 
 import software.amazon.awssdk.services.secretsmanager.SecretsManagerClient;
 
+/**
+ * Configures the AWS Secrets Manager client bean.
+ */
 @Configuration
 public class AWSSecretsManagerConfig {
 

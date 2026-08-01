@@ -15,6 +15,9 @@ import lombok.Setter;
 import java.util.Objects;
 import java.time.Instant;
 
+/**
+ * Single-use, hashed token issued to a user for confirming their email address.
+ */
 @Setter
 @Getter
 @Table(name = "auth_email_verification_tokens")

@@ -13,6 +13,9 @@ import local.socialnetwork.shared.validation.ValidAge;
 
 import java.time.LocalDate;
 
+/**
+ * Payload submitted to register a new user account.
+ */
 @Schema(description = "New user registration payload")
 public record RegisterRequest(
         @Schema(description = "First name") @NotBlank String firstName,

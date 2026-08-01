@@ -14,6 +14,9 @@ import lombok.Setter;
 
 import java.util.Objects;
 
+/**
+ * Authority granted to an {@link AuthUser}, e.g. {@code ROLE_USER}.
+ */
 @Setter
 @Getter
 @Table(name = "auth_user_roles")

@@ -4,6 +4,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import local.socialnetwork.profiles.entity.UserProfile;
 
+/**
+ * A user's public profile, excluding private fields.
+ */
 @Schema(description = "Public user profile")
 public record UserProfileResponse(
         String username,
