@@ -15,11 +15,7 @@ import local.socialnetwork.comments.service.CommentService;
 
 import local.socialnetwork.posts.repository.PostRepository;
 
-import local.socialnetwork.profiles.entity.UserProfile;
-
-import local.socialnetwork.profiles.repository.UserProfileRepository;
-
-import local.socialnetwork.profiles.service.AvatarStorageService;
+import local.socialnetwork.profiles.service.UserProfileService;
 
 import local.socialnetwork.shared.dto.response.AuthorSummary;
 
@@ -46,8 +42,6 @@ import java.util.Map;
 import java.util.List;
 import java.util.UUID;
 
-import java.util.function.Function;
-
 import java.util.stream.Collectors;
 
 import java.util.stream.Stream;
@@ -63,8 +57,7 @@ public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
     private final AuthUserRepository authUserRepository;
-    private final UserProfileRepository userProfileRepository;
-    private final AvatarStorageService avatarStorageService;
+    private final UserProfileService userProfileService;
 
     /**
      * {@inheritDoc}
@@ -112,8 +105,7 @@ public class CommentServiceImpl implements CommentService {
                                 .map(reply -> reply.getAuthor().getId()))
                 .distinct()
                 .toList();
-        var authorsById = userProfileRepository.findByAuthUserIdIn(authorIds).stream()
-                .collect(Collectors.toMap(profile -> profile.getAuthUser().getId(), Function.identity()));
+        var authorsById = userProfileService.getAuthorSummaries(authorIds);
 
         return page.map(comment -> CommentResponse.from(
                 comment,
@@ -178,16 +170,14 @@ public class CommentServiceImpl implements CommentService {
     }
 
     private AuthorSummary resolveAuthor(UUID authUserId) {
-        var profile = userProfileRepository.findByAuthUserId(authUserId)
-                .orElseThrow(() -> new UserNotFoundException("Profile not found for user id: " + authUserId));
-        return AuthorSummary.from(profile, avatarStorageService.presign(profile.getAvatarUrl()));
+        return userProfileService.getAuthorSummary(authUserId);
     }
 
-    private AuthorSummary toAuthorSummary(Map<UUID, UserProfile> authorsById, UUID authUserId) {
-        var profile = authorsById.get(authUserId);
-        if (profile == null) {
+    private AuthorSummary toAuthorSummary(Map<UUID, AuthorSummary> authorsById, UUID authUserId) {
+        var author = authorsById.get(authUserId);
+        if (author == null) {
             throw new UserNotFoundException("Profile not found for user id: " + authUserId);
         }
-        return AuthorSummary.from(profile, avatarStorageService.presign(profile.getAvatarUrl()));
+        return author;
     }
 }

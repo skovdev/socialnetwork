@@ -1,4 +1,4 @@
-package local.socialnetwork.dto.api.response;
+package local.socialnetwork.shared.dto.response;
 
 import org.springframework.http.HttpStatus;
 

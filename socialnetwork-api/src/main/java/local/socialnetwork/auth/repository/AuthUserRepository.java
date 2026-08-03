@@ -16,4 +16,6 @@ import java.util.Optional;
 public interface AuthUserRepository extends CrudRepository<AuthUser, UUID> {
     boolean existsByEmail(String email);
     Optional<AuthUser> findByEmail(String email);
+    Optional<AuthUser> findByUserProfileUsername(String username);
+    boolean existsByUserProfileUsername(String username);
 }

@@ -21,7 +21,7 @@ import local.socialnetwork.comments.service.CommentService;
 
 import local.socialnetwork.core.config.security.principal.UserPrincipal;
 
-import local.socialnetwork.dto.api.response.ApiResponseDto;
+import local.socialnetwork.shared.dto.response.ApiResponseDto;
 
 import local.socialnetwork.shared.constant.VersionApi;
 

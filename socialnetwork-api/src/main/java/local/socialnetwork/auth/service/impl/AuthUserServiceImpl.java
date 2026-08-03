@@ -27,9 +27,9 @@ import local.socialnetwork.auth.service.LoginRateLimiterService;
 
 import local.socialnetwork.core.config.jwt.JwtTokenProvider;
 
-import local.socialnetwork.profiles.entity.UserProfile;
+import local.socialnetwork.profiles.dto.NewProfileDetails;
 
-import local.socialnetwork.profiles.repository.UserProfileRepository;
+import local.socialnetwork.profiles.service.UserProfileService;
 
 import local.socialnetwork.shared.exception.UserNotFoundException;
 import local.socialnetwork.shared.exception.TokenExpiredException;
@@ -81,7 +81,7 @@ public class AuthUserServiceImpl implements AuthUserService {
     private static final String ROLE_USER = "ROLE_USER";
 
     private final AuthUserRepository authUserRepository;
-    private final UserProfileRepository userProfileRepository;
+    private final UserProfileService userProfileService;
     private final AuthEmailVerificationTokenRepository emailTokenRepository;
     private final AuthRefreshTokenRepository refreshTokenRepository;
     private final LoginRateLimiterService loginRateLimiterService;
@@ -98,7 +98,9 @@ public class AuthUserServiceImpl implements AuthUserService {
         validateEmailNotExists(request.email());
         var authUser = buildAuthUser(request);
         var authUserRole = buildAuthUserRole(authUser);
-        var userProfile = buildUserProfile(request, authUser);
+        var userProfile = userProfileService.createProfile(authUser, new NewProfileDetails(
+                request.firstName(), request.lastName(), normalizeUsername(request.username()),
+                request.birthDate(), request.phoneNumber()));
         authUser.setAuthUserRoles(Set.of(authUserRole));
         authUser.setUserProfile(userProfile);
         authUserRepository.save(authUser);
@@ -166,8 +168,7 @@ public class AuthUserServiceImpl implements AuthUserService {
         var authUser = storedToken.getUser();
         refreshTokenRepository.delete(storedToken);
 
-        var username = userProfileRepository.findByAuthUserId(authUser.getId())
-                .map(UserProfile::getUsername)
+        var username = userProfileService.findUsernameByAuthUserId(authUser.getId())
                 .orElseThrow(() -> new UserNotFoundException("Profile not found for user id: " + authUser.getId()));
         var accessToken = createAccessToken(username);
         var newRefreshToken = createAndPersistRefreshToken(authUser);
@@ -238,8 +239,7 @@ public class AuthUserServiceImpl implements AuthUserService {
     }
 
     private AuthUser resolveAuthUser(String username) {
-        return userProfileRepository.findByUsername(normalizeUsername(username))
-                .map(UserProfile::getAuthUser)
+        return authUserRepository.findByUserProfileUsername(normalizeUsername(username))
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
     }
 
@@ -268,7 +268,7 @@ public class AuthUserServiceImpl implements AuthUserService {
     }
 
     private void validateUsernameNotExists(String username) {
-        if (userProfileRepository.existsByUsername(normalizeUsername(username))) {
+        if (authUserRepository.existsByUserProfileUsername(normalizeUsername(username))) {
             throw new UsernameAlreadyExistsException("Username '" + username + "' already exists");
         }
     }
@@ -292,18 +292,6 @@ public class AuthUserServiceImpl implements AuthUserService {
         authUserRole.setAuthUser(authUser);
         authUserRole.setAuthority(ROLE_USER);
         return authUserRole;
-    }
-
-    private UserProfile buildUserProfile(RegisterRequest request, AuthUser authUser) {
-        var userProfile = new UserProfile();
-        userProfile.setFirstName(request.firstName());
-        userProfile.setLastName(request.lastName());
-        userProfile.setDisplayName(request.firstName() + " " + request.lastName());
-        userProfile.setUsername(normalizeUsername(request.username()));
-        userProfile.setBirthDate(request.birthDate());
-        userProfile.setPhoneNumber(request.phoneNumber());
-        userProfile.setAuthUser(authUser);
-        return userProfile;
     }
 
     private static String normalizeEmail(String email) {

@@ -11,7 +11,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-import local.socialnetwork.dto.api.response.ApiResponseDto;
+import local.socialnetwork.shared.dto.response.ApiResponseDto;
 
 import local.socialnetwork.posts.dto.http.response.PostResponse;
 

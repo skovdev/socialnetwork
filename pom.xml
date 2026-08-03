@@ -47,6 +47,7 @@
         <spring.retry.version>2.0.12</spring.retry.version>
         <testcontainers.version>1.21.4</testcontainers.version>
         <redis.testcontainers.version>2.2.4</redis.testcontainers.version>
+        <archunit.version>1.4.2</archunit.version>
         <netty.version>4.1.126.Final</netty.version>
         <openai.java.version>2.12.0</openai.java.version>
         <!-- Plugin versions -->

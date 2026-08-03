@@ -2,9 +2,9 @@ package local.socialnetwork.auth.service.impl;
 
 import local.socialnetwork.auth.entity.AuthUser;
 
-import local.socialnetwork.core.config.security.principal.UserPrincipal;
+import local.socialnetwork.auth.repository.AuthUserRepository;
 
-import local.socialnetwork.profiles.repository.UserProfileRepository;
+import local.socialnetwork.core.config.security.principal.UserPrincipal;
 
 import lombok.RequiredArgsConstructor;
 
@@ -36,21 +36,16 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
 
-    private final UserProfileRepository userProfileRepository;
+    private final AuthUserRepository authUserRepository;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         var normalized = username != null ? username.toLowerCase() : null;
-        var userProfile = userProfileRepository.findByUsername(normalized)
+        var authUser = authUserRepository.findByUserProfileUsername(normalized)
                 .orElseThrow(() -> {
                     log.warn("User not found for username: {}", username);
                     return new UsernameNotFoundException(username + " is not found");
                 });
-        var authUser = userProfile.getAuthUser();
-        if (authUser == null) {
-            log.warn("UserProfile '{}' has no linked AuthUser", username);
-            throw new UsernameNotFoundException("Auth record missing for username: " + username);
-        }
         log.debug("Loaded user details for username: {}", normalized);
         return new UserPrincipal(authUser.getId(), normalized, authUser.getPasswordHash(), getAuthorities(authUser));
     }

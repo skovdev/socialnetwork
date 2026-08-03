@@ -14,7 +14,7 @@ import jakarta.validation.Valid;
 
 import local.socialnetwork.core.config.security.principal.UserPrincipal;
 
-import local.socialnetwork.dto.api.response.ApiResponseDto;
+import local.socialnetwork.shared.dto.response.ApiResponseDto;
 
 import local.socialnetwork.posts.dto.http.request.CreatePostRequestDto;
 import local.socialnetwork.posts.dto.http.request.UpdatePostRequestDto;

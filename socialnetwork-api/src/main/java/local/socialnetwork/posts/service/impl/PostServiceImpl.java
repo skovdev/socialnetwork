@@ -13,11 +13,7 @@ import local.socialnetwork.posts.repository.PostRepository;
 
 import local.socialnetwork.posts.service.PostService;
 
-import local.socialnetwork.profiles.entity.UserProfile;
-
-import local.socialnetwork.profiles.repository.UserProfileRepository;
-
-import local.socialnetwork.profiles.service.AvatarStorageService;
+import local.socialnetwork.profiles.service.UserProfileService;
 
 import local.socialnetwork.shared.dto.response.AuthorSummary;
 
@@ -45,8 +41,6 @@ import java.time.Instant;
 
 import java.util.Map;
 import java.util.UUID;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * Default implementation of {@link PostService}.
@@ -58,8 +52,7 @@ public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
     private final AuthUserRepository authUserRepository;
-    private final UserProfileRepository userProfileRepository;
-    private final AvatarStorageService avatarStorageService;
+    private final UserProfileService userProfileService;
 
     /**
      * {@inheritDoc}
@@ -97,8 +90,7 @@ public class PostServiceImpl implements PostService {
     public Page<PostResponse> getFeed(Pageable pageable) {
         var page = postRepository.findAllByOrderByCreatedAtDesc(pageable);
         var authorIds = page.getContent().stream().map(post -> post.getAuthor().getId()).distinct().toList();
-        var authorsById = userProfileRepository.findByAuthUserIdIn(authorIds).stream()
-                .collect(Collectors.toMap(profile -> profile.getAuthUser().getId(), Function.identity()));
+        var authorsById = userProfileService.getAuthorSummaries(authorIds);
         return page.map(post -> PostResponse.from(post, toAuthorSummary(authorsById, post.getAuthor().getId())));
     }
 
@@ -108,11 +100,10 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional(readOnly = true)
     public Page<PostResponse> getPostsByUsername(String username, Pageable pageable) {
-        var profile = userProfileRepository.findByUsername(username)
+        var author = userProfileService.findAuthorByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException("User '" + username + "' not found"));
-        var page = postRepository.findByAuthorIdOrderByCreatedAtDesc(profile.getAuthUser().getId(), pageable);
-        var author = AuthorSummary.from(profile, avatarStorageService.presign(profile.getAvatarUrl()));
-        return page.map(post -> PostResponse.from(post, author));
+        var page = postRepository.findByAuthorIdOrderByCreatedAtDesc(author.authUserId(), pageable);
+        return page.map(post -> PostResponse.from(post, author.summary()));
     }
 
     /**
@@ -156,16 +147,14 @@ public class PostServiceImpl implements PostService {
     }
 
     private AuthorSummary resolveAuthor(UUID authUserId) {
-        var profile = userProfileRepository.findByAuthUserId(authUserId)
-                .orElseThrow(() -> new UserNotFoundException("Profile not found for user id: " + authUserId));
-        return AuthorSummary.from(profile, avatarStorageService.presign(profile.getAvatarUrl()));
+        return userProfileService.getAuthorSummary(authUserId);
     }
 
-    private AuthorSummary toAuthorSummary(Map<UUID, UserProfile> authorsById, UUID authUserId) {
-        var profile = authorsById.get(authUserId);
-        if (profile == null) {
+    private AuthorSummary toAuthorSummary(Map<UUID, AuthorSummary> authorsById, UUID authUserId) {
+        var author = authorsById.get(authUserId);
+        if (author == null) {
             throw new UserNotFoundException("Profile not found for user id: " + authUserId);
         }
-        return AuthorSummary.from(profile, avatarStorageService.presign(profile.getAvatarUrl()));
+        return author;
     }
 }

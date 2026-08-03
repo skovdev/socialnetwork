@@ -1,5 +1,10 @@
 package local.socialnetwork.profiles.service.impl;
 
+import local.socialnetwork.auth.entity.AuthUser;
+
+import local.socialnetwork.profiles.dto.AuthorProfile;
+import local.socialnetwork.profiles.dto.NewProfileDetails;
+
 import local.socialnetwork.profiles.dto.http.request.UpdateProfileRequestDto;
 
 import local.socialnetwork.profiles.entity.UserProfile;
@@ -8,6 +13,8 @@ import local.socialnetwork.profiles.repository.UserProfileRepository;
 
 import local.socialnetwork.profiles.service.UserProfileService;
 import local.socialnetwork.profiles.service.AvatarStorageService;
+
+import local.socialnetwork.shared.dto.response.AuthorSummary;
 
 import local.socialnetwork.shared.exception.UserNotFoundException;
 import local.socialnetwork.shared.exception.AvatarNotFoundException;
@@ -22,8 +29,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Map;
 import java.util.UUID;
 import java.util.Optional;
+import java.util.Collection;
+
+import java.util.stream.Collectors;
 
 /**
  * Default implementation of {@link UserProfileService}.
@@ -61,6 +72,71 @@ public class UserProfileServiceImpl implements UserProfileService {
     @Transactional(readOnly = true)
     public Optional<UserProfile> findByAuthUserId(UUID authUserId) {
         return userProfileRepository.findByAuthUserId(authUserId);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public UserProfile createProfile(AuthUser authUser, NewProfileDetails details) {
+        var profile = new UserProfile();
+        profile.setAuthUser(authUser);
+        profile.setFirstName(details.firstName());
+        profile.setLastName(details.lastName());
+        profile.setDisplayName(details.firstName() + " " + details.lastName());
+        profile.setUsername(details.username());
+        profile.setBirthDate(details.birthDate());
+        profile.setPhoneNumber(details.phoneNumber());
+        return profile;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public boolean existsByUsername(String username) {
+        return userProfileRepository.existsByUsername(username);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<String> findUsernameByAuthUserId(UUID authUserId) {
+        return userProfileRepository.findByAuthUserId(authUserId).map(UserProfile::getUsername);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public AuthorSummary getAuthorSummary(UUID authUserId) {
+        var profile = userProfileRepository.findByAuthUserId(authUserId)
+                .orElseThrow(() -> new UserNotFoundException("Profile not found for user id: " + authUserId));
+        return toAuthorSummary(profile);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Map<UUID, AuthorSummary> getAuthorSummaries(Collection<UUID> authUserIds) {
+        return userProfileRepository.findByAuthUserIdIn(authUserIds).stream()
+                .collect(Collectors.toMap(profile -> profile.getAuthUser().getId(), this::toAuthorSummary));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<AuthorProfile> findAuthorByUsername(String username) {
+        return userProfileRepository.findByUsername(username)
+                .map(profile -> new AuthorProfile(profile.getAuthUser().getId(), toAuthorSummary(profile)));
     }
 
     /**
@@ -108,6 +184,11 @@ public class UserProfileServiceImpl implements UserProfileService {
         profile.setAvatarUrl(null);
         userProfileRepository.save(profile);
         log.info("Avatar removed for auth user id: {}", authUserId);
+    }
+
+    private AuthorSummary toAuthorSummary(UserProfile profile) {
+        return new AuthorSummary(
+                profile.getUsername(), profile.getDisplayName(), avatarStorageService.presign(profile.getAvatarUrl()));
     }
 
     private void buildProfile(UpdateProfileRequestDto request, UserProfile profile) {
