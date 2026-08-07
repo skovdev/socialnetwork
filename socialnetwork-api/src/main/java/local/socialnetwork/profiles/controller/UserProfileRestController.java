@@ -11,6 +11,10 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import local.socialnetwork.core.config.security.principal.UserPrincipal;
+
+import local.socialnetwork.likes.service.LikeService;
+
 import local.socialnetwork.shared.dto.response.ApiResponseDto;
 
 import local.socialnetwork.posts.dto.http.response.PostResponse;
@@ -32,6 +36,8 @@ import org.springframework.data.domain.Pageable;
 
 import org.springframework.data.web.PagedModel;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -49,6 +55,7 @@ public class UserProfileRestController {
     private final UserProfileService userProfileService;
     private final AvatarStorageService avatarStorageService;
     private final PostService postService;
+    private final LikeService likeService;
 
     @Operation(summary = "Get user profile by username", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses({
@@ -73,9 +80,11 @@ public class UserProfileRestController {
     })
     @GetMapping("/{username}/posts")
     public ApiResponseDto<PagedModel<PostResponse>> getPosts(
+            @Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal principal,
             @Parameter(description = "Username to retrieve posts for") @PathVariable("username") String username,
             Pageable pageable) {
-        return ApiResponseDto.buildSuccessResponse(new PagedModel<>(postService.getPostsByUsername(username, pageable)));
+        var posts = likeService.decorate(postService.getPostsByUsername(username, pageable), principal.getId());
+        return ApiResponseDto.buildSuccessResponse(new PagedModel<>(posts));
     }
 
 }
