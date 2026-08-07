@@ -14,6 +14,8 @@ import jakarta.validation.Valid;
 
 import local.socialnetwork.core.config.security.principal.UserPrincipal;
 
+import local.socialnetwork.likes.service.LikeService;
+
 import local.socialnetwork.shared.dto.response.ApiResponseDto;
 
 import local.socialnetwork.posts.dto.http.request.CreatePostRequestDto;
@@ -58,6 +60,7 @@ import java.util.UUID;
 public class PostRestController {
 
     private final PostService postService;
+    private final LikeService likeService;
 
     /**
      * Creates a new post authored by the currently authenticated user.
@@ -87,7 +90,8 @@ public class PostRestController {
     @GetMapping
     public ApiResponseDto<PagedModel<PostResponse>> getFeed(
             @Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal principal, Pageable pageable) {
-        return ApiResponseDto.buildSuccessResponse(new PagedModel<>(postService.getFeed(pageable)));
+        return ApiResponseDto.buildSuccessResponse(
+                new PagedModel<>(likeService.decorate(postService.getFeed(pageable), principal.getId())));
     }
 
     /**
@@ -102,7 +106,8 @@ public class PostRestController {
     @GetMapping("/{id}")
     public ApiResponseDto<PostResponse> getPost(
             @Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal principal, @PathVariable("id") UUID id) {
-        return ApiResponseDto.buildSuccessResponse(postService.getPost(id));
+        var post = likeService.decorate(postService.getPost(id), principal.getId());
+        return ApiResponseDto.buildSuccessResponse(post);
     }
 
     /**
@@ -121,7 +126,8 @@ public class PostRestController {
             @Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal principal,
             @PathVariable("id") UUID id,
             @Parameter(description = "Post content") @RequestBody @Valid UpdatePostRequestDto request) {
-        return ApiResponseDto.buildSuccessResponse(postService.updatePost(principal.getId(), id, request));
+        var post = likeService.decorate(postService.updatePost(principal.getId(), id, request), principal.getId());
+        return ApiResponseDto.buildSuccessResponse(post);
     }
 
     /**

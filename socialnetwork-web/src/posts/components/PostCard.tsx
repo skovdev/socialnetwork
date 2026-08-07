@@ -6,6 +6,7 @@ import { postApi } from "../api/postApi";
 import type { Post } from "../types";
 import { ApiError } from "../../core/api/httpClient";
 import { CommentSection } from "../../comments/components/CommentSection";
+import { likeApi } from "../../likes/api/likeApi";
 import { Avatar } from "../../shared/components/Avatar";
 import type { CurrentUser } from "../../shared/types";
 
@@ -31,6 +32,7 @@ export function PostCard({ post, currentUser, onUpdated, onDeleted }: PostCardPr
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showComments, setShowComments] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
+    const [isLiking, setIsLiking] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const menuRef = useRef<HTMLDivElement>(null);
 
@@ -70,6 +72,20 @@ export function PostCard({ post, currentUser, onUpdated, onDeleted }: PostCardPr
             onDeleted(post.id);
         } catch (err) {
             setError(err instanceof ApiError ? err.message : "Failed to delete post");
+        }
+    }
+
+    async function handleToggleLike() {
+        if (isLiking) return;
+        setIsLiking(true);
+        setError(null);
+        try {
+            const summary = post.likedByCurrentUser ? await likeApi.unlikePost(post.id) : await likeApi.likePost(post.id);
+            onUpdated({ ...post, likeCount: summary.count, likedByCurrentUser: summary.likedByCurrentUser });
+        } catch (err) {
+            setError(err instanceof ApiError ? err.message : "Failed to update like");
+        } finally {
+            setIsLiking(false);
         }
     }
 
@@ -154,6 +170,17 @@ export function PostCard({ post, currentUser, onUpdated, onDeleted }: PostCardPr
 
             {!isEditing && (
                 <div className="post-actions">
+                    <button
+                        type="button"
+                        className={post.likedByCurrentUser ? "action-btn active" : "action-btn"}
+                        onClick={() => void handleToggleLike()}
+                        disabled={isLiking}
+                    >
+                        <svg viewBox="0 0 24 24" style={{ fill: post.likedByCurrentUser ? "currentColor" : "none" }}>
+                            <path d="M12 21s-6.7-4.35-9.33-8.2C.29 9.92 1.3 6 4.6 5.03 6.9 4.36 9 5.4 12 8.3c3-2.9 5.1-3.94 7.4-3.27 3.3.97 4.31 4.89 1.93 7.77C18.7 16.65 12 21 12 21z" />
+                        </svg>
+                        {post.likeCount > 0 ? `${post.likeCount} ${post.likeCount === 1 ? "Like" : "Likes"}` : "Like"}
+                    </button>
                     <button
                         type="button"
                         className={showComments ? "action-btn active" : "action-btn"}
