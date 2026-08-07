@@ -10,6 +10,8 @@ export interface Post {
     content: string;
     createdAt: string;
     updatedAt: string | null;
+    likeCount: number;
+    likedByCurrentUser: boolean;
 }
 
 export interface CreatePostRequest {

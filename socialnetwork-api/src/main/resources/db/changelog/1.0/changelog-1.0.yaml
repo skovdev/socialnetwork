@@ -34,3 +34,12 @@ databaseChangeLog:
             path: db/changelog/1.0/004-create-comments.sql
             relativeToChangelogFile: false
             encoding: UTF-8
+
+  - changeSet:
+      id: create-likes-table
+      author: stanislav.kovalenko
+      changes:
+        - sqlFile:
+            path: db/changelog/1.0/005-create-likes.sql
+            relativeToChangelogFile: false
+            encoding: UTF-8
