@@ -14,6 +14,11 @@ export const postApi = {
         return response.data;
     },
 
+    async getFeed(page = 0, size = 20): Promise<PostPage> {
+        const response = await apiRequest<PostPage>(`/api/v1/posts?page=${page}&size=${size}`);
+        return response.data;
+    },
+
     async getPost(id: string): Promise<Post> {
         const response = await apiRequest<Post>(`/api/v1/posts/${encodeURIComponent(id)}`);
         return response.data;

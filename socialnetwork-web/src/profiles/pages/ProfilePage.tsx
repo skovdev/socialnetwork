@@ -58,6 +58,9 @@ export function ProfilePage() {
                     <span className="brand-name">SocialNetwork</span>
                 </div>
                 <div>
+                    <Link to="/feed" className="btn btn-secondary">
+                        Feed
+                    </Link>
                     <button type="button" className="btn btn-secondary" onClick={() => void logout()}>
                         Log out
                     </button>

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
 
 import { postApi } from "../api/postApi";
@@ -9,12 +9,13 @@ import { Avatar } from "../../shared/components/Avatar";
 import type { CurrentUser } from "../../shared/types";
 
 interface PostListProps {
-    username: string;
+    username?: string;
     currentUser: CurrentUser | null;
     showComposer: boolean;
+    emptyMessage?: string;
 }
 
-export function PostList({ username, currentUser, showComposer }: PostListProps) {
+export function PostList({ username, currentUser, showComposer, emptyMessage = "No posts yet." }: PostListProps) {
     const [posts, setPosts] = useState<Post[]>([]);
     const [page, setPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
@@ -26,20 +27,24 @@ export function PostList({ username, currentUser, showComposer }: PostListProps)
     const [error, setError] = useState<string | null>(null);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+    const fetchPage = useCallback(
+        (pageNumber: number) => (username ? postApi.getPostsByUsername(username, pageNumber) : postApi.getFeed(pageNumber)),
+        [username],
+    );
+
     useEffect(() => {
         setPosts([]);
         setPage(0);
         setIsLoading(true);
         setError(null);
-        postApi
-            .getPostsByUsername(username, 0)
+        fetchPage(0)
             .then((loaded) => {
                 setPosts(loaded.content);
                 setTotalPages(loaded.page.totalPages);
             })
             .catch((err) => setError(err instanceof ApiError ? err.message : "Failed to load posts"))
             .finally(() => setIsLoading(false));
-    }, [username]);
+    }, [fetchPage]);
 
     useEffect(() => {
         if (isComposing) textareaRef.current?.focus();
@@ -49,7 +54,7 @@ export function PostList({ username, currentUser, showComposer }: PostListProps)
         setIsLoadingMore(true);
         try {
             const next = page + 1;
-            const loaded = await postApi.getPostsByUsername(username, next);
+            const loaded = await fetchPage(next);
             setPosts((prev) => [...prev, ...loaded.content]);
             setPage(next);
             setTotalPages(loaded.page.totalPages);
@@ -136,7 +141,7 @@ export function PostList({ username, currentUser, showComposer }: PostListProps)
                 </p>
             )}
             {isLoading && <p className="hint">Loading posts…</p>}
-            {!isLoading && posts.length === 0 && <p className="hint">No posts yet.</p>}
+            {!isLoading && posts.length === 0 && <p className="hint">{emptyMessage}</p>}
 
             <div className="post-list">
                 {posts.map((post) => (

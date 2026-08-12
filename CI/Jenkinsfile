@@ -2,6 +2,7 @@ pipeline {
     agent any
     tools {
         jdk 'jdk-25'
+        nodejs 'node-20'
     }
     stages {
         stage("Clone the project from GitHub") {
@@ -9,7 +10,7 @@ pipeline {
                 git branch: 'master', url: 'https://github.com/skovdev/socialnetwork.git'
             }
         }
-        stage("Compilation") {
+        stage("Back-end: build") {
             steps {
                 dir('socialnetwork-api') {
                     withMaven(jdk: 'jdk-25', maven: 'apache-maven-3.9.3') {
@@ -18,12 +19,27 @@ pipeline {
                 }
             }
         }
-        stage ("Tests") {
+        stage ("Back-end: tests") {
             steps {
                 dir('socialnetwork-api') {
                     withMaven(jdk: 'jdk-25', maven: 'apache-maven-3.9.3') {
                         sh "mvn test"
                     }
+                }
+            }
+        }
+        stage ("Front-end: install & lint") {
+            steps {
+                dir('socialnetwork-web') {
+                    sh "npm ci"
+                    sh "npm run lint"
+                }
+            }
+        }
+        stage ("Front-end: build") {
+            steps {
+                dir('socialnetwork-web') {
+                    sh "npm run build"
                 }
             }
         }

@@ -26,7 +26,6 @@ Pet-project for self-education, designed to simulate a basic social media applic
 ```
 socialnetwork-api/     # Backend — this Spring Boot REST API
 socialnetwork-web/     # Frontend — React + TypeScript SPA
-docs/                  # Shared API docs and scenarios
 CI/                    # Jenkins pipeline
 ```
 
@@ -38,9 +37,9 @@ socialnetwork-api/src/main/java/local/socialnetwork/
 ├── profiles/      # User profile read/update endpoints, avatar upload/delete
 ├── posts/         # Post creation, feed, and management endpoints
 ├── comments/      # Comment creation, browsing, and management endpoints
+├── likes/         # Post like/unlike and browsing endpoints
 ├── core/          # JWT provider, security config, filters, AWS clients
-├── shared/        # Base entity, exceptions, API version constant
-└── dto/           # Shared API response wrapper
+└── shared/        # Base entity, exceptions, API version constant, API response wrapper
 ```
 
 ## API Endpoints
@@ -71,6 +70,7 @@ Base path: `/api/v1`
 | Method | Path | Auth | Description |
 |---|---|---|---|
 | `GET` | `/users/{username}` | Bearer | Retrieve a user profile by username |
+| `GET` | `/users/{username}/posts` | Bearer | Retrieve a paginated feed of posts authored by a user, newest first |
 
 Avatar URLs returned in profile responses are short-lived, presigned S3 URLs (valid for 1 hour by default).
 
@@ -97,6 +97,14 @@ Post content is limited to 5000 characters. Each post response includes a minima
 
 Comment content is limited to 2000 characters.
 
+### Likes (`/posts/{postId}/likes`)
+
+| Method | Path | Auth | Description |
+|---|---|---|---|
+| `POST` | `/posts/{postId}/likes` | Bearer | Like a post on behalf of the current user (idempotent) |
+| `DELETE` | `/posts/{postId}/likes` | Bearer | Unlike a post on behalf of the current user (idempotent) |
+| `GET` | `/posts/{postId}/likes` | Bearer | Retrieve a paginated page of users who liked a post, newest like first |
+
 Swagger UI is available at `http://localhost:8080/swagger-ui.html`.
 
 ## Database Schema
@@ -112,6 +120,7 @@ Migrations are managed by Liquibase and run automatically on startup.
 | `user_profiles` | Public profile data — username, display name, bio, avatar (S3 storage key), etc. |
 | `posts` | User-authored posts — content, author reference, timestamps |
 | `comments` | User-authored comments on posts — content, post/author references, optional parent comment (for replies), timestamps |
+| `likes` | One like per user per post — post/author references, unique on `(post_id, author_id)`, timestamp |
 
 ## Prerequisites
 
@@ -129,14 +138,14 @@ The application reads its configuration from `application.properties`. Sensitive
 
 | Variable | Description |
 |---|---|
-| `AWS_ACCESS_KEY_ID` | IAM access key |
-| `AWS_SECRET_ACCESS_KEY` | IAM secret key |
+| `SN_AWS_ACCESS_KEY_ID` | IAM access key |
+| `SN_AWS_SECRET_ACCESS_KEY` | IAM secret key |
 
 ### Optional environment variables
 
 | Variable | Default | Description |
 |---|---|---|
-| `CORS_ALLOWED_ORIGINS` | `*` | Comma-separated list of allowed CORS origins |
+| `CORS_ALLOWED_ORIGINS` | `http://localhost:5173` | Comma-separated list of allowed CORS origins |
 | `SN_AWS_S3_AVATAR_BUCKET_NAME` | `socialnetwork-user-avatar-upload` | S3 bucket used to store uploaded avatar images |
 | `SN_REDIS_HOST` | `localhost` | Redis host used for the posts cache |
 | `SN_REDIS_PORT` | `6379` | Redis port used for the posts cache |

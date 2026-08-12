@@ -19,15 +19,18 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Documents and enforces the intended module boundaries between features
- * (auth, profiles, posts, comments) and infrastructure packages (core, shared).
+ * (auth, profiles, posts, comments, likes) and infrastructure packages (core, shared).
  * <p>
- * This test is expected to currently FAIL: it exists to produce the exact list
- * of existing violations so they can be fixed feature by feature.
+ * Note: {@code onlyBeAccessed()} only catches calls to members declared directly on a
+ * matched class. Calls to inherited members (e.g. {@code CrudRepository} methods like
+ * {@code findById}, or getters inherited from {@code AbstractBaseModel}) resolve to the
+ * declaring superclass and are not attributed to the feature package, so this rule does
+ * not catch every cross-feature repository/entity access.
  */
 class ModuleBoundaryTest {
 
     private static final String BASE_PACKAGE = "local.socialnetwork";
-    private static final String[] FEATURES = {"auth", "profiles", "posts", "comments"};
+    private static final String[] FEATURES = {"auth", "profiles", "posts", "comments", "likes"};
 
     private static JavaClasses importProductionClasses() {
         return new ClassFileImporter()
@@ -69,7 +72,8 @@ class ModuleBoundaryTest {
                         BASE_PACKAGE + ".auth..",
                         BASE_PACKAGE + ".profiles..",
                         BASE_PACKAGE + ".posts..",
-                        BASE_PACKAGE + ".comments..");
+                        BASE_PACKAGE + ".comments..",
+                        BASE_PACKAGE + ".likes..");
 
         rule.check(classes);
     }

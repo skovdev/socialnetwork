@@ -6,6 +6,7 @@ import { VerifyEmailPage } from "../../auth/pages/VerifyEmailPage";
 import { EditProfilePage } from "../../profiles/pages/EditProfilePage";
 import { ProfilePage } from "../../profiles/pages/ProfilePage";
 import { UserProfilePage } from "../../profiles/pages/UserProfilePage";
+import { FeedPage } from "../../posts/pages/FeedPage";
 import { ProtectedRoute } from "../../shared/components/ProtectedRoute";
 
 export function AppRouter() {
@@ -14,6 +15,14 @@ export function AppRouter() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/verify" element={<VerifyEmailPage />} />
+            <Route
+                path="/feed"
+                element={
+                    <ProtectedRoute>
+                        <FeedPage />
+                    </ProtectedRoute>
+                }
+            />
             <Route
                 path="/profile"
                 element={
@@ -38,6 +47,7 @@ export function AppRouter() {
                     </ProtectedRoute>
                 }
             />
+            <Route path="/" element={<Navigate to="/feed" replace />} />
             <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
     );

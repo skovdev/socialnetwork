@@ -44,6 +44,9 @@ export function UserProfilePage() {
                     <span className="brand-name">SocialNetwork</span>
                 </div>
                 <div>
+                    <Link to="/feed" className="btn btn-secondary">
+                        Feed
+                    </Link>
                     <Link to="/profile" className="btn btn-secondary">
                         My profile
                     </Link>

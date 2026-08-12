@@ -21,7 +21,7 @@ export function LoginPage() {
         setIsSubmitting(true);
         try {
             await login({ username, password });
-            navigate("/profile");
+            navigate("/feed");
         } catch (err) {
             setError(err instanceof ApiError ? err.message : "Login failed");
         } finally {
