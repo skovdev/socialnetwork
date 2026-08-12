@@ -161,12 +161,14 @@ public class AuthUserServiceImpl implements AuthUserService {
                 .orElseThrow(() -> new TokenNotFoundException("Refresh token not found"));
 
         if (storedToken.getExpiresAt().isBefore(Instant.now())) {
-            refreshTokenRepository.delete(storedToken);
+            refreshTokenRepository.deleteByJti(jti);
             throw new TokenExpiredException("Refresh token has expired");
         }
 
         var authUser = storedToken.getUser();
-        refreshTokenRepository.delete(storedToken);
+        if (refreshTokenRepository.deleteByJti(jti) == 0) {
+            throw new TokenNotFoundException("Refresh token was already used");
+        }
 
         var username = userProfileService.findUsernameByAuthUserId(authUser.getId())
                 .orElseThrow(() -> new UserNotFoundException("Profile not found for user id: " + authUser.getId()));

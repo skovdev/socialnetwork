@@ -62,7 +62,23 @@ async function rawRequest<T>(path: string, options: RequestOptions): Promise<Api
     return payload;
 }
 
+// Shared by concurrent 401s so only one /auth/refresh request is ever in flight at a time.
+// Without this, two requests racing on the same expired access token would each rotate the
+// refresh token independently, and the loser would be logged out for a benign race.
+let refreshInFlight: Promise<boolean> | null = null;
+
 async function refreshAccessToken(): Promise<boolean> {
+    if (refreshInFlight) {
+        return refreshInFlight;
+    }
+
+    refreshInFlight = doRefreshAccessToken().finally(() => {
+        refreshInFlight = null;
+    });
+    return refreshInFlight;
+}
+
+async function doRefreshAccessToken(): Promise<boolean> {
     const refreshToken = tokenManager.getRefreshToken();
     if (!refreshToken) {
         return false;
