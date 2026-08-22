@@ -67,6 +67,12 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <version>${spring.boot.test.version}</version>
         </dependency>
+        <!-- Spring AI -->
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-starter-model-openai</artifactId>
+            <version>${spring.ai.version}</version>
+        </dependency>
         <!-- Jakarta Persistence API -->
         <dependency>
             <groupId>jakarta.persistence</groupId>
@@ -191,7 +197,6 @@
             <artifactId>s3</artifactId>
             <version>${aws.sdk.s3.version}</version>
         </dependency>
-
     </dependencies>
 
     <build>

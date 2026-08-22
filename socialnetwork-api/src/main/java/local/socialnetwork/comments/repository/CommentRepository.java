@@ -21,4 +21,5 @@ import java.util.Collection;
 public interface CommentRepository extends CrudRepository<Comment, UUID>, PagingAndSortingRepository<Comment, UUID> {
     Page<Comment> findByPostIdAndParentIsNullOrderByCreatedAtAsc(UUID postId, Pageable pageable);
     List<Comment> findByParentIdInOrderByCreatedAtAsc(Collection<UUID> parentIds);
+    List<Comment> findByParentIdOrderByCreatedAtDesc(UUID parentId, Pageable pageable);
 }

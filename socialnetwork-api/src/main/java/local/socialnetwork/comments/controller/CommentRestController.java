@@ -12,12 +12,15 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 import jakarta.validation.Valid;
 
+import local.socialnetwork.comments.dto.ReplyTone;
+
 import local.socialnetwork.comments.dto.http.request.CreateCommentRequestDto;
 import local.socialnetwork.comments.dto.http.request.UpdateCommentRequestDto;
 
 import local.socialnetwork.comments.dto.http.response.CommentResponse;
 
 import local.socialnetwork.comments.service.CommentService;
+import local.socialnetwork.comments.service.CommentReplySuggestionService;
 
 import local.socialnetwork.core.config.security.principal.UserPrincipal;
 
@@ -40,11 +43,13 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -58,6 +63,7 @@ import java.util.UUID;
 public class CommentRestController {
 
     private final CommentService commentService;
+    private final CommentReplySuggestionService commentReplySuggestionService;
 
     /**
      * Creates a new comment (or reply) authored by the currently authenticated user.
@@ -129,5 +135,28 @@ public class CommentRestController {
     public void deleteComment(
             @Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal principal, @PathVariable("id") UUID id) {
         commentService.deleteComment(principal.getId(), id);
+    }
+
+    /**
+     * Generates 3 AI-drafted reply suggestions for an existing comment, grounded in that
+     * comment's own content and its immediate thread context. Suggestions are returned for
+     * review; none is posted automatically.
+     */
+    @Operation(summary = "Generate AI reply suggestions", security = @SecurityRequirement(name = "bearerAuth"))
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Reply suggestions generated"),
+            @ApiResponse(responseCode = "400", description = "Invalid tone value"),
+            @ApiResponse(responseCode = "401", description = "Not authenticated"),
+            @ApiResponse(responseCode = "404", description = "Comment not found"),
+            @ApiResponse(responseCode = "503", description = "AI provider failed to generate suggestions")
+    })
+    @PostMapping("/comments/{id}/suggestions")
+    public ApiResponseDto<List<String>> generateReplySuggestions(
+            @Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal principal,
+            @PathVariable("id") UUID id,
+            @Parameter(description = "Desired reply tone (defaults to NEUTRAL if omitted)")
+            @RequestParam(required = false) ReplyTone tone) {
+        return ApiResponseDto.buildSuccessResponse(
+                commentReplySuggestionService.generateReplySuggestions(principal.getId(), id, tone));
     }
 }

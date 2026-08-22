@@ -1,5 +1,5 @@
 import { apiRequest } from "../../core/api/httpClient";
-import type { Comment, CommentPage, CreateCommentRequest, UpdateCommentRequest } from "../types";
+import type { Comment, CommentPage, CreateCommentRequest, ReplyTone, UpdateCommentRequest } from "../types";
 
 export const commentApi = {
     async createComment(postId: string, request: CreateCommentRequest): Promise<Comment> {
@@ -27,5 +27,14 @@ export const commentApi = {
 
     async deleteComment(id: string): Promise<void> {
         await apiRequest<void>(`/api/v1/comments/${encodeURIComponent(id)}`, { method: "DELETE" });
+    },
+
+    async generateReplySuggestions(commentId: string, tone?: ReplyTone): Promise<string[]> {
+        const query = tone ? `?tone=${encodeURIComponent(tone)}` : "";
+        const response = await apiRequest<string[]>(
+            `/api/v1/comments/${encodeURIComponent(commentId)}/suggestions${query}`,
+            { method: "POST" },
+        );
+        return response.data;
     },
 };
