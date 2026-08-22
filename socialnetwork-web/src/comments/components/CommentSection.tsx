@@ -3,7 +3,8 @@ import type { FormEvent } from "react";
 import { Link } from "react-router-dom";
 
 import { commentApi } from "../api/commentApi";
-import type { Comment } from "../types";
+import type { Comment, ReplyTone } from "../types";
+import { REPLY_TONES } from "../types";
 import { ApiError } from "../../core/api/httpClient";
 import { Avatar } from "../../shared/components/Avatar";
 import type { CurrentUser } from "../../shared/types";
@@ -86,6 +87,70 @@ function CommentForm({ currentUser, initialValue = "", placeholder, submitLabel,
     );
 }
 
+interface ReplySuggestionsProps {
+    commentId: string;
+    onPick: (suggestion: string) => void;
+}
+
+/** AI-generated reply suggestions for a comment. Picking one only fills the reply box below — it is never posted automatically. */
+function ReplySuggestions({ commentId, onPick }: ReplySuggestionsProps) {
+    const [tone, setTone] = useState<ReplyTone>("NEUTRAL");
+    const [suggestions, setSuggestions] = useState<string[] | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+    async function handleSuggest() {
+        setIsLoading(true);
+        setError(null);
+        try {
+            const result = await commentApi.generateReplySuggestions(commentId, tone);
+            setSuggestions(result);
+        } catch (err) {
+            setError(err instanceof ApiError ? err.message : "Failed to generate suggestions");
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
+    return (
+        <div className="reply-suggestions">
+            <div className="reply-suggestions-toolbar">
+                <select
+                    aria-label="Reply tone"
+                    value={tone}
+                    onChange={(e) => setTone(e.target.value as ReplyTone)}
+                    disabled={isLoading}
+                >
+                    {REPLY_TONES.map((option) => (
+                        <option key={option.value} value={option.value}>
+                            {option.label}
+                        </option>
+                    ))}
+                </select>
+                <button type="button" className="suggest-button" onClick={() => void handleSuggest()} disabled={isLoading}>
+                    {isLoading ? "Thinking…" : "✨ Suggest replies"}
+                </button>
+            </div>
+            {error && (
+                <p className="alert" role="alert">
+                    {error}
+                </p>
+            )}
+            {suggestions && suggestions.length > 0 && (
+                <ul className="reply-suggestions-list">
+                    {suggestions.map((suggestion, index) => (
+                        <li key={index}>
+                            <button type="button" className="reply-suggestion-chip" onClick={() => onPick(suggestion)}>
+                                {suggestion}
+                            </button>
+                        </li>
+                    ))}
+                </ul>
+            )}
+        </div>
+    );
+}
+
 interface CommentCardProps {
     comment: Comment;
     currentUser: CurrentUser | null;
@@ -110,7 +175,15 @@ function CommentCard({
 }: CommentCardProps) {
     const [isReplying, setIsReplying] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
+    const [replyDraft, setReplyDraft] = useState("");
+    const [replySeed, setReplySeed] = useState(0);
     const isOwner = currentUser?.username === comment.author.username;
+
+    function applySuggestion(suggestion: string) {
+        setReplyDraft(suggestion);
+        setReplySeed((seed) => seed + 1);
+        setIsReplying(true);
+    }
 
     return (
         <div className="comment-row">
@@ -145,7 +218,7 @@ function CommentCard({
                         {comment.updatedAt && <span>edited</span>}
                         {!isReply && onReply && (
                             <button type="button" onClick={() => setIsReplying((v) => !v)}>
-                                Reply
+                                ✨ AI Reply
                             </button>
                         )}
                         {isOwner && (
@@ -162,16 +235,22 @@ function CommentCard({
                 )}
 
                 {isReplying && onReply && (
-                    <CommentForm
-                        currentUser={currentUser}
-                        placeholder={`Reply to @${comment.author.username}`}
-                        submitLabel="Reply"
-                        onCancel={() => setIsReplying(false)}
-                        onSubmit={async (content) => {
-                            await onReply(content);
-                            setIsReplying(false);
-                        }}
-                    />
+                    <>
+                        <CommentForm
+                            key={replySeed}
+                            currentUser={currentUser}
+                            initialValue={replyDraft}
+                            placeholder={`Reply to @${comment.author.username}`}
+                            submitLabel="Reply"
+                            onCancel={() => setIsReplying(false)}
+                            onSubmit={async (content) => {
+                                await onReply(content);
+                                setIsReplying(false);
+                                setReplyDraft("");
+                            }}
+                        />
+                        <ReplySuggestions commentId={comment.id} onPick={applySuggestion} />
+                    </>
                 )}
 
                 {!isReply && comment.replies.length > 0 && (

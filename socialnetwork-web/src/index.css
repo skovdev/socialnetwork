@@ -844,6 +844,73 @@ form {
   cursor: not-allowed;
 }
 
+.reply-suggestions {
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.reply-suggestions-toolbar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.reply-suggestions-toolbar select {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-h);
+  border-radius: var(--radius-sm);
+  padding: 4px 8px;
+  font: 12px var(--sans);
+}
+
+.suggest-button {
+  background: none;
+  border: none;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+  cursor: pointer;
+  padding: 4px 6px;
+}
+
+.suggest-button:hover {
+  color: var(--accent-hover);
+}
+
+.suggest-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.reply-suggestions-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+}
+
+.reply-suggestion-chip {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: var(--accent-bg);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  font: 13px var(--sans);
+  color: var(--text-h);
+  cursor: pointer;
+}
+
+.reply-suggestion-chip:hover {
+  border-color: var(--accent);
+}
+
 .view-more {
   font-size: 13px;
   font-weight: 600;
