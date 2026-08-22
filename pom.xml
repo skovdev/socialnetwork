@@ -30,6 +30,7 @@
         <spring.boot.test.version>3.5.6</spring.boot.test.version>
         <spring.boot.cache.version>3.5.6</spring.boot.cache.version>
         <spring.boot.data.redis.version>3.5.6</spring.boot.data.redis.version>
+        <spring.ai.version>1.0.0</spring.ai.version>
         <jakarta.persistence.api.version>3.1.0</jakarta.persistence.api.version>
         <jjwt.version>0.13.0</jjwt.version>
         <jackson.version>2.20.0</jackson.version>
@@ -49,7 +50,6 @@
         <redis.testcontainers.version>2.2.4</redis.testcontainers.version>
         <archunit.version>1.4.2</archunit.version>
         <netty.version>4.1.126.Final</netty.version>
-        <openai.java.version>2.12.0</openai.java.version>
         <!-- Plugin versions -->
         <spring.boot.maven.plugin.version>3.5.6</spring.boot.maven.plugin.version>
         <maven.compiler.plugin.version>3.13.0</maven.compiler.plugin.version>

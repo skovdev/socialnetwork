@@ -32,3 +32,13 @@ export interface CommentPage {
         size: number;
     };
 }
+
+export type ReplyTone = "NEUTRAL" | "FRIENDLY" | "PROFESSIONAL" | "SUPPORTIVE" | "HUMOROUS";
+
+export const REPLY_TONES: { value: ReplyTone; label: string }[] = [
+    { value: "NEUTRAL", label: "Neutral" },
+    { value: "FRIENDLY", label: "Friendly" },
+    { value: "PROFESSIONAL", label: "Professional" },
+    { value: "SUPPORTIVE", label: "Supportive" },
+    { value: "HUMOROUS", label: "Humorous" },
+];

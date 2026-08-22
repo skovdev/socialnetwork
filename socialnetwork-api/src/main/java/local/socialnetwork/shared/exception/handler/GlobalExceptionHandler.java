@@ -7,6 +7,7 @@ import local.socialnetwork.shared.exception.CommentNotFoundException;
 import local.socialnetwork.shared.exception.PostAccessDeniedException;
 import local.socialnetwork.shared.exception.CommentAccessDeniedException;
 import local.socialnetwork.shared.exception.InvalidCommentParentException;
+import local.socialnetwork.shared.exception.CommentSuggestionGenerationException;
 
 import org.springframework.dao.DataIntegrityViolationException;
 
@@ -40,6 +41,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.List;
 
@@ -187,6 +190,24 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ProblemDetail> handleInvalidCommentParent(InvalidCommentParentException ex) {
         log.warn("Invalid comment parent: {}", ex.getMessage(), ex);
         return problem(HttpStatus.BAD_REQUEST, "INVALID_COMMENT_PARENT", ex.getMessage());
+    }
+
+    @ExceptionHandler(CommentSuggestionGenerationException.class)
+    public ResponseEntity<ProblemDetail> handleCommentSuggestionGeneration(CommentSuggestionGenerationException ex) {
+        log.error("Comment suggestion generation failed: {}", ex.getMessage(), ex);
+        return problem(HttpStatus.SERVICE_UNAVAILABLE, "COMMENT_SUGGESTION_GENERATION_FAILED",
+                "Could not generate reply suggestions right now. Please try again later.");
+    }
+
+    /**
+     * Handles an invalid request parameter value (e.g. an unrecognised enum constant) that Spring
+     * could not convert to the target type.
+     */
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ProblemDetail> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
+        log.warn("Invalid request parameter '{}': {}", ex.getName(), ex.getMessage());
+        return problem(HttpStatus.BAD_REQUEST, "VALIDATION_FAILED",
+                "Invalid value for parameter '" + ex.getName() + "'.");
     }
 
     /**
