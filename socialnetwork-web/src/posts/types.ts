@@ -22,6 +22,14 @@ export interface UpdatePostRequest {
     content: string;
 }
 
+export interface GeneratePostContentRequest {
+    topic: string;
+}
+
+export interface GeneratedPostContent {
+    content: string;
+}
+
 export interface PostPage {
     content: Post[];
     page: {
