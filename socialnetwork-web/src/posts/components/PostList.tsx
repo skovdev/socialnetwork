@@ -25,6 +25,9 @@ export function PostList({ username, currentUser, showComposer, emptyMessage = "
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [topic, setTopic] = useState("");
+    const [isGenerating, setIsGenerating] = useState(false);
+    const [generateError, setGenerateError] = useState<string | null>(null);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
 
     const fetchPage = useCallback(
@@ -65,6 +68,21 @@ export function PostList({ username, currentUser, showComposer, emptyMessage = "
         }
     }
 
+    async function handleGenerate() {
+        if (!topic.trim()) return;
+        setIsGenerating(true);
+        setGenerateError(null);
+        try {
+            const generated = await postApi.generatePostContent(topic);
+            setContent(generated);
+            textareaRef.current?.focus();
+        } catch (err) {
+            setGenerateError(err instanceof ApiError ? err.message : "Failed to generate post content");
+        } finally {
+            setIsGenerating(false);
+        }
+    }
+
     async function handleSubmit(event: FormEvent) {
         event.preventDefault();
         if (!content.trim()) return;
@@ -74,6 +92,8 @@ export function PostList({ username, currentUser, showComposer, emptyMessage = "
             const post = await postApi.createPost({ content });
             setPosts((prev) => [post, ...prev]);
             setContent("");
+            setTopic("");
+            setGenerateError(null);
             setIsComposing(false);
         } catch (err) {
             setError(err instanceof ApiError ? err.message : "Failed to create post");
@@ -107,6 +127,30 @@ export function PostList({ username, currentUser, showComposer, emptyMessage = "
                                     placeholder="What's on your mind?"
                                 />
                             </div>
+                            <div className="ai-generate-row">
+                                <input
+                                    type="text"
+                                    className="ai-generate-input"
+                                    value={topic}
+                                    onChange={(e) => setTopic(e.target.value)}
+                                    maxLength={300}
+                                    placeholder="Give AI a topic or instruction…"
+                                    disabled={isGenerating}
+                                />
+                                <button
+                                    type="button"
+                                    className="suggest-button"
+                                    onClick={() => void handleGenerate()}
+                                    disabled={isGenerating || !topic.trim()}
+                                >
+                                    {isGenerating ? "Generating…" : "✨ Generate with AI"}
+                                </button>
+                            </div>
+                            {generateError && (
+                                <p className="alert" role="alert">
+                                    {generateError}
+                                </p>
+                            )}
                             <div className="composer-footer">
                                 <span className="composer-hint">{content.length} / 5000</span>
                                 <button
@@ -115,6 +159,8 @@ export function PostList({ username, currentUser, showComposer, emptyMessage = "
                                     onClick={() => {
                                         setIsComposing(false);
                                         setContent("");
+                                        setTopic("");
+                                        setGenerateError(null);
                                     }}
                                 >
                                     Cancel

@@ -1,5 +1,12 @@
 import { apiRequest } from "../../core/api/httpClient";
-import type { CreatePostRequest, Post, PostPage, UpdatePostRequest } from "../types";
+import type {
+    CreatePostRequest,
+    GeneratedPostContent,
+    GeneratePostContentRequest,
+    Post,
+    PostPage,
+    UpdatePostRequest,
+} from "../types";
 
 export const postApi = {
     async createPost(request: CreatePostRequest): Promise<Post> {
@@ -31,5 +38,14 @@ export const postApi = {
 
     async deletePost(id: string): Promise<void> {
         await apiRequest<void>(`/api/v1/posts/${encodeURIComponent(id)}`, { method: "DELETE" });
+    },
+
+    async generatePostContent(topic: string): Promise<string> {
+        const request: GeneratePostContentRequest = { topic };
+        const response = await apiRequest<GeneratedPostContent>("/api/v1/posts/generate", {
+            method: "POST",
+            body: request,
+        });
+        return response.data.content;
     },
 };

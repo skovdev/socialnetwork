@@ -7,6 +7,7 @@ import local.socialnetwork.shared.exception.CommentNotFoundException;
 import local.socialnetwork.shared.exception.PostAccessDeniedException;
 import local.socialnetwork.shared.exception.CommentAccessDeniedException;
 import local.socialnetwork.shared.exception.InvalidCommentParentException;
+import local.socialnetwork.shared.exception.PostContentGenerationException;
 import local.socialnetwork.shared.exception.CommentSuggestionGenerationException;
 
 import org.springframework.dao.DataIntegrityViolationException;
@@ -197,6 +198,13 @@ public class GlobalExceptionHandler {
         log.error("Comment suggestion generation failed: {}", ex.getMessage(), ex);
         return problem(HttpStatus.SERVICE_UNAVAILABLE, "COMMENT_SUGGESTION_GENERATION_FAILED",
                 "Could not generate reply suggestions right now. Please try again later.");
+    }
+
+    @ExceptionHandler(PostContentGenerationException.class)
+    public ResponseEntity<ProblemDetail> handlePostContentGeneration(PostContentGenerationException ex) {
+        log.error("Post content generation failed: {}", ex.getMessage(), ex);
+        return problem(HttpStatus.SERVICE_UNAVAILABLE, "POST_CONTENT_GENERATION_FAILED",
+                "Could not generate post content right now. Please try again later.");
     }
 
     /**
