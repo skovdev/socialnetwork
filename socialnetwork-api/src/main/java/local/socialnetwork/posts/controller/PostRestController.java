@@ -20,10 +20,13 @@ import local.socialnetwork.shared.dto.response.ApiResponseDto;
 
 import local.socialnetwork.posts.dto.http.request.CreatePostRequestDto;
 import local.socialnetwork.posts.dto.http.request.UpdatePostRequestDto;
+import local.socialnetwork.posts.dto.http.request.GeneratePostContentRequestDto;
 
 import local.socialnetwork.posts.dto.http.response.PostResponse;
+import local.socialnetwork.posts.dto.http.response.GeneratedPostContentResponse;
 
 import local.socialnetwork.posts.service.PostService;
+import local.socialnetwork.posts.service.PostContentGenerationService;
 
 import local.socialnetwork.shared.constant.VersionApi;
 
@@ -61,6 +64,7 @@ public class PostRestController {
 
     private final PostService postService;
     private final LikeService likeService;
+    private final PostContentGenerationService postContentGenerationService;
 
     /**
      * Creates a new post authored by the currently authenticated user.
@@ -145,5 +149,25 @@ public class PostRestController {
     public void deletePost(
             @Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal principal, @PathVariable("id") UUID id) {
         postService.deletePost(principal.getId(), id);
+    }
+
+    /**
+     * Generates AI-drafted post content from a short topic or instruction. The result is returned
+     * for review and is not posted automatically.
+     */
+    @Operation(summary = "Generate AI post content", security = @SecurityRequirement(name = "bearerAuth"))
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Post content generated"),
+            @ApiResponse(responseCode = "400", description = "Validation error"),
+            @ApiResponse(responseCode = "401", description = "Not authenticated"),
+            @ApiResponse(responseCode = "503", description = "AI provider failed to generate content")
+    })
+    @PostMapping("/generate")
+    public ApiResponseDto<GeneratedPostContentResponse> generatePostContent(
+            @Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal principal,
+            @Parameter(description = "Topic or instruction to generate post content from")
+            @RequestBody @Valid GeneratePostContentRequestDto request) {
+        return ApiResponseDto.buildSuccessResponse(
+                postContentGenerationService.generateContent(principal.getId(), request));
     }
 }
