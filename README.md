@@ -4,7 +4,7 @@ Pet-project for self-education, designed to simulate a basic social media applic
 
 ## Overview
 
-**SocialNetwork** is a monolith REST API built with Java 25 and Spring Boot 3. It covers user registration with email verification, JWT-based authentication with token rotation, user profile management including avatar upload, post creation/browsing, and threaded comments on posts. Secrets are stored in AWS Secrets Manager; transactional emails are sent via AWS SES v2; avatar images are stored in AWS S3 and served via presigned URLs.
+**SocialNetwork** is a monolith REST API built with Java 25 and Spring Boot 3. It covers user registration with email verification, JWT-based authentication with token rotation, user profile management including avatar upload, post creation/browsing, threaded comments on posts, and post likes. It also includes AI-assisted features — comment reply suggestions and post content generation — backed by Spring AI and OpenAI. Secrets are stored in AWS Secrets Manager; transactional emails are sent via AWS SES v2; avatar images are stored in AWS S3 and served via presigned URLs.
 
 ## Tech Stack
 
@@ -17,6 +17,7 @@ Pet-project for self-education, designed to simulate a basic social media applic
 | Caching | Redis (Spring Cache abstraction) |
 | Migrations | Liquibase 5 |
 | Cloud | AWS Secrets Manager, AWS SES v2, AWS S3 |
+| AI | Spring AI, OpenAI (gpt-4.1) |
 | API Docs | SpringDoc OpenAPI / Swagger UI |
 | Testing | JUnit Jupiter 6, Mockito 5, Testcontainers 1.21 |
 | Build | Maven 3, Lombok |
@@ -35,10 +36,10 @@ CI/                    # Jenkins pipeline
 socialnetwork-api/src/main/java/local/socialnetwork/
 ├── auth/          # Registration, email verification, login, token refresh, logout
 ├── profiles/      # User profile read/update endpoints, avatar upload/delete
-├── posts/         # Post creation, feed, and management endpoints
-├── comments/      # Comment creation, browsing, and management endpoints
+├── posts/         # Post creation, feed, management endpoints, and AI content generation
+├── comments/      # Comment creation, browsing, management endpoints, and AI reply suggestions
 ├── likes/         # Post like/unlike and browsing endpoints
-├── core/          # JWT provider, security config, filters, AWS clients
+├── core/          # JWT provider, security config, filters, AWS clients, AI chat client
 └── shared/        # Base entity, exceptions, API version constant, API response wrapper
 ```
 
@@ -83,6 +84,7 @@ Avatar URLs returned in profile responses are short-lived, presigned S3 URLs (va
 | `GET` | `/posts/{id}` | Bearer | Retrieve a single post by ID |
 | `PUT` | `/posts/{id}` | Bearer | Update a post's content — author only |
 | `DELETE` | `/posts/{id}` | Bearer | Delete a post — author only |
+| `POST` | `/posts/generate` | Bearer | AI-generate draft post content from a topic/instruction (for review — not auto-posted) |
 
 Post content is limited to 5000 characters. Each post response includes a minimal author summary (username, display name).
 
@@ -94,6 +96,7 @@ Post content is limited to 5000 characters. Each post response includes a minima
 | `GET` | `/posts/{postId}/comments` | Bearer | Retrieve a paginated page of top-level comments (oldest first), with replies nested inline |
 | `PUT` | `/comments/{id}` | Bearer | Update a comment's content — author only |
 | `DELETE` | `/comments/{id}` | Bearer | Delete a comment and its replies — author only |
+| `POST` | `/comments/{id}/suggestions` | Bearer | AI-generate 3 draft reply suggestions for a comment (optional `?tone=` query param; for review — nothing auto-posted) |
 
 Comment content is limited to 2000 characters.
 
@@ -129,6 +132,7 @@ Migrations are managed by Liquibase and run automatically on startup.
 - PostgreSQL 14+ running locally (or via Docker)
 - Redis 7+ running locally (or via Docker), e.g. `docker run -p 6379:6379 redis:7-alpine`
 - AWS credentials with access to Secrets Manager, SES, and S3
+- An OpenAI API key stored in AWS Secrets Manager (see [AWS Secrets Manager](#aws-secrets-manager)) for the AI features
 
 ## Configuration
 
@@ -153,7 +157,11 @@ The application reads its configuration from `application.properties`. Sensitive
 
 ### AWS Secrets Manager
 
-The application fetches the RS256 key pair from the secret named `socialnetwork-security-private-public-keys`.
+The application fetches the RS256 key pair from the secret named `socialnetwork-security-private-public-keys`, and the OpenAI API key from the secret named `socialnetwork-openai-api-key` (key `openai-public-api-key` within that secret).
+
+### AI features (Spring AI + OpenAI)
+
+Comment reply suggestions and post content generation use Spring AI's `ChatClient` backed by OpenAI (model `gpt-4.1`, configurable via `spring.ai.openai.chat.options.model`). The API key is not read from properties or environment variables directly — it's fetched at startup from the AWS Secrets Manager secret described above, using the same IAM credentials as the rest of the application. Both AI endpoints return `503` if the AI provider is unavailable.
 
 ### AWS S3 (avatar storage)
 
