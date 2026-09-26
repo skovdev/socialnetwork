@@ -37,14 +37,22 @@ import java.util.stream.Collectors;
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final AuthUserRepository authUserRepository;
+    private final UserPrincipalCache userPrincipalCache;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        var normalized = username != null ? username.toLowerCase() : null;
+        if (username == null) {
+            throw new UsernameNotFoundException("null is not found");
+        }
+        var normalized = username.toLowerCase();
+        return userPrincipalCache.get(normalized, this::loadPrincipal);
+    }
+
+    private UserPrincipal loadPrincipal(String normalized) {
         var authUser = authUserRepository.findByUserProfileUsername(normalized)
                 .orElseThrow(() -> {
-                    log.warn("User not found for username: {}", username);
-                    return new UsernameNotFoundException(username + " is not found");
+                    log.warn("User not found for username: {}", normalized);
+                    return new UsernameNotFoundException(normalized + " is not found");
                 });
         log.debug("Loaded user details for username: {}", normalized);
         return new UserPrincipal(authUser.getId(), normalized, authUser.getPasswordHash(), getAuthorities(authUser));

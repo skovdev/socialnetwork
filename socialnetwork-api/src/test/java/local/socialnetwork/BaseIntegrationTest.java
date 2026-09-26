@@ -2,8 +2,12 @@ package local.socialnetwork;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import local.socialnetwork.auth.service.impl.UserPrincipalCache;
+
 import local.socialnetwork.config.TestAwsSecretsConfig;
 import local.socialnetwork.config.TestContainersConfig;
+
+import org.junit.jupiter.api.BeforeEach;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -45,6 +49,15 @@ public abstract class BaseIntegrationTest {
 
     @Autowired
     protected ObjectMapper objectMapper;
+
+    @Autowired
+    private UserPrincipalCache userPrincipalCache;
+
+    /** Each test recreates its users with fresh ids, so principals cached by a previous test are stale. */
+    @BeforeEach
+    void clearUserPrincipalCache() {
+        userPrincipalCache.clear();
+    }
 
     /** Replaces the real SesV2Client so registration tests never attempt live email delivery. */
     @MockitoBean
