@@ -25,7 +25,6 @@ import org.springframework.security.core.Authentication;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import org.springframework.stereotype.Component;
 
@@ -39,8 +38,8 @@ import java.security.spec.X509EncodedKeySpec;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.InvalidKeySpecException;
 
-import java.util.Date;
 import java.util.Map;
+import java.util.Date;
 import java.util.Base64;
 import java.util.Optional;
 
@@ -82,19 +81,10 @@ public class JwtTokenProvider {
 
     }
 
-    public Authentication authentication(String token) {
-        try {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(extractUsername(token));
-            return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
-        } catch (UsernameNotFoundException e) {
-            throw new UsernameNotFoundException("User not found");
-        }
-    }
-
-    public String extractUsername(String token) {
-        return parseSignedClaims(token)
-                .getPayload()
-                .get("username", String.class);
+    public Authentication authenticate(String token) {
+        var username = parseSignedClaims(token).getPayload().get("username", String.class);
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
     public String resolveToken(HttpServletRequest request) {
@@ -104,20 +94,15 @@ public class JwtTokenProvider {
                 .orElse(null);
     }
 
-    public boolean validateToken(String token) {
+    private Jws<Claims> parseSignedClaims(String token) {
         try {
-            Jws<Claims> claimsJws = parseSignedClaims(token);
-            return !claimsJws.getPayload().getExpiration().before(new Date());
+            return Jwts.parser()
+                    .verifyWith(publicKey)
+                    .build()
+                    .parseSignedClaims(token);
         } catch (JwtException | IllegalArgumentException e) {
             throw new InvalidJwtAuthenticationException("Expired or invalid JWT token");
         }
-    }
-
-    private Jws<Claims> parseSignedClaims(String token) {
-        return Jwts.parser()
-                .verifyWith(publicKey)
-                .build()
-                .parseSignedClaims(token);
     }
 
     @SuppressWarnings("unchecked")

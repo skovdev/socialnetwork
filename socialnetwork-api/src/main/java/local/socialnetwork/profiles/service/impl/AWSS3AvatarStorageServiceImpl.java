@@ -1,12 +1,12 @@
 package local.socialnetwork.profiles.service.impl;
 
+import local.socialnetwork.core.cache.ExpiringCache;
+
 import local.socialnetwork.core.config.AWSS3Properties;
 
 import local.socialnetwork.profiles.service.AvatarStorageService;
 
 import local.socialnetwork.shared.exception.InvalidAvatarFileException;
-
-import lombok.RequiredArgsConstructor;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -37,15 +37,26 @@ import java.util.UUID;
  */
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class AWSS3AvatarStorageServiceImpl implements AvatarStorageService {
 
     private static final long MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024L;
     private static final Set<String> ALLOWED_CONTENT_TYPES = Set.of("image/jpeg", "image/png", "image/webp");
 
+    private static final int PRESIGNED_URL_CACHE_MAX_ENTRIES = 10_000;
+
     private final S3Client s3Client;
     private final S3Presigner s3Presigner;
     private final AWSS3Properties awsS3Properties;
+
+    private final ExpiringCache<String, String> presignedUrlCache;
+
+    public AWSS3AvatarStorageServiceImpl(S3Client s3Client, S3Presigner s3Presigner, AWSS3Properties awsS3Properties) {
+        this.s3Client = s3Client;
+        this.s3Presigner = s3Presigner;
+        this.awsS3Properties = awsS3Properties;
+        var validity = awsS3Properties.avatarPresignedUrlDuration();
+        this.presignedUrlCache = new ExpiringCache<>(validity.dividedBy(2), PRESIGNED_URL_CACHE_MAX_ENTRIES);
+    }
 
     @Override
     public String upload(UUID authUserId, MultipartFile file) {
@@ -86,9 +97,16 @@ public class AWSS3AvatarStorageServiceImpl implements AvatarStorageService {
         if (key == null) {
             return null;
         }
+        return presignedUrlCache.get(key, this::presignUncached);
+    }
+
+    private String presignUncached(String key) {
+        var validity = awsS3Properties.avatarPresignedUrlDuration();
         var presignRequest = GetObjectPresignRequest.builder()
-                .signatureDuration(awsS3Properties.avatarPresignedUrlDuration())
-                .getObjectRequest(get -> get.bucket(awsS3Properties.avatarBucketName()).key(key))
+                .signatureDuration(validity)
+                .getObjectRequest(get -> get.bucket(awsS3Properties.avatarBucketName())
+                        .key(key)
+                        .responseCacheControl("private, max-age=" + validity.dividedBy(2).toSeconds()))
                 .build();
         return s3Presigner.presignGetObject(presignRequest).url().toString();
     }

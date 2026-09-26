@@ -12,8 +12,6 @@ import lombok.RequiredArgsConstructor;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.security.core.Authentication;
-
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -40,9 +38,9 @@ public class JwtVerificationTokenFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
         var token = jwtTokenProvider.resolveToken(request);
-        if (token != null && jwtTokenProvider.validateToken(token)) {
+        if (token != null) {
             try {
-                var authentication = jwtTokenProvider.authentication(token);
+                var authentication = jwtTokenProvider.authenticate(token);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             } catch (UsernameNotFoundException e) {
                 // Token is cryptographically valid but the referenced user no longer exists
