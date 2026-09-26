@@ -90,6 +90,7 @@ public class AuthUserServiceImpl implements AuthUserService {
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
+    private final UserPrincipalCache userPrincipalCache;
 
     @Override
     @Transactional
@@ -220,6 +221,8 @@ public class AuthUserServiceImpl implements AuthUserService {
         }
         refreshTokenRepository.deleteByUserId(userId);
         emailTokenRepository.deleteByAuthUser(authUser);
+        userProfileService.findUsernameByAuthUserId(userId)
+                .ifPresent(username -> userPrincipalCache.evictAfterCommit(username.toLowerCase()));
         authUserRepository.delete(authUser);
         log.info("Account deleted for user id: {}", userId);
     }

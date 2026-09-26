@@ -2,6 +2,8 @@ package local.socialnetwork.auth.repository;
 
 import local.socialnetwork.auth.entity.AuthUser;
 
+import org.springframework.data.jpa.repository.EntityGraph;
+
 import org.springframework.data.repository.CrudRepository;
 
 import org.springframework.stereotype.Repository;
@@ -16,6 +18,7 @@ import java.util.Optional;
 public interface AuthUserRepository extends CrudRepository<AuthUser, UUID> {
     boolean existsByEmail(String email);
     Optional<AuthUser> findByEmail(String email);
+    @EntityGraph(attributePaths = "authUserRoles")
     Optional<AuthUser> findByUserProfileUsername(String username);
     boolean existsByUserProfileUsername(String username);
 }
