@@ -82,6 +82,11 @@ export function ProfilePage() {
                                 </Link>
                             </div>
                             <p className="username">@{profile.username}</p>
+                            <p className="follow-counts">
+                                <Link to={`/users/${profile.username}/followers`}>{profile.followerCount} Followers</Link>
+                                {" · "}
+                                <Link to={`/users/${profile.username}/following`}>{profile.followingCount} Following</Link>
+                            </p>
                             {profile.bio && <p className="bio">{profile.bio}</p>}
                         </div>
                     </div>

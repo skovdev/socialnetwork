@@ -46,6 +46,7 @@ import static org.mockito.Mockito.verify;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 
@@ -109,7 +110,41 @@ class ProfileRestControllerIT extends BaseIntegrationTest {
                 .andExpect(jsonPath("$.data.username").value(TEST_USERNAME))
                 .andExpect(jsonPath("$.data.firstName").value("Me"))
                 .andExpect(jsonPath("$.data.lastName").value("User"))
-                .andExpect(jsonPath("$.data.birthDate").value("1992-03-20"));
+                .andExpect(jsonPath("$.data.birthDate").value("1992-03-20"))
+                .andExpect(jsonPath("$.data.followerCount").value(0))
+                .andExpect(jsonPath("$.data.followingCount").value(0));
+    }
+
+    @Test
+    void getProfile_afterFollowingSomeoneElse_reflectsFollowingCount() throws Exception {
+        var otherAuthUser = new AuthUser();
+        otherAuthUser.setEmail("other@example.com");
+        otherAuthUser.setPasswordHash(passwordEncoder.encode("Secret1234"));
+        otherAuthUser.setAuthStatus(AuthStatus.ACTIVE);
+
+        var otherRole = new AuthUserRole();
+        otherRole.setAuthority("ROLE_USER");
+        otherRole.setAuthUser(otherAuthUser);
+        otherAuthUser.setAuthUserRoles(new HashSet<>(Set.of(otherRole)));
+
+        var otherProfile = new UserProfile();
+        otherProfile.setUsername("other");
+        otherProfile.setFirstName("Other");
+        otherProfile.setLastName("Person");
+        otherProfile.setDisplayName("Other Person");
+        otherProfile.setAuthUser(otherAuthUser);
+        otherAuthUser.setUserProfile(otherProfile);
+
+        authUserRepository.save(otherAuthUser);
+
+        mockMvc.perform(post("/api/v1/users/other/follow")
+                        .header("Authorization", "Bearer " + bearerToken))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get(BASE_URL)
+                        .header("Authorization", "Bearer " + bearerToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.followingCount").value(1));
     }
 
     @Test

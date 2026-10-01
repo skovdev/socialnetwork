@@ -11,6 +11,7 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.UUID;
+import java.util.Collection;
 
 /**
  * Repository for {@link Post} entities.
@@ -18,6 +19,6 @@ import java.util.UUID;
 @Repository
 public interface PostRepository extends CrudRepository<Post, UUID>, PagingAndSortingRepository<Post, UUID> {
     Page<Post> findAllByOrderByCreatedAtDesc(Pageable pageable);
-
     Page<Post> findByAuthorIdOrderByCreatedAtDesc(UUID authorId, Pageable pageable);
+    Page<Post> findByAuthorIdInOrderByCreatedAtDesc(Collection<UUID> authorIds, Pageable pageable);
 }

@@ -14,6 +14,8 @@ import jakarta.validation.Valid;
 
 import local.socialnetwork.core.config.security.principal.UserPrincipal;
 
+import local.socialnetwork.follows.service.FollowService;
+
 import local.socialnetwork.shared.dto.response.ApiResponseDto;
 
 import local.socialnetwork.profiles.dto.http.request.UpdateProfileRequestDto;
@@ -48,6 +50,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.UUID;
+
 /**
  * REST controller for the authenticated user's own profile.
  * All endpoints require a valid Bearer JWT token.
@@ -60,6 +64,7 @@ public class ProfileRestController {
 
     private final UserProfileService userProfileService;
     private final AvatarStorageService avatarStorageService;
+    private final FollowService followService;
 
     /**
      * Returns the profile of the currently authenticated user.
@@ -75,7 +80,7 @@ public class ProfileRestController {
             @Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal principal) {
         var profile = userProfileService.findByAuthUserId(principal.getId())
                 .orElseThrow(() -> new UserNotFoundException("Profile not found for user: " + principal.getUsername()));
-        return ApiResponseDto.buildSuccessResponse(toResponse(profile));
+        return ApiResponseDto.buildSuccessResponse(toResponse(profile, principal.getId()));
     }
 
     /**
@@ -93,7 +98,7 @@ public class ProfileRestController {
             @Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal principal,
             @Parameter(description = "Profile fields to update") @RequestBody @Valid UpdateProfileRequestDto request) {
         var updated = userProfileService.update(principal.getId(), request);
-        return ApiResponseDto.buildSuccessResponse(toResponse(updated));
+        return ApiResponseDto.buildSuccessResponse(toResponse(updated, principal.getId()));
     }
 
     /**
@@ -111,7 +116,7 @@ public class ProfileRestController {
             @Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal principal,
             @Parameter(description = "Avatar image file (JPEG, PNG, or WebP; max 5 MB)") @RequestParam("file") MultipartFile file) {
         var updated = userProfileService.updateAvatar(principal.getId(), file);
-        return ApiResponseDto.buildSuccessResponse(toResponse(updated));
+        return ApiResponseDto.buildSuccessResponse(toResponse(updated, principal.getId()));
     }
 
     /**
@@ -129,7 +134,7 @@ public class ProfileRestController {
         userProfileService.deleteAvatar(principal.getId());
     }
 
-    private MyProfileResponse toResponse(UserProfile profile) {
-        return MyProfileResponse.from(profile, avatarStorageService.presign(profile.getAvatarUrl()));
+    private MyProfileResponse toResponse(UserProfile profile, UUID authUserId) {
+        return MyProfileResponse.from(profile, avatarStorageService.presign(profile.getAvatarUrl()), followService.getCounts(authUserId));
     }
 }

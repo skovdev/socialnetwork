@@ -4,7 +4,7 @@ Pet-project for self-education, designed to simulate a basic social media applic
 
 ## Overview
 
-**SocialNetwork** is a monolith REST API built with Java 25 and Spring Boot 3. It covers user registration with email verification, JWT-based authentication with token rotation, user profile management including avatar upload, post creation/browsing, threaded comments on posts, and post likes. It also includes AI-assisted features — comment reply suggestions and post content generation — backed by Spring AI and OpenAI. Secrets are stored in AWS Secrets Manager; transactional emails are sent via AWS SES v2; avatar images are stored in AWS S3 and served via presigned URLs.
+**SocialNetwork** is a monolith REST API built with Java 25 and Spring Boot 3. It covers user registration with email verification, JWT-based authentication with token rotation, user profile management including avatar upload, post creation/browsing, threaded comments on posts, post likes, and a follow graph (follow/unfollow, followers/following browsing, and a personalized following-based feed). It also includes AI-assisted features — comment reply suggestions and post content generation — backed by Spring AI and OpenAI. Secrets are stored in AWS Secrets Manager; transactional emails are sent via AWS SES v2; avatar images are stored in AWS S3 and served via presigned URLs.
 
 ## Tech Stack
 
@@ -39,6 +39,7 @@ socialnetwork-api/src/main/java/local/socialnetwork/
 ├── posts/         # Post creation, feed, management endpoints, and AI content generation
 ├── comments/      # Comment creation, browsing, management endpoints, and AI reply suggestions
 ├── likes/         # Post like/unlike and browsing endpoints
+├── follows/       # Follow/unfollow, followers/following browsing endpoints
 ├── core/          # JWT provider, security config, filters, AWS clients, AI chat client
 └── shared/        # Base entity, exceptions, API version constant, API response wrapper
 ```
@@ -72,15 +73,20 @@ Base path: `/api/v1`
 |---|---|---|---|
 | `GET` | `/users/{username}` | Bearer | Retrieve a user profile by username |
 | `GET` | `/users/{username}/posts` | Bearer | Retrieve a paginated feed of posts authored by a user, newest first |
+| `POST` | `/users/{username}/follow` | Bearer | Follow a user on behalf of the current user (idempotent; 400 if following yourself) |
+| `DELETE` | `/users/{username}/follow` | Bearer | Unfollow a user on behalf of the current user (idempotent) |
+| `GET` | `/users/{username}/followers` | Bearer | Retrieve a paginated page of users following a user, newest follow first |
+| `GET` | `/users/{username}/following` | Bearer | Retrieve a paginated page of users a user follows, newest follow first |
 
-Avatar URLs returned in profile responses are short-lived, presigned S3 URLs (valid for 1 hour by default).
+Avatar URLs returned in profile responses are short-lived, presigned S3 URLs (valid for 1 hour by default). `GET /users/{username}` and `GET /profiles` responses also include `followerCount`/`followingCount` (and, for `/users/{username}`, `followedByCurrentUser`).
 
 ### Posts (`/posts`)
 
 | Method | Path | Auth | Description |
 |---|---|---|---|
 | `POST` | `/posts` | Bearer | Create a new post authored by the current user |
-| `GET` | `/posts` | Bearer | Retrieve a paginated feed of posts, newest first |
+| `GET` | `/posts` | Bearer | Retrieve a paginated global feed of posts, newest first |
+| `GET` | `/posts/following` | Bearer | Retrieve a paginated feed of posts authored by the current user or users they follow, newest first (falls back to the global feed when following nobody yet) |
 | `GET` | `/posts/{id}` | Bearer | Retrieve a single post by ID |
 | `PUT` | `/posts/{id}` | Bearer | Update a post's content — author only |
 | `DELETE` | `/posts/{id}` | Bearer | Delete a post — author only |
@@ -124,6 +130,7 @@ Migrations are managed by Liquibase and run automatically on startup.
 | `posts` | User-authored posts — content, author reference, timestamps |
 | `comments` | User-authored comments on posts — content, post/author references, optional parent comment (for replies), timestamps |
 | `likes` | One like per user per post — post/author references, unique on `(post_id, author_id)`, timestamp |
+| `follows` | One follow per user pair — follower/followed references, unique on `(follower_id, followed_id)`, timestamp |
 
 ## Prerequisites
 

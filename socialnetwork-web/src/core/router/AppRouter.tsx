@@ -7,6 +7,9 @@ import { EditProfilePage } from "../../profiles/pages/EditProfilePage";
 import { ProfilePage } from "../../profiles/pages/ProfilePage";
 import { UserProfilePage } from "../../profiles/pages/UserProfilePage";
 import { FeedPage } from "../../posts/pages/FeedPage";
+import { ExplorePage } from "../../posts/pages/ExplorePage";
+import { FollowersPage } from "../../follows/pages/FollowersPage";
+import { FollowingPage } from "../../follows/pages/FollowingPage";
 import { ProtectedRoute } from "../../shared/components/ProtectedRoute";
 
 export function AppRouter() {
@@ -20,6 +23,14 @@ export function AppRouter() {
                 element={
                     <ProtectedRoute>
                         <FeedPage />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/explore"
+                element={
+                    <ProtectedRoute>
+                        <ExplorePage />
                     </ProtectedRoute>
                 }
             />
@@ -44,6 +55,22 @@ export function AppRouter() {
                 element={
                     <ProtectedRoute>
                         <UserProfilePage />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/users/:username/followers"
+                element={
+                    <ProtectedRoute>
+                        <FollowersPage />
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/users/:username/following"
+                element={
+                    <ProtectedRoute>
+                        <FollowingPage />
                     </ProtectedRoute>
                 }
             />

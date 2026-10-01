@@ -1,13 +1,12 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
+import { FollowUserList } from "../components/FollowUserList";
 import { profileApi } from "../../profiles/api/profileApi";
-import { useAuth } from "../../auth/hooks/AuthContext";
-import { PostList } from "../components/PostList";
 import type { CurrentUser } from "../../shared/types";
 
-export function FeedPage() {
-    const { logout } = useAuth();
+export function FollowersPage() {
+    const { username } = useParams<{ username: string }>();
     const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
 
     useEffect(() => {
@@ -19,6 +18,10 @@ export function FeedPage() {
             .catch(() => {});
     }, []);
 
+    if (!username) {
+        return null;
+    }
+
     return (
         <>
             <header className="topbar">
@@ -27,23 +30,21 @@ export function FeedPage() {
                     <span className="brand-name">SocialNetwork</span>
                 </div>
                 <div>
-                    <Link to="/explore" className="btn btn-secondary">
-                        Explore
+                    <Link to={`/users/${username}`} className="btn btn-secondary">
+                        Back to profile
                     </Link>
-                    <Link to="/profile" className="btn btn-secondary">
-                        My profile
+                    <Link to="/feed" className="btn btn-secondary">
+                        Feed
                     </Link>
-                    <button type="button" className="btn btn-secondary" onClick={() => void logout()}>
-                        Log out
-                    </button>
                 </div>
             </header>
             <main className="profile-main">
-                <PostList
-                    mode="following"
+                <h1>Followers of @{username}</h1>
+                <FollowUserList
+                    username={username}
+                    mode="followers"
                     currentUser={currentUser}
-                    showComposer
-                    emptyMessage="No posts yet. Follow people to see their posts here, or check out Explore."
+                    emptyMessage="No followers yet."
                 />
             </main>
         </>

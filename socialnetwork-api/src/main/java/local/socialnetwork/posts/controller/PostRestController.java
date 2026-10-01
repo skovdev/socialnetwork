@@ -99,6 +99,23 @@ public class PostRestController {
     }
 
     /**
+     * Returns a page of posts authored by the currently authenticated user or by users they
+     * follow, ordered from newest to oldest. Falls back to the global feed when the viewer
+     * follows nobody yet.
+     */
+    @Operation(summary = "Get following feed", security = @SecurityRequirement(name = "bearerAuth"))
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Following feed retrieved"),
+            @ApiResponse(responseCode = "401", description = "Not authenticated")
+    })
+    @GetMapping("/following")
+    public ApiResponseDto<PagedModel<PostResponse>> getFollowingFeed(
+            @Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal principal, Pageable pageable) {
+        return ApiResponseDto.buildSuccessResponse(
+                new PagedModel<>(likeService.decorate(postService.getFollowingFeed(principal.getId(), pageable), principal.getId())));
+    }
+
+    /**
      * Returns a single post by ID.
      */
     @Operation(summary = "Get post", security = @SecurityRequirement(name = "bearerAuth"))
