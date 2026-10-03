@@ -43,3 +43,12 @@ databaseChangeLog:
             path: db/changelog/1.0/005-create-likes.sql
             relativeToChangelogFile: false
             encoding: UTF-8
+
+  - changeSet:
+      id: create-follows-table
+      author: stanislav.kovalenko
+      changes:
+        - sqlFile:
+            path: db/changelog/1.0/006-create-follows.sql
+            relativeToChangelogFile: false
+            encoding: UTF-8

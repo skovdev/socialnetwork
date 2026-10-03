@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 class ModuleBoundaryTest {
 
     private static final String BASE_PACKAGE = "local.socialnetwork";
-    private static final String[] FEATURES = {"auth", "profiles", "posts", "comments", "likes"};
+    private static final String[] FEATURES = {"auth", "profiles", "posts", "comments", "likes", "follows"};
 
     private static JavaClasses importProductionClasses() {
         return new ClassFileImporter()
@@ -73,7 +73,8 @@ class ModuleBoundaryTest {
                         BASE_PACKAGE + ".profiles..",
                         BASE_PACKAGE + ".posts..",
                         BASE_PACKAGE + ".comments..",
-                        BASE_PACKAGE + ".likes..");
+                        BASE_PACKAGE + ".likes..",
+                        BASE_PACKAGE + ".follows..");
 
         rule.check(classes);
     }

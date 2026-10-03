@@ -13,6 +13,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 import local.socialnetwork.core.config.security.principal.UserPrincipal;
 
+import local.socialnetwork.follows.service.FollowService;
+
 import local.socialnetwork.likes.service.LikeService;
 
 import local.socialnetwork.shared.dto.response.ApiResponseDto;
@@ -56,6 +58,7 @@ public class UserProfileRestController {
     private final AvatarStorageService avatarStorageService;
     private final PostService postService;
     private final LikeService likeService;
+    private final FollowService followService;
 
     @Operation(summary = "Get user profile by username", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponses({
@@ -65,11 +68,13 @@ public class UserProfileRestController {
     })
     @GetMapping("/{username}")
     public ApiResponseDto<UserProfileResponse> getProfile(
+            @Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal principal,
             @Parameter(description = "Username to retrieve") @PathVariable("username") String username) {
         var profile = userProfileService.findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException("User '" + username + "' not found"));
         var avatarUrl = avatarStorageService.presign(profile.getAvatarUrl());
-        return ApiResponseDto.buildSuccessResponse(UserProfileResponse.from(profile, avatarUrl));
+        var summary = followService.getSummary(username, principal.getId());
+        return ApiResponseDto.buildSuccessResponse(UserProfileResponse.from(profile, avatarUrl, summary));
     }
 
     @Operation(summary = "Get posts authored by a user", security = @SecurityRequirement(name = "bearerAuth"))

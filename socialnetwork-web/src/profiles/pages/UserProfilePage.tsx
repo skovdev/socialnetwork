@@ -7,6 +7,7 @@ import type { PublicUserProfile } from "../types";
 import { PostList } from "../../posts/components/PostList";
 import { Avatar } from "../../shared/components/Avatar";
 import type { CurrentUser } from "../../shared/types";
+import { FollowButton } from "../../follows/components/FollowButton";
 
 export function UserProfilePage() {
     const { username } = useParams<{ username: string }>();
@@ -65,8 +66,32 @@ export function UserProfilePage() {
                             <div className="identity-row">
                                 <Avatar avatarUrl={profile.avatarUrl} displayName={profile.displayName} size="lg" />
                                 <div className="identity-text">
-                                    <h1>{profile.displayName}</h1>
+                                    <div className="name-row">
+                                        <h1>{profile.displayName}</h1>
+                                        {currentUser && currentUser.username !== profile.username && (
+                                            <FollowButton
+                                                username={profile.username}
+                                                initiallyFollowed={profile.followedByCurrentUser}
+                                                onChange={(summary) =>
+                                                    setProfile((p) =>
+                                                        p
+                                                            ? {
+                                                                  ...p,
+                                                                  followerCount: summary.followerCount,
+                                                                  followedByCurrentUser: summary.followedByCurrentUser,
+                                                              }
+                                                            : p,
+                                                    )
+                                                }
+                                            />
+                                        )}
+                                    </div>
                                     <p className="username">@{profile.username}</p>
+                                    <p className="follow-counts">
+                                        <Link to={`/users/${profile.username}/followers`}>{profile.followerCount} Followers</Link>
+                                        {" · "}
+                                        <Link to={`/users/${profile.username}/following`}>{profile.followingCount} Following</Link>
+                                    </p>
                                     {profile.bio && <p className="bio">{profile.bio}</p>}
                                 </div>
                             </div>

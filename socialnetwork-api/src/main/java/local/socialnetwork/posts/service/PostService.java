@@ -40,6 +40,13 @@ public interface PostService {
     Page<PostResponse> getPostsByUsername(String username, Pageable pageable);
 
     /**
+     * Returns a page of posts authored by {@code viewerId} or by users {@code viewerId} follows,
+     * ordered from newest to oldest. Falls back to {@link #getFeed(Pageable)} when {@code viewerId}
+     * follows nobody, so a new account is never shown an empty feed.
+     */
+    Page<PostResponse> getFollowingFeed(UUID viewerId, Pageable pageable);
+
+    /**
      * Updates the content of the post belonging to {@code postId}, provided {@code authUserId} is the author.
      *
      * @throws local.socialnetwork.shared.exception.PostNotFoundException     if no post exists with the given ID

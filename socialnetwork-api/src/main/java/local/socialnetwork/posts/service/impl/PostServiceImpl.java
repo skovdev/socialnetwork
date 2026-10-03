@@ -2,6 +2,8 @@ package local.socialnetwork.posts.service.impl;
 
 import local.socialnetwork.auth.repository.AuthUserRepository;
 
+import local.socialnetwork.follows.service.FollowService;
+
 import local.socialnetwork.posts.dto.http.request.CreatePostRequestDto;
 import local.socialnetwork.posts.dto.http.request.UpdatePostRequestDto;
 
@@ -41,6 +43,7 @@ import java.time.Instant;
 
 import java.util.Map;
 import java.util.UUID;
+import java.util.HashSet;
 
 /**
  * Default implementation of {@link PostService}.
@@ -53,6 +56,7 @@ public class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
     private final AuthUserRepository authUserRepository;
     private final UserProfileService userProfileService;
+    private final FollowService followService;
 
     /**
      * {@inheritDoc}
@@ -104,6 +108,24 @@ public class PostServiceImpl implements PostService {
                 .orElseThrow(() -> new UserNotFoundException("User '" + username + "' not found"));
         var page = postRepository.findByAuthorIdOrderByCreatedAtDesc(author.authUserId(), pageable);
         return page.map(post -> PostResponse.from(post, author.summary()));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Page<PostResponse> getFollowingFeed(UUID viewerId, Pageable pageable) {
+        var followedIds = followService.getFollowedAuthorIds(viewerId);
+        if (followedIds.isEmpty()) {
+            return getFeed(pageable);
+        }
+        var authorIds = new HashSet<>(followedIds);
+        authorIds.add(viewerId);
+        var page = postRepository.findByAuthorIdInOrderByCreatedAtDesc(authorIds, pageable);
+        var authorsById = userProfileService.getAuthorSummaries(
+                page.getContent().stream().map(post -> post.getAuthor().getId()).distinct().toList());
+        return page.map(post -> PostResponse.from(post, toAuthorSummary(authorsById, post.getAuthor().getId())));
     }
 
     /**

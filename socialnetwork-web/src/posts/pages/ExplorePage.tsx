@@ -6,7 +6,7 @@ import { useAuth } from "../../auth/hooks/AuthContext";
 import { PostList } from "../components/PostList";
 import type { CurrentUser } from "../../shared/types";
 
-export function FeedPage() {
+export function ExplorePage() {
     const { logout } = useAuth();
     const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
 
@@ -27,8 +27,8 @@ export function FeedPage() {
                     <span className="brand-name">SocialNetwork</span>
                 </div>
                 <div>
-                    <Link to="/explore" className="btn btn-secondary">
-                        Explore
+                    <Link to="/feed" className="btn btn-secondary">
+                        Home
                     </Link>
                     <Link to="/profile" className="btn btn-secondary">
                         My profile
@@ -39,12 +39,7 @@ export function FeedPage() {
                 </div>
             </header>
             <main className="profile-main">
-                <PostList
-                    mode="following"
-                    currentUser={currentUser}
-                    showComposer
-                    emptyMessage="No posts yet. Follow people to see their posts here, or check out Explore."
-                />
+                <PostList currentUser={currentUser} showComposer={false} emptyMessage="No posts yet." />
             </main>
         </>
     );
