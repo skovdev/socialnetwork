@@ -10,12 +10,14 @@ import type { CurrentUser } from "../../shared/types";
 
 interface PostListProps {
     username?: string;
+    /** Ignored when `username` is set. Defaults to "feed" (the global feed). */
+    mode?: "feed" | "following";
     currentUser: CurrentUser | null;
     showComposer: boolean;
     emptyMessage?: string;
 }
 
-export function PostList({ username, currentUser, showComposer, emptyMessage = "No posts yet." }: PostListProps) {
+export function PostList({ username, mode = "feed", currentUser, showComposer, emptyMessage = "No posts yet." }: PostListProps) {
     const [posts, setPosts] = useState<Post[]>([]);
     const [page, setPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
@@ -31,8 +33,13 @@ export function PostList({ username, currentUser, showComposer, emptyMessage = "
     const textareaRef = useRef<HTMLTextAreaElement>(null);
 
     const fetchPage = useCallback(
-        (pageNumber: number) => (username ? postApi.getPostsByUsername(username, pageNumber) : postApi.getFeed(pageNumber)),
-        [username],
+        (pageNumber: number) =>
+            username
+                ? postApi.getPostsByUsername(username, pageNumber)
+                : mode === "following"
+                  ? postApi.getFollowingFeed(pageNumber)
+                  : postApi.getFeed(pageNumber),
+        [username, mode],
     );
 
     useEffect(() => {

@@ -17,6 +17,9 @@ export interface PublicUserProfile {
     avatarUrl: string | null;
     country: string | null;
     city: string | null;
+    followerCount: number;
+    followingCount: number;
+    followedByCurrentUser: boolean;
 }
 
 export interface MyProfile extends PublicUserProfile {
@@ -25,6 +28,9 @@ export interface MyProfile extends PublicUserProfile {
     address: string | null;
     familyStatus: FamilyStatus | null;
 }
+// Note: MyProfile inherits followedByCurrentUser from PublicUserProfile, but the backend's
+// /api/v1/profiles response never sends it (it is meaningless for your own profile) — it comes
+// back undefined at runtime, and pages for your own profile simply never read it.
 
 export interface UpdateProfileRequest {
     displayName: string;

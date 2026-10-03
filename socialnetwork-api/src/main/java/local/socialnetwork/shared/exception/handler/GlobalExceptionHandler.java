@@ -1,5 +1,6 @@
 package local.socialnetwork.shared.exception.handler;
 
+import local.socialnetwork.shared.exception.SelfFollowException;
 import local.socialnetwork.shared.exception.UserNotFoundException;
 import local.socialnetwork.shared.exception.TokenExpiredException;
 import local.socialnetwork.shared.exception.PostNotFoundException;
@@ -34,6 +35,7 @@ import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 
 import org.springframework.security.authentication.BadCredentialsException;
+
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import org.springframework.validation.FieldError;
@@ -44,8 +46,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-
-import java.util.List;
 
 /**
  * Centralised exception-to-HTTP-response mapping. All error responses use
@@ -173,6 +173,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ProblemDetail> handlePostAccessDenied(PostAccessDeniedException ex) {
         log.warn("Post access denied: {}", ex.getMessage(), ex);
         return problem(HttpStatus.FORBIDDEN, "POST_ACCESS_DENIED", ex.getMessage());
+    }
+
+    @ExceptionHandler(SelfFollowException.class)
+    public ResponseEntity<ProblemDetail> handleSelfFollow(SelfFollowException ex) {
+        log.warn("Self-follow attempt: {}", ex.getMessage(), ex);
+        return problem(HttpStatus.BAD_REQUEST, "SELF_FOLLOW_NOT_ALLOWED", ex.getMessage());
     }
 
     @ExceptionHandler(CommentNotFoundException.class)

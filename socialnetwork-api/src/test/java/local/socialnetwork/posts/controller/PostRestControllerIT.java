@@ -236,4 +236,40 @@ class PostRestControllerIT extends BaseIntegrationTest {
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.errorCode").value("POST_ACCESS_DENIED"));
     }
+
+    @Test
+    void getFollowingFeed_whenFollowingNobody_fallsBackToGlobalFeed() throws Exception {
+        createPostAndGetId(authorToken, "Global post");
+
+        mockMvc.perform(get(BASE_URL + "/following")
+                        .header("Authorization", "Bearer " + otherUserToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.content[0].content").value("Global post"));
+    }
+
+    @Test
+    void getFollowingFeed_includesFollowedAuthorAndOwnPosts_excludesUnfollowedAuthor() throws Exception {
+        var unfollowedToken = createUserAndGetToken("charlie", "charlie@example.com", "Charlie Third");
+
+        createPostAndGetId(authorToken, "Author's post");
+        createPostAndGetId(unfollowedToken, "Unfollowed author's post");
+        createPostAndGetId(otherUserToken, "Viewer's own post");
+
+        mockMvc.perform(post("/api/v1/users/author/follow")
+                        .header("Authorization", "Bearer " + otherUserToken))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get(BASE_URL + "/following")
+                        .header("Authorization", "Bearer " + otherUserToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.content.length()").value(2))
+                .andExpect(jsonPath("$.data.content[0].content").value("Viewer's own post"))
+                .andExpect(jsonPath("$.data.content[1].content").value("Author's post"));
+    }
+
+    @Test
+    void getFollowingFeed_whenUnauthenticated_returns401() throws Exception {
+        mockMvc.perform(get(BASE_URL + "/following"))
+                .andExpect(status().isUnauthorized());
+    }
 }

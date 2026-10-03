@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -47,6 +48,7 @@ class UserProfileRestControllerIT extends BaseIntegrationTest {
     private PasswordEncoder passwordEncoder;
 
     private String bearerToken;
+    private String otherBearerToken;
 
     @BeforeEach
     void setUp() {
@@ -72,6 +74,28 @@ class UserProfileRestControllerIT extends BaseIntegrationTest {
         authUserRepository.save(authUser);
 
         bearerToken = jwtTokenProvider.createToken(Map.of("username", TEST_USERNAME));
+
+        var otherAuthUser = new AuthUser();
+        otherAuthUser.setEmail("bob@example.com");
+        otherAuthUser.setPasswordHash(passwordEncoder.encode("Secret1234"));
+        otherAuthUser.setAuthStatus(AuthStatus.ACTIVE);
+
+        var otherRole = new AuthUserRole();
+        otherRole.setAuthority("ROLE_USER");
+        otherRole.setAuthUser(otherAuthUser);
+        otherAuthUser.setAuthUserRoles(Set.of(otherRole));
+
+        var otherProfile = new UserProfile();
+        otherProfile.setUsername("bob");
+        otherProfile.setFirstName("Bob");
+        otherProfile.setLastName("Jones");
+        otherProfile.setDisplayName("Bob Jones");
+        otherProfile.setAuthUser(otherAuthUser);
+        otherAuthUser.setUserProfile(otherProfile);
+
+        authUserRepository.save(otherAuthUser);
+
+        otherBearerToken = jwtTokenProvider.createToken(Map.of("username", "bob"));
     }
 
     @Test
@@ -82,7 +106,29 @@ class UserProfileRestControllerIT extends BaseIntegrationTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.data.username").value(TEST_USERNAME))
                 .andExpect(jsonPath("$.data.firstName").value("Alice"))
-                .andExpect(jsonPath("$.data.lastName").value("Smith"));
+                .andExpect(jsonPath("$.data.lastName").value("Smith"))
+                .andExpect(jsonPath("$.data.followerCount").value(0))
+                .andExpect(jsonPath("$.data.followingCount").value(0))
+                .andExpect(jsonPath("$.data.followedByCurrentUser").value(false));
+    }
+
+    @Test
+    void getProfile_afterBeingFollowed_reflectsFollowerCountAndFollowedByCurrentUser() throws Exception {
+        mockMvc.perform(post("/api/v1/users/" + TEST_USERNAME + "/follow")
+                        .header("Authorization", "Bearer " + otherBearerToken))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get(BASE_URL + "/" + TEST_USERNAME)
+                        .header("Authorization", "Bearer " + otherBearerToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.followerCount").value(1))
+                .andExpect(jsonPath("$.data.followedByCurrentUser").value(true));
+
+        mockMvc.perform(get(BASE_URL + "/" + TEST_USERNAME)
+                        .header("Authorization", "Bearer " + bearerToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.followerCount").value(1))
+                .andExpect(jsonPath("$.data.followedByCurrentUser").value(false));
     }
 
     @Test
