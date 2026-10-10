@@ -151,6 +151,7 @@ The application reads its configuration from `application.properties`. Sensitive
 |---|---|
 | `SN_AWS_ACCESS_KEY_ID` | IAM access key |
 | `SN_AWS_SECRET_ACCESS_KEY` | IAM secret key |
+| `SN_DB_PASSWORD` | PostgreSQL password for the application user |
 
 ### Optional environment variables
 
@@ -158,6 +159,9 @@ The application reads its configuration from `application.properties`. Sensitive
 |---|---|---|
 | `CORS_ALLOWED_ORIGINS` | `http://localhost:5173` | Comma-separated list of allowed CORS origins |
 | `SN_AWS_S3_AVATAR_BUCKET_NAME` | `socialnetwork-user-avatar-upload` | S3 bucket used to store uploaded avatar images |
+| `SN_DB_URL` | `jdbc:postgresql://localhost:5432/socialnetwork_db` | JDBC URL of the PostgreSQL database |
+| `SN_DB_USERNAME` | `socialnetwork_user` | PostgreSQL user |
+| `SN_JPA_SHOW_SQL` | `false` | Set to `true` to log every SQL statement |
 | `SN_REDIS_HOST` | `localhost` | Redis host used for the posts cache |
 | `SN_REDIS_PORT` | `6379` | Redis port used for the posts cache |
 | `SN_REDIS_PASSWORD` | *(empty)* | Redis password, if authentication is enabled |

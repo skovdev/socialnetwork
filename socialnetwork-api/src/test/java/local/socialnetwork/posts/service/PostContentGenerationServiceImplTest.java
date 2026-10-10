@@ -1,6 +1,7 @@
 package local.socialnetwork.posts.service;
 
 import local.socialnetwork.core.ai.AiChatService;
+import local.socialnetwork.core.ai.AiRequestLimiter;
 
 import local.socialnetwork.posts.dto.http.request.GeneratePostContentRequestDto;
 
@@ -37,6 +38,9 @@ class PostContentGenerationServiceImplTest {
 
     @Mock
     private AiChatService aiChatService;
+
+    @Mock
+    private AiRequestLimiter aiRequestLimiter;
 
     @InjectMocks
     private PostContentGenerationServiceImpl service;

@@ -8,6 +8,8 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import local.socialnetwork.core.config.jwt.JwtTokenProvider;
 
+import local.socialnetwork.shared.exception.InvalidJwtAuthenticationException;
+
 import lombok.RequiredArgsConstructor;
 
 import lombok.extern.slf4j.Slf4j;
@@ -42,9 +44,10 @@ public class JwtVerificationTokenFilter extends OncePerRequestFilter {
             try {
                 var authentication = jwtTokenProvider.authenticate(token);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
+            } catch (InvalidJwtAuthenticationException e) {
+                log.debug("Rejected invalid JWT: {}", e.getMessage());
+                SecurityContextHolder.clearContext();
             } catch (UsernameNotFoundException e) {
-                // Token is cryptographically valid but the referenced user no longer exists
-                // (e.g. account deleted while token still live). Treat as unauthenticated.
                 log.warn("JWT references a non-existent user — treating request as unauthenticated: {}", e.getMessage());
                 SecurityContextHolder.clearContext();
             }

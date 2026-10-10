@@ -46,6 +46,9 @@ class LikeRestControllerIT extends BaseIntegrationTest {
     private AuthUserRepository authUserRepository;
 
     @Autowired
+    private local.socialnetwork.likes.repository.LikeRepository likeRepository;
+
+    @Autowired
     private JwtTokenProvider jwtTokenProvider;
 
     @Autowired
@@ -255,5 +258,19 @@ class LikeRestControllerIT extends BaseIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.content[0].likeCount").value(1))
                 .andExpect(jsonPath("$.data.content[0].likedByCurrentUser").value(true));
+    }
+
+    @Test
+    void insertIfAbsent_calledTwice_secondInsertIsNoOpAndDoesNotAbortTransaction() {
+        var userId = authUserRepository.findByUserProfileUsername("other").orElseThrow().getId();
+        var postUuid = java.util.UUID.fromString(postId);
+
+        var first = likeRepository.insertIfAbsent(java.util.UUID.randomUUID(), postUuid, userId, java.time.Instant.now());
+        var second = likeRepository.insertIfAbsent(java.util.UUID.randomUUID(), postUuid, userId, java.time.Instant.now());
+
+        org.assertj.core.api.Assertions.assertThat(first).isEqualTo(1);
+        org.assertj.core.api.Assertions.assertThat(second).isZero();
+        // A plain INSERT hitting the unique constraint would have aborted the transaction; this must still work.
+        org.assertj.core.api.Assertions.assertThat(likeRepository.countByPostId(postUuid)).isEqualTo(1L);
     }
 }

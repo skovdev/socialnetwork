@@ -6,6 +6,7 @@ import local.socialnetwork.shared.exception.TokenExpiredException;
 import local.socialnetwork.shared.exception.PostNotFoundException;
 import local.socialnetwork.shared.exception.CommentNotFoundException;
 import local.socialnetwork.shared.exception.PostAccessDeniedException;
+import local.socialnetwork.shared.exception.TooManyAiRequestsException;
 import local.socialnetwork.shared.exception.CommentAccessDeniedException;
 import local.socialnetwork.shared.exception.InvalidCommentParentException;
 import local.socialnetwork.shared.exception.PostContentGenerationException;
@@ -103,6 +104,17 @@ public class GlobalExceptionHandler {
         log.warn("Login rate limit exceeded: {}", ex.getMessage());
         var problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.TOO_MANY_REQUESTS, ex.getMessage());
         problemDetail.setProperty("errorCode", "TOO_MANY_LOGIN_ATTEMPTS");
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                .header(HttpHeaders.RETRY_AFTER, String.valueOf(ex.getRetryAfterSeconds()))
+                .contentType(MediaType.APPLICATION_PROBLEM_JSON)
+                .body(problemDetail);
+    }
+
+    @ExceptionHandler(TooManyAiRequestsException.class)
+    public ResponseEntity<ProblemDetail> handleTooManyAiRequests(TooManyAiRequestsException ex) {
+        log.warn("AI rate limit exceeded: {}", ex.getMessage());
+        var problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.TOO_MANY_REQUESTS, ex.getMessage());
+        problemDetail.setProperty("errorCode", "TOO_MANY_AI_REQUESTS");
         return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
                 .header(HttpHeaders.RETRY_AFTER, String.valueOf(ex.getRetryAfterSeconds()))
                 .contentType(MediaType.APPLICATION_PROBLEM_JSON)
