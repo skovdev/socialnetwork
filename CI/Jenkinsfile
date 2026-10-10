@@ -1,47 +1,68 @@
 pipeline {
-    agent any
+    agent { label 'docker' } // Testcontainers (Postgres/Redis) needs a Docker-capable agent
+
     tools {
         jdk 'jdk-25'
         nodejs 'node-20'
     }
+
+    options {
+        timeout(time: 30, unit: 'MINUTES')
+        buildDiscarder(logRotator(numToKeepStr: '20'))
+        disableConcurrentBuilds()
+    }
+
+    triggers {
+        pollSCM('H/5 * * * *') // or drop this in favor of a GitHub webhook
+    }
+
     stages {
-        stage("Clone the project from GitHub") {
+        stage('Checkout') {
             steps {
-                git branch: 'master', url: 'https://github.com/skovdev/socialnetwork.git'
+                checkout scm
             }
         }
-        stage("Back-end: build") {
+
+        stage('Back-end: build & test') {
             steps {
                 dir('socialnetwork-api') {
                     withMaven(jdk: 'jdk-25', maven: 'apache-maven-3.9.3') {
-                        sh "mvn clean install -DskipTests"
+                        sh 'mvn -B -ntp clean verify'
                     }
                 }
             }
-        }
-        stage ("Back-end: tests") {
-            steps {
-                dir('socialnetwork-api') {
-                    withMaven(jdk: 'jdk-25', maven: 'apache-maven-3.9.3') {
-                        sh "mvn test"
-                    }
+            post {
+                always {
+                    junit 'socialnetwork-api/target/surefire-reports/*.xml'
                 }
             }
         }
-        stage ("Front-end: install & lint") {
+
+        stage('Front-end: install & lint') {
             steps {
                 dir('socialnetwork-web') {
-                    sh "npm ci"
-                    sh "npm run lint"
+                    sh 'npm ci'
+                    sh 'npm run lint'
                 }
             }
         }
-        stage ("Front-end: build") {
+
+        stage('Front-end: build') {
             steps {
                 dir('socialnetwork-web') {
-                    sh "npm run build"
+                    sh 'npm run build'
                 }
             }
+        }
+    }
+
+    post {
+        always {
+            archiveArtifacts artifacts: 'socialnetwork-api/target/*.jar, socialnetwork-web/dist/**', allowEmptyArchive: true
+            cleanWs()
+        }
+        failure {
+            echo 'Build failed — wire up Slack/email notification here if desired.'
         }
     }
 }

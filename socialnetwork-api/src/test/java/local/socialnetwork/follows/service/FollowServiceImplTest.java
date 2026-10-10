@@ -2,7 +2,6 @@ package local.socialnetwork.follows.service;
 
 import local.socialnetwork.auth.entity.AuthUser;
 
-import local.socialnetwork.auth.repository.AuthUserRepository;
 
 import local.socialnetwork.follows.entity.Follow;
 
@@ -28,7 +27,6 @@ import org.mockito.InjectMocks;
 
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import org.springframework.dao.DataIntegrityViolationException;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -56,9 +54,6 @@ class FollowServiceImplTest {
     private FollowRepository followRepository;
 
     @Mock
-    private AuthUserRepository authUserRepository;
-
-    @Mock
     private UserProfileService userProfileService;
 
     @InjectMocks
@@ -75,14 +70,13 @@ class FollowServiceImplTest {
     }
 
     @Test
-    void follow_newFollow_savesAndReturnsSummaryWithFollowedTrue() {
+    void follow_newFollow_insertsAndReturnsSummaryWithFollowedTrue() {
         var followerId = UUID.randomUUID();
         var targetId = UUID.randomUUID();
 
         when(userProfileService.findAuthorByUsername("target")).thenReturn(Optional.of(authorProfile(targetId, "target")));
-        when(followRepository.existsByFollowerIdAndFollowedId(followerId, targetId)).thenReturn(false, true);
-        when(authUserRepository.findById(followerId)).thenReturn(Optional.of(authUserWithId(followerId)));
-        when(authUserRepository.findById(targetId)).thenReturn(Optional.of(authUserWithId(targetId)));
+        when(followRepository.insertIfAbsent(any(), eq(followerId), eq(targetId), any())).thenReturn(1);
+        when(followRepository.existsByFollowerIdAndFollowedId(followerId, targetId)).thenReturn(true);
         when(followRepository.countByFollowedId(targetId)).thenReturn(1L);
         when(followRepository.countByFollowerId(targetId)).thenReturn(0L);
 
@@ -90,41 +84,23 @@ class FollowServiceImplTest {
 
         assertThat(result.followerCount()).isEqualTo(1L);
         assertThat(result.followedByCurrentUser()).isTrue();
-        verify(followRepository).save(any(Follow.class));
     }
 
     @Test
-    void follow_alreadyFollowing_isIdempotent_doesNotSaveAgain() {
+    void follow_alreadyFollowingOrConcurrent_isIdempotent_insertIsNoOp() {
         var followerId = UUID.randomUUID();
         var targetId = UUID.randomUUID();
 
         when(userProfileService.findAuthorByUsername("target")).thenReturn(Optional.of(authorProfile(targetId, "target")));
+        when(followRepository.insertIfAbsent(any(), eq(followerId), eq(targetId), any())).thenReturn(0);
         when(followRepository.existsByFollowerIdAndFollowedId(followerId, targetId)).thenReturn(true);
-        when(followRepository.countByFollowedId(targetId)).thenReturn(1L);
-        when(followRepository.countByFollowerId(targetId)).thenReturn(0L);
-
-        followService.follow(followerId, "target");
-
-        verify(followRepository, never()).save(any());
-        verify(authUserRepository, never()).findById(any());
-    }
-
-    @Test
-    void follow_concurrentDataIntegrityViolation_isSwallowed() {
-        var followerId = UUID.randomUUID();
-        var targetId = UUID.randomUUID();
-
-        when(userProfileService.findAuthorByUsername("target")).thenReturn(Optional.of(authorProfile(targetId, "target")));
-        when(followRepository.existsByFollowerIdAndFollowedId(followerId, targetId)).thenReturn(false);
-        when(authUserRepository.findById(followerId)).thenReturn(Optional.of(authUserWithId(followerId)));
-        when(authUserRepository.findById(targetId)).thenReturn(Optional.of(authUserWithId(targetId)));
-        when(followRepository.save(any(Follow.class))).thenThrow(new DataIntegrityViolationException("duplicate"));
         when(followRepository.countByFollowedId(targetId)).thenReturn(1L);
         when(followRepository.countByFollowerId(targetId)).thenReturn(0L);
 
         var result = followService.follow(followerId, "target");
 
         assertThat(result.followerCount()).isEqualTo(1L);
+        verify(followRepository, never()).save(any());
     }
 
     @Test

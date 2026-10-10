@@ -272,4 +272,10 @@ class PostRestControllerIT extends BaseIntegrationTest {
         mockMvc.perform(get(BASE_URL + "/following"))
                 .andExpect(status().isUnauthorized());
     }
+
+    @Test
+    void getFeed_withMalformedBearerToken_returns401() throws Exception {
+        mockMvc.perform(get(BASE_URL).header("Authorization", "Bearer not-a-real-jwt"))
+                .andExpect(status().isUnauthorized());
+    }
 }

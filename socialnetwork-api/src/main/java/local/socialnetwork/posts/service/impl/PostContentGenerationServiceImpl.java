@@ -1,6 +1,7 @@
 package local.socialnetwork.posts.service.impl;
 
 import local.socialnetwork.core.ai.AiChatService;
+import local.socialnetwork.core.ai.AiRequestLimiter;
 
 import local.socialnetwork.posts.dto.http.request.GeneratePostContentRequestDto;
 
@@ -31,12 +32,14 @@ import java.util.UUID;
 public class PostContentGenerationServiceImpl implements PostContentGenerationService {
 
     private final AiChatService aiChatService;
+    private final AiRequestLimiter aiRequestLimiter;
 
     /**
      * {@inheritDoc}
      */
     @Override
     public GeneratedPostContentResponse generateContent(UUID authUserId, GeneratePostContentRequestDto request) {
+        aiRequestLimiter.acquire(authUserId);
         try {
             log.info("Generating post content requested by auth user id: {}", authUserId);
             var content = aiChatService.chat(PostContentGenerationPrompts.SYSTEM_PROMPT, request.topic());

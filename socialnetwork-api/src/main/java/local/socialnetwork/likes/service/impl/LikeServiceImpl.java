@@ -1,12 +1,7 @@
 package local.socialnetwork.likes.service.impl;
 
-import local.socialnetwork.auth.entity.AuthUser;
-import local.socialnetwork.auth.repository.AuthUserRepository;
-
 import local.socialnetwork.likes.dto.http.response.LikeSummary;
 import local.socialnetwork.likes.dto.http.response.LikeResponse;
-
-import local.socialnetwork.likes.entity.Like;
 
 import local.socialnetwork.likes.repository.PostLikeCount;
 import local.socialnetwork.likes.repository.LikeRepository;
@@ -14,8 +9,6 @@ import local.socialnetwork.likes.repository.LikeRepository;
 import local.socialnetwork.likes.service.LikeService;
 
 import local.socialnetwork.posts.dto.http.response.PostResponse;
-
-import local.socialnetwork.posts.entity.Post;
 
 import local.socialnetwork.posts.repository.PostRepository;
 
@@ -29,8 +22,6 @@ import local.socialnetwork.shared.exception.PostNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 import lombok.extern.slf4j.Slf4j;
-
-import org.springframework.dao.DataIntegrityViolationException;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -57,7 +48,6 @@ public class LikeServiceImpl implements LikeService {
 
     private final LikeRepository likeRepository;
     private final PostRepository postRepository;
-    private final AuthUserRepository authUserRepository;
     private final UserProfileService userProfileService;
 
     /**
@@ -66,17 +56,10 @@ public class LikeServiceImpl implements LikeService {
     @Override
     @Transactional
     public LikeSummary likePost(UUID authUserId, UUID postId) {
-        var post = findPostOrThrow(postId);
-        if (!likeRepository.existsByPostIdAndAuthorId(postId, authUserId)) {
-            var author = authUserRepository.findById(authUserId)
-                    .orElseThrow(() -> new UserNotFoundException("User not found for id: " + authUserId));
-            var like = createLike(post, author);
-            try {
-                likeRepository.save(like);
-                log.info("Post {} liked by auth user id: {}", postId, authUserId);
-            } catch (DataIntegrityViolationException ex) {
-                log.debug("Post {} already liked by auth user id: {} (concurrent like)", postId, authUserId);
-            }
+        requirePostExists(postId);
+        var inserted = likeRepository.insertIfAbsent(UUID.randomUUID(), postId, authUserId, Instant.now());
+        if (inserted > 0) {
+            log.info("Post {} liked by auth user id: {}", postId, authUserId);
         }
         return computeSummary(postId, authUserId);
     }
@@ -156,21 +139,8 @@ public class LikeServiceImpl implements LikeService {
         return posts.map(post -> post.withLikeSummary(summaries.get(post.id())));
     }
 
-    private Like createLike(Post post, AuthUser author) {
-        var like = new Like();
-        like.setPost(post);
-        like.setAuthor(author);
-        like.setCreatedAt(Instant.now());
-        return like;
-    }
-
     private LikeSummary computeSummary(UUID postId, UUID viewerId) {
         return new LikeSummary(likeRepository.countByPostId(postId), likeRepository.existsByPostIdAndAuthorId(postId, viewerId));
-    }
-
-    private Post findPostOrThrow(UUID postId) {
-        return postRepository.findById(postId)
-                .orElseThrow(() -> new PostNotFoundException("Post not found for id: " + postId));
     }
 
     private void requirePostExists(UUID postId) {

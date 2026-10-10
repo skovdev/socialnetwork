@@ -2,6 +2,8 @@ package local.socialnetwork.core.ai.config;
 
 import local.socialnetwork.core.cloud.aws.secrets.AWSSecretsManagerProvider;
 
+import local.socialnetwork.core.config.AiProperties;
+
 import lombok.RequiredArgsConstructor;
 
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +20,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
+
+import org.springframework.web.client.RestClient;
+
 /**
  * Configures the Spring AI {@link ChatClient} using an OpenAI API key retrieved from AWS Secrets
  * Manager. Declaring {@link OpenAiChatModel} as a bean causes Spring AI's
@@ -32,6 +39,7 @@ public class AiClientConfig {
     private static final String KEY_NAME = "openai-public-api-key";
 
     private final AWSSecretsManagerProvider awsSecretsManagerProvider;
+    private final AiProperties aiProperties;
 
     @Value("${aws.secretsmanager.secretName.socialnetwork-openai-api-key}")
     private String openAiApiKeySecretName;
@@ -47,6 +55,7 @@ public class AiClientConfig {
     public OpenAiChatModel openAiChatModel() {
         var openAiApi = OpenAiApi.builder()
                 .apiKey(retrieveApiKey())
+                .restClientBuilder(RestClient.builder().requestFactory(requestFactory()))
                 .build();
         var options = OpenAiChatOptions.builder()
                 .model(model)
@@ -64,6 +73,13 @@ public class AiClientConfig {
     @Bean
     public ChatClient chatClient(ChatClient.Builder builder) {
         return builder.build();
+    }
+
+    private ClientHttpRequestFactory requestFactory() {
+        var factory = new SimpleClientHttpRequestFactory();
+        factory.setConnectTimeout(aiProperties.timeout().connect());
+        factory.setReadTimeout(aiProperties.timeout().read());
+        return factory;
     }
 
     private String retrieveApiKey() {
