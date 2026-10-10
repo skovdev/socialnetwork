@@ -11,9 +11,11 @@ import local.socialnetwork.comments.repository.CommentRepository;
 import local.socialnetwork.comments.service.CommentReplySuggestionService;
 
 import local.socialnetwork.core.ai.AiChatService;
+import local.socialnetwork.core.ai.AiRequestLimiter;
 
 import local.socialnetwork.posts.service.PostService;
 
+import local.socialnetwork.shared.exception.AiChatException;
 import local.socialnetwork.shared.exception.CommentNotFoundException;
 import local.socialnetwork.shared.exception.CommentSuggestionGenerationException;
 
@@ -25,7 +27,7 @@ import org.springframework.data.domain.PageRequest;
 
 import org.springframework.stereotype.Service;
 
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionOperations;
 
 import java.util.List;
 import java.util.UUID;
@@ -47,22 +49,18 @@ public class CommentReplySuggestionServiceImpl implements CommentReplySuggestion
     private final CommentRepository commentRepository;
     private final PostService postService;
     private final AiChatService aiChatService;
+    private final AiRequestLimiter aiRequestLimiter;
+    private final TransactionOperations transactionOperations;
 
     /**
      * {@inheritDoc}
      */
     @Override
-    @Transactional(readOnly = true)
     public List<String> generateReplySuggestions(UUID authUserId, UUID commentId, ReplyTone tone) {
-        var comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new CommentNotFoundException("Comment not found for id: " + commentId));
         var effectiveTone = Objects.requireNonNullElse(tone, ReplyTone.NEUTRAL);
-
-        var post = postService.getPost(comment.getPost().getId());
-        var threadContext = resolveThreadContext(comment);
+        var userPrompt = transactionOperations.execute(status -> loadUserPrompt(commentId));
         var systemPrompt = CommentReplyPrompts.systemPrompt(effectiveTone);
-        var userPrompt = buildUserPrompt(post.content(), comment, threadContext);
-
+        aiRequestLimiter.acquire(authUserId);
         try {
             log.info("Generating reply suggestions for comment {} (tone={}) requested by auth user id: {}",
                     commentId, effectiveTone, authUserId);
@@ -73,18 +71,20 @@ public class CommentReplySuggestionServiceImpl implements CommentReplySuggestion
                         "AI provider returned no usable suggestions for comment: " + commentId);
             }
             return suggestions;
-        } catch (CommentSuggestionGenerationException e) {
+        } catch (CommentSuggestionGenerationException | AiChatException e) {
             log.error("Failed to generate reply suggestions for comment '{}': {}", commentId, e.getMessage(), e);
             throw new CommentSuggestionGenerationException(
                     "An error occurred while generating comment reply suggestions", e);
         }
     }
 
-    /**
-     * Returns the content of recent other replies in the same thread as {@code comment} (its
-     * siblings if it is itself a reply, or its own replies if it is top-level), most recent
-     * first, excluding {@code comment} itself.
-     */
+    private String loadUserPrompt(UUID commentId) {
+        var comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new CommentNotFoundException("Comment not found for id: " + commentId));
+        var post = postService.getPost(comment.getPost().getId());
+        return buildUserPrompt(post.content(), comment, resolveThreadContext(comment));
+    }
+
     private List<String> resolveThreadContext(Comment comment) {
         var threadRootId = comment.getParent() != null ? comment.getParent().getId() : comment.getId();
         return commentRepository

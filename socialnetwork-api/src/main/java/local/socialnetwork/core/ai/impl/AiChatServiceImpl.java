@@ -39,6 +39,8 @@ public class AiChatServiceImpl implements AiChatService {
             }
             return content;
         } catch (AiChatException e) {
+            throw e;
+        } catch (RuntimeException e) {
             log.error("Error while communicating with AI model: {}", e.getMessage(), e);
             throw new AiChatException("Failed to communicate with AI model: " + e.getMessage(), e);
         }

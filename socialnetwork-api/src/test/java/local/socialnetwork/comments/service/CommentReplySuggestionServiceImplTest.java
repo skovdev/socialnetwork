@@ -9,6 +9,7 @@ import local.socialnetwork.comments.repository.CommentRepository;
 import local.socialnetwork.comments.service.impl.CommentReplySuggestionServiceImpl;
 
 import local.socialnetwork.core.ai.AiChatService;
+import local.socialnetwork.core.ai.AiRequestLimiter;
 
 import local.socialnetwork.posts.dto.http.response.PostResponse;
 
@@ -21,6 +22,7 @@ import local.socialnetwork.shared.exception.CommentNotFoundException;
 import local.socialnetwork.shared.exception.CommentSuggestionGenerationException;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
 
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -29,6 +31,9 @@ import org.mockito.InjectMocks;
 import org.mockito.ArgumentCaptor;
 
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionOperations;
 
 import org.springframework.data.domain.Pageable;
 
@@ -45,6 +50,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.lenient;
 
 @ExtendWith(MockitoExtension.class)
 class CommentReplySuggestionServiceImplTest {
@@ -58,8 +64,21 @@ class CommentReplySuggestionServiceImplTest {
     @Mock
     private AiChatService aiChatService;
 
+    @Mock
+    private AiRequestLimiter aiRequestLimiter;
+
+    @Mock
+    private TransactionOperations transactionOperations;
+
     @InjectMocks
     private CommentReplySuggestionServiceImpl service;
+
+    @BeforeEach
+    @SuppressWarnings("unchecked")
+    void runTransactionCallbacksInline() {
+        lenient().when(transactionOperations.execute(any())).thenAnswer(invocation ->
+                ((TransactionCallback<Object>) invocation.getArgument(0)).doInTransaction(null));
+    }
 
     private Post post(UUID postId, String content) {
         var post = new Post();

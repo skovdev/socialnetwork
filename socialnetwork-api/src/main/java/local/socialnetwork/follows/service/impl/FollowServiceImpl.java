@@ -2,7 +2,6 @@ package local.socialnetwork.follows.service.impl;
 
 import local.socialnetwork.auth.entity.AuthUser;
 
-import local.socialnetwork.auth.repository.AuthUserRepository;
 
 import local.socialnetwork.follows.dto.http.response.FollowCounts;
 import local.socialnetwork.follows.dto.http.response.FollowSummary;
@@ -27,7 +26,6 @@ import lombok.RequiredArgsConstructor;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.dao.DataIntegrityViolationException;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -51,7 +49,6 @@ import java.util.function.Function;
 public class FollowServiceImpl implements FollowService {
 
     private final FollowRepository followRepository;
-    private final AuthUserRepository authUserRepository;
     private final UserProfileService userProfileService;
 
     /**
@@ -64,16 +61,10 @@ public class FollowServiceImpl implements FollowService {
         if (target.authUserId().equals(followerId)) {
             throw new SelfFollowException("Users cannot follow themselves");
         }
-        if (!followRepository.existsByFollowerIdAndFollowedId(followerId, target.authUserId())) {
-            var follower = findAuthUserOrThrow(followerId);
-            var followed = findAuthUserOrThrow(target.authUserId());
-            var follow = createFollow(follower, followed);
-            try {
-                followRepository.save(follow);
-                log.info("Auth user {} followed auth user {}", followerId, target.authUserId());
-            } catch (DataIntegrityViolationException ex) {
-                log.debug("Auth user {} already follows {} (concurrent follow)", followerId, target.authUserId());
-            }
+        var inserted = followRepository.insertIfAbsent(
+                UUID.randomUUID(), followerId, target.authUserId(), Instant.now());
+        if (inserted > 0) {
+            log.info("Auth user {} followed auth user {}", followerId, target.authUserId());
         }
         return computeSummary(target.authUserId(), followerId);
     }
@@ -140,22 +131,9 @@ public class FollowServiceImpl implements FollowService {
         return followRepository.findFollowedIdsByFollowerId(followerId);
     }
 
-    private Follow createFollow(AuthUser follower, AuthUser followed) {
-        var follow = new Follow();
-        follow.setFollower(follower);
-        follow.setFollowed(followed);
-        follow.setCreatedAt(Instant.now());
-        return follow;
-    }
-
     private AuthorProfile resolveTargetOrThrow(String username) {
         return userProfileService.findAuthorByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException("User '" + username + "' not found"));
-    }
-
-    private AuthUser findAuthUserOrThrow(UUID authUserId) {
-        return authUserRepository.findById(authUserId)
-                .orElseThrow(() -> new UserNotFoundException("User not found for id: " + authUserId));
     }
 
     private FollowSummary computeSummary(UUID targetId, UUID viewerId) {

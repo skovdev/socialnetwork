@@ -52,3 +52,12 @@ databaseChangeLog:
             path: db/changelog/1.0/006-create-follows.sql
             relativeToChangelogFile: false
             encoding: UTF-8
+
+  - changeSet:
+      id: add-lookup-indexes
+      author: stanislav.kovalenko
+      changes:
+        - sqlFile:
+            path: db/changelog/1.0/007-add-lookup-indexes.sql
+            relativeToChangelogFile: false
+            encoding: UTF-8
