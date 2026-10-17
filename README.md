@@ -4,7 +4,7 @@ Pet-project for self-education, designed to simulate a basic social media applic
 
 ## Overview
 
-**SocialNetwork** is a monolith REST API built with Java 25 and Spring Boot 3. It covers user registration with email verification, JWT-based authentication with token rotation, user profile management including avatar upload, post creation/browsing, threaded comments on posts, post likes, and a follow graph (follow/unfollow, followers/following browsing, and a personalized following-based feed). It also includes AI-assisted features — comment reply suggestions and post content generation — backed by Spring AI and OpenAI. Secrets are stored in AWS Secrets Manager; transactional emails are sent via AWS SES v2; avatar images are stored in AWS S3 and served via presigned URLs.
+**SocialNetwork** is a monolith REST API built with Java 25 and Spring Boot 3. It covers user registration with email verification (and resend), JWT-based authentication with token rotation, password change, account deletion, user profile management including avatar upload, post creation/browsing, threaded comments on posts, post likes, and a follow graph (follow/unfollow, followers/following browsing, and a personalized following-based feed). It also includes AI-assisted features — comment reply suggestions and post content generation — backed by Spring AI and OpenAI. Secrets are stored in AWS Secrets Manager; transactional emails are sent via AWS SES v2; avatar images are stored in AWS S3 and served via presigned URLs.
 
 ## Tech Stack
 
@@ -17,7 +17,7 @@ Pet-project for self-education, designed to simulate a basic social media applic
 | Caching | Redis (Spring Cache abstraction) |
 | Migrations | Liquibase 5 |
 | Cloud | AWS Secrets Manager, AWS SES v2, AWS S3 |
-| AI | Spring AI, OpenAI (gpt-4.1) |
+| AI | Spring AI, OpenAI (gpt-4.1-2025-04-14) |
 | API Docs | SpringDoc OpenAPI / Swagger UI |
 | Testing | JUnit Jupiter 6, Mockito 5, Testcontainers 1.21 |
 | Build | Maven 3, Lombok |
@@ -57,6 +57,11 @@ Base path: `/api/v1`
 | `POST` | `/auth/login` | Public | Authenticate and receive access + refresh token pair |
 | `POST` | `/auth/refresh` | Public | Rotate refresh token, issue new token pair |
 | `POST` | `/auth/logout` | Bearer | Invalidate all refresh tokens for the current user |
+| `POST` | `/auth/resend-verification` | Public | Re-send the verification email for an unverified account (always `200`, to prevent account enumeration) |
+| `PUT` | `/auth/password` | Bearer | Change password (requires current password); invalidates all sessions |
+| `DELETE` | `/auth/account` | Bearer | Permanently delete the account and its data (requires password confirmation) |
+
+Login is protected against brute force: after 5 failed attempts within 15 minutes, further attempts are rejected (`socialnetwork.security.login-rate-limit.*`). Invalid or expired JWTs yield `401`.
 
 ### Profiles (`/profiles`) — the authenticated user's own profile
 
@@ -92,7 +97,7 @@ Avatar URLs returned in profile responses are short-lived, presigned S3 URLs (va
 | `DELETE` | `/posts/{id}` | Bearer | Delete a post — author only |
 | `POST` | `/posts/generate` | Bearer | AI-generate draft post content from a topic/instruction (for review — not auto-posted) |
 
-Post content is limited to 5000 characters. Each post response includes a minimal author summary (username, display name).
+All paginated endpoints cap the page size at 50 (default 20). Post content is limited to 5000 characters. Each post response includes a minimal author summary (username, display name).
 
 ### Comments (`/posts/{postId}/comments`, `/comments`)
 
@@ -151,7 +156,7 @@ The application reads its configuration from `application.properties`. Sensitive
 |---|---|
 | `SN_AWS_ACCESS_KEY_ID` | IAM access key |
 | `SN_AWS_SECRET_ACCESS_KEY` | IAM secret key |
-| `SN_DB_PASSWORD` | PostgreSQL password for the application user |
+| `SN_DB_PASSWORD` | PostgreSQL password for the application user (a local-development default exists in `application.properties`) |
 
 ### Optional environment variables
 
@@ -172,7 +177,7 @@ The application fetches the RS256 key pair from the secret named `socialnetwork-
 
 ### AI features (Spring AI + OpenAI)
 
-Comment reply suggestions and post content generation use Spring AI's `ChatClient` backed by OpenAI (model `gpt-4.1`, configurable via `spring.ai.openai.chat.options.model`). The API key is not read from properties or environment variables directly — it's fetched at startup from the AWS Secrets Manager secret described above, using the same IAM credentials as the rest of the application. Both AI endpoints return `503` if the AI provider is unavailable.
+Comment reply suggestions and post content generation use Spring AI's `ChatClient` backed by OpenAI (model `gpt-4.1-2025-04-14`, configurable via `spring.ai.openai.chat.options.model`). The API key is not read from properties or environment variables directly — it's fetched at startup from the AWS Secrets Manager secret described above, using the same IAM credentials as the rest of the application. Both AI endpoints return `503` if the AI provider is unavailable. Each user is limited to 10 AI requests per minute (`socialnetwork.ai.rate-limit.*`); exceeding it returns `429` with a `Retry-After` header. Provider HTTP timeouts are 5 s connect / 30 s read (`socialnetwork.ai.timeout.*`).
 
 ### AWS S3 (avatar storage)
 
@@ -195,6 +200,10 @@ spring.data.redis.port=6379
 
 `GET /posts/{id}` responses are cached in Redis for 10 minutes (`socialnetwork.cache.posts.ttl`). Cache entries are evicted immediately on update or delete of the corresponding post.
 
+### Authenticated principal cache
+
+User lookups performed on each authenticated request are cached per instance for 30 seconds (`socialnetwork.security.principal-cache.ttl`).
+
 ## Running the Application
 
 ```bash
@@ -211,7 +220,7 @@ cd socialnetwork-api
 mvn test
 ```
 
-Integration tests use Testcontainers and spin up a real PostgreSQL instance automatically.
+Integration tests use Testcontainers and spin up a real PostgreSQL instance automatically (requires Docker; Testcontainers 1.21.4+ for Docker 29). `ModuleBoundaryTest` (ArchUnit) enforces isolation between feature modules.
 
 ## Actuator
 
