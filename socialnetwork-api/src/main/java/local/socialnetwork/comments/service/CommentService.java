@@ -36,6 +36,14 @@ public interface CommentService {
     Page<CommentResponse> getComments(UUID postId, Pageable pageable);
 
     /**
+     * Returns a page of replies to the top-level comment {@code commentId}, oldest first.
+     *
+     * @throws local.socialnetwork.shared.exception.CommentNotFoundException if no comment exists with the given ID
+     * @throws local.socialnetwork.shared.exception.InvalidCommentParentException if the comment is itself a reply
+     */
+    Page<CommentResponse> getReplies(UUID commentId, Pageable pageable);
+
+    /**
      * Updates the content of the comment belonging to {@code commentId}, provided
      * {@code authUserId} is the author.
      *

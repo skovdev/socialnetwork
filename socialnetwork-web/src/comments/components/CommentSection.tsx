@@ -11,13 +11,15 @@ import type { CurrentUser } from "../../shared/types";
 
 function addReply(comments: Comment[], parentId: string, reply: Comment): Comment[] {
     return comments.map((comment) =>
-        comment.id === parentId ? { ...comment, replies: [...comment.replies, reply] } : comment,
+        comment.id === parentId
+            ? { ...comment, replies: [...comment.replies, reply], replyCount: comment.replyCount + 1 }
+            : comment,
     );
 }
 
 function replaceComment(comments: Comment[], updated: Comment): Comment[] {
     return comments.map((comment) => {
-        if (comment.id === updated.id) return { ...updated, replies: comment.replies };
+        if (comment.id === updated.id) return { ...updated, replies: comment.replies, replyCount: comment.replyCount };
         if (comment.replies.some((reply) => reply.id === updated.id)) {
             return { ...comment, replies: comment.replies.map((reply) => (reply.id === updated.id ? updated : reply)) };
         }
@@ -28,7 +30,12 @@ function replaceComment(comments: Comment[], updated: Comment): Comment[] {
 function removeComment(comments: Comment[], id: string): Comment[] {
     return comments
         .filter((comment) => comment.id !== id)
-        .map((comment) => ({ ...comment, replies: comment.replies.filter((reply) => reply.id !== id) }));
+        .map((comment) => {
+            const replies = comment.replies.filter((reply) => reply.id !== id);
+            return replies.length === comment.replies.length
+                ? comment
+                : { ...comment, replies, replyCount: Math.max(comment.replyCount - 1, 0) };
+        });
 }
 
 function formatTimestamp(iso: string): string {
@@ -161,6 +168,7 @@ interface CommentCardProps {
     /** Only used by top-level cards to render their nested replies. */
     onEditReply?: (replyId: string, content: string) => Promise<void>;
     onDeleteReply?: (replyId: string) => Promise<void>;
+    onLoadMoreReplies?: () => Promise<void>;
 }
 
 function CommentCard({
@@ -172,7 +180,9 @@ function CommentCard({
     onDelete,
     onEditReply,
     onDeleteReply,
+    onLoadMoreReplies,
 }: CommentCardProps) {
+    const [isLoadingReplies, setIsLoadingReplies] = useState(false);
     const [isReplying, setIsReplying] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
     const [replyDraft, setReplyDraft] = useState("");
@@ -253,7 +263,7 @@ function CommentCard({
                     </>
                 )}
 
-                {!isReply && comment.replies.length > 0 && (
+                {!isReply && (comment.replies.length > 0 || comment.replyCount > 0) && (
                     <div className="replies">
                         {comment.replies.map((reply) => (
                             <CommentCard
@@ -265,6 +275,23 @@ function CommentCard({
                                 onDelete={() => onDeleteReply!(reply.id)}
                             />
                         ))}
+                        {onLoadMoreReplies && comment.replyCount > comment.replies.length && (
+                            <button
+                                className="view-more"
+                                type="button"
+                                disabled={isLoadingReplies}
+                                onClick={() => {
+                                    setIsLoadingReplies(true);
+                                    void onLoadMoreReplies().finally(() => setIsLoadingReplies(false));
+                                }}
+                            >
+                                {isLoadingReplies
+                                    ? "Loading…"
+                                    : `View ${comment.replyCount - comment.replies.length} more ${
+                                          comment.replyCount - comment.replies.length === 1 ? "reply" : "replies"
+                                      }`}
+                            </button>
+                        )}
                     </div>
                 )}
             </div>
@@ -325,6 +352,24 @@ export function CommentSection({ postId, currentUser }: CommentSectionProps) {
         setComments((prev) => addReply(prev, parentId, created));
     }
 
+    async function handleLoadMoreReplies(commentId: string) {
+        try {
+            const replies: Comment[] = [];
+            for (let replyPage = 0; ; replyPage++) {
+                const loaded = await commentApi.getReplies(commentId, replyPage);
+                replies.push(...loaded.content);
+                if (replyPage + 1 >= loaded.page.totalPages) break;
+            }
+            setComments((prev) =>
+                prev.map((comment) =>
+                    comment.id === commentId ? { ...comment, replies, replyCount: replies.length } : comment,
+                ),
+            );
+        } catch (err) {
+            setError(err instanceof ApiError ? err.message : "Failed to load replies");
+        }
+    }
+
     async function handleEditComment(id: string, content: string) {
         const updated = await commentApi.updateComment(id, { content });
         setComments((prev) => replaceComment(prev, updated));
@@ -356,6 +401,7 @@ export function CommentSection({ postId, currentUser }: CommentSectionProps) {
                     onDelete={() => handleDeleteComment(comment.id)}
                     onEditReply={handleEditComment}
                     onDeleteReply={handleDeleteComment}
+                    onLoadMoreReplies={() => handleLoadMoreReplies(comment.id)}
                 />
             ))}
 

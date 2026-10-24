@@ -61,7 +61,9 @@ Base path: `/api/v1`
 | `PUT` | `/auth/password` | Bearer | Change password (requires current password); invalidates all sessions |
 | `DELETE` | `/auth/account` | Bearer | Permanently delete the account and its data (requires password confirmation) |
 
-Login is protected against brute force: after 5 failed attempts within 15 minutes, further attempts are rejected (`socialnetwork.security.login-rate-limit.*`). Invalid or expired JWTs yield `401`.
+Login is protected against brute force: after 5 failed attempts within 15 minutes for the same IP + username, further attempts are rejected with `429` (`socialnetwork.security.login-rate-limit.*`). `register`, `refresh` and `resend-verification` are additionally throttled per client IP (`socialnetwork.security.request-rate-limit.*`, default 20/min). Counters live in Redis, so limits hold across restarts and instances; if Redis is unreachable the limiters fail open. Invalid or expired JWTs yield `401`.
+
+Access tokens are RS256 JWTs carrying `iss`, `sub` (the user ID), `jti` and a `kid` header, valid for 1 hour; a token is rejected if its subject no longer matches an `ACTIVE` account. Refresh tokens are opaque random values stored only as SHA-256 hashes, single-use, and valid for 7 days; expired tokens are purged nightly. Verification emails are sent asynchronously after the registration transaction commits — if delivery fails, use `resend-verification`.
 
 ### Profiles (`/profiles`) — the authenticated user's own profile
 
@@ -90,14 +92,14 @@ Avatar URLs returned in profile responses are short-lived, presigned S3 URLs (va
 | Method | Path | Auth | Description |
 |---|---|---|---|
 | `POST` | `/posts` | Bearer | Create a new post authored by the current user |
-| `GET` | `/posts` | Bearer | Retrieve a paginated global feed of posts, newest first |
+| `GET` | `/posts` | Bearer | Retrieve a global feed of posts, newest first (slice pagination, see below) |
 | `GET` | `/posts/following` | Bearer | Retrieve a paginated feed of posts authored by the current user or users they follow, newest first (falls back to the global feed when following nobody yet) |
 | `GET` | `/posts/{id}` | Bearer | Retrieve a single post by ID |
 | `PUT` | `/posts/{id}` | Bearer | Update a post's content — author only |
 | `DELETE` | `/posts/{id}` | Bearer | Delete a post — author only |
 | `POST` | `/posts/generate` | Bearer | AI-generate draft post content from a topic/instruction (for review — not auto-posted) |
 
-All paginated endpoints cap the page size at 50 (default 20). Post content is limited to 5000 characters. Each post response includes a minimal author summary (username, display name).
+All paginated endpoints cap the page size at 50 (default 20) and ignore client-supplied `sort` parameters (each listing has a fixed order). Post lists (`/posts`, `/posts/following`, `/users/{username}/posts`) return `{content, page: {size, number, hasNext}}` instead of totals, so no `COUNT(*)` runs per request; other lists return `totalElements`/`totalPages`. Post content is limited to 5000 characters. Each post response includes a minimal author summary (username, display name).
 
 ### Comments (`/posts/{postId}/comments`, `/comments`)
 
@@ -154,8 +156,8 @@ The application reads its configuration from `application.properties`. Sensitive
 
 | Variable | Description |
 |---|---|
-| `SN_AWS_ACCESS_KEY_ID` | IAM access key |
-| `SN_AWS_SECRET_ACCESS_KEY` | IAM secret key |
+| `SN_AWS_ACCESS_KEY_ID` | IAM access key — optional: when blank the AWS SDK default credentials chain is used (env, `~/.aws` profile, SSO, IAM role) |
+| `SN_AWS_SECRET_ACCESS_KEY` | IAM secret key — optional, see above |
 | `SN_DB_PASSWORD` | PostgreSQL password for the application user (a local-development default exists in `application.properties`) |
 
 ### Optional environment variables
@@ -170,6 +172,9 @@ The application reads its configuration from `application.properties`. Sensitive
 | `SN_REDIS_HOST` | `localhost` | Redis host used for the posts cache |
 | `SN_REDIS_PORT` | `6379` | Redis port used for the posts cache |
 | `SN_REDIS_PASSWORD` | *(empty)* | Redis password, if authentication is enabled |
+| `SN_REDIS_TIMEOUT` | `500ms` | Redis command/connect timeout — short on purpose so a Redis outage degrades the cache and rate limiter instead of hanging requests |
+| `SN_VERIFY_BASE_URL` | `http://localhost:8080/api/v1/auth/verify?token=` | Base of the link in verification emails |
+| `SN_SWAGGER_ENABLED` | `true` | Set to `false` to disable Swagger UI and the OpenAPI docs |
 
 ### AWS Secrets Manager
 
@@ -198,7 +203,7 @@ spring.data.redis.host=localhost
 spring.data.redis.port=6379
 ```
 
-`GET /posts/{id}` responses are cached in Redis for 10 minutes (`socialnetwork.cache.posts.ttl`). Cache entries are evicted immediately on update or delete of the corresponding post.
+`GET /posts/{id}` caches the post itself (id, author id, content, timestamps) in Redis for 10 minutes (`socialnetwork.cache.posts.ttl`) as typed JSON; author details and like data are composed fresh on every read, so profile or avatar changes are never stale. Entries are evicted on update or delete of the post. Redis failures are logged and fall through to the database.
 
 ### Authenticated principal cache
 

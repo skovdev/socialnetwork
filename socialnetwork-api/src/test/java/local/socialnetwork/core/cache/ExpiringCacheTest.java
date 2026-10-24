@@ -72,4 +72,48 @@ class ExpiringCacheTest {
 
         assertEquals(5, loads.get());
     }
+
+    @Test
+    void get_whenFull_keepsRecentlyLoadedEntryCached() {
+        var loads = new AtomicInteger();
+        var cache = new ExpiringCache<Integer, Integer>(Duration.ofMinutes(1), 10);
+        for (var i = 0; i < 25; i++) {
+            cache.get(i, key -> loads.incrementAndGet());
+        }
+        var before = loads.get();
+
+        cache.get(24, key -> loads.incrementAndGet());
+
+        assertEquals(before, loads.get());
+    }
+
+    @Test
+    void get_concurrentMissesForSameKey_loadOnce() throws Exception {
+        var loads = new AtomicInteger();
+        var cache = new ExpiringCache<String, String>(Duration.ofMinutes(1), 10);
+        var start = new java.util.concurrent.CountDownLatch(1);
+        try (var pool = java.util.concurrent.Executors.newFixedThreadPool(8)) {
+            var futures = new java.util.ArrayList<java.util.concurrent.Future<String>>();
+            for (var i = 0; i < 8; i++) {
+                futures.add(pool.submit(() -> {
+                    start.await();
+                    return cache.get("k", key -> {
+                        loads.incrementAndGet();
+                        try {
+                            Thread.sleep(50);
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                        }
+                        return "v";
+                    });
+                }));
+            }
+            start.countDown();
+            for (var future : futures) {
+                assertEquals("v", future.get());
+            }
+        }
+
+        assertEquals(1, loads.get());
+    }
 }

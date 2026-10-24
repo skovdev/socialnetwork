@@ -17,6 +17,7 @@ import local.socialnetwork.follows.service.FollowService;
 
 import local.socialnetwork.likes.service.LikeService;
 
+import local.socialnetwork.shared.dto.response.SliceResponse;
 import local.socialnetwork.shared.dto.response.ApiResponseDto;
 
 import local.socialnetwork.posts.dto.http.response.PostResponse;
@@ -36,7 +37,6 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Pageable;
 
-import org.springframework.data.web.PagedModel;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
@@ -84,12 +84,12 @@ public class UserProfileRestController {
             @ApiResponse(responseCode = "404", description = "User not found")
     })
     @GetMapping("/{username}/posts")
-    public ApiResponseDto<PagedModel<PostResponse>> getPosts(
+    public ApiResponseDto<SliceResponse<PostResponse>> getPosts(
             @Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal principal,
             @Parameter(description = "Username to retrieve posts for") @PathVariable("username") String username,
             Pageable pageable) {
         var posts = likeService.decorate(postService.getPostsByUsername(username, pageable), principal.getId());
-        return ApiResponseDto.buildSuccessResponse(new PagedModel<>(posts));
+        return ApiResponseDto.buildSuccessResponse(SliceResponse.from(posts));
     }
 
 }

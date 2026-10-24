@@ -8,13 +8,21 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import local.socialnetwork.core.config.jwt.JwtTokenProvider;
 
+import local.socialnetwork.core.config.security.principal.UserPrincipal;
+
 import local.socialnetwork.shared.exception.InvalidJwtAuthenticationException;
 
 import lombok.RequiredArgsConstructor;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+
+import org.springframework.security.core.Authentication;
+
 import org.springframework.security.core.context.SecurityContextHolder;
+
+import org.springframework.security.core.userdetails.UserDetailsService;
 
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
@@ -34,6 +42,7 @@ import java.io.IOException;
 public class JwtVerificationTokenFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final UserDetailsService userDetailsService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -42,8 +51,7 @@ public class JwtVerificationTokenFilter extends OncePerRequestFilter {
         var token = jwtTokenProvider.resolveToken(request);
         if (token != null) {
             try {
-                var authentication = jwtTokenProvider.authenticate(token);
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                SecurityContextHolder.getContext().setAuthentication(authenticate(token));
             } catch (InvalidJwtAuthenticationException e) {
                 log.debug("Rejected invalid JWT: {}", e.getMessage());
                 SecurityContextHolder.clearContext();
@@ -53,5 +61,18 @@ public class JwtVerificationTokenFilter extends OncePerRequestFilter {
             }
         }
         filterChain.doFilter(request, response);
+    }
+
+    private Authentication authenticate(String token) {
+        var identity = jwtTokenProvider.verify(token);
+        var userDetails = userDetailsService.loadUserByUsername(identity.username());
+        // The subject pins the token to one account: a recreated username must not inherit old tokens,
+        // and an account that is no longer ACTIVE loses access as soon as the principal cache refreshes.
+        if (!(userDetails instanceof UserPrincipal principal)
+                || !principal.isActive()
+                || !principal.getId().toString().equals(identity.subject())) {
+            throw new InvalidJwtAuthenticationException("JWT does not match an active account");
+        }
+        return new UsernamePasswordAuthenticationToken(principal, "", principal.getAuthorities());
     }
 }

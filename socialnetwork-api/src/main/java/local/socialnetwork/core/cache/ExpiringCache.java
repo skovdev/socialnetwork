@@ -9,15 +9,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 /**
- * Minimal in-process cache with a fixed time-to-live and a soft size bound.
- *
- * <p>Intended for small, hot, per-instance lookups (e.g. the authenticated principal or a presigned URL)
- * where a network round trip to Redis would cost as much as the work being cached. Values are never
- * {@code null}; loader exceptions propagate and nothing is cached for them. Concurrent misses on the same
- * key may each invoke the loader, which is acceptable for idempotent lookups.
+ * A small thread-safe TTL cache with a hard size bound, for per-instance caches of cheap-to-recompute values
+ * (authenticated principals, presigned URLs). Concurrent misses for the same key run the loader once.
+ * Not a general-purpose cache: when full it drops expired entries first and then an arbitrary tenth of the rest.
  *
  * @param <K> key type
- * @param <V> value type
+ * @param <V> value type, never {@code null}
  */
 public final class ExpiringCache<K, V> {
 
@@ -34,7 +31,8 @@ public final class ExpiringCache<K, V> {
     }
 
     /**
-     * Returns the cached value for {@code key}, loading and caching it when absent or expired.
+     * Returns the cached value for {@code key}, loading and caching it if absent or expired. A loader that
+     * throws leaves nothing cached.
      */
     public V get(K key, Function<? super K, ? extends V> loader) {
         var now = System.nanoTime();
@@ -42,15 +40,17 @@ public final class ExpiringCache<K, V> {
         if (entry != null && now - entry.expiresAtNanos() < 0) {
             return entry.value();
         }
-        var value = Objects.requireNonNull(loader.apply(key), "loader must not return null");
         if (entries.size() >= maxSize) {
-            entries.values().removeIf(e -> now - e.expiresAtNanos() >= 0);
-            if (entries.size() >= maxSize) {
-                entries.clear();
-            }
+            makeRoom(now);
         }
-        entries.put(key, new Entry<>(value, now + ttlNanos));
-        return value;
+        // compute() runs the loader under the key's bin lock, so concurrent misses load once.
+        return entries.compute(key, (k, current) -> {
+            if (current != null && now - current.expiresAtNanos() < 0) {
+                return current;
+            }
+            var value = Objects.requireNonNull(loader.apply(k), "loader must not return null");
+            return new Entry<>(value, System.nanoTime() + ttlNanos);
+        }).value();
     }
 
     public void evict(K key) {
@@ -59,5 +59,18 @@ public final class ExpiringCache<K, V> {
 
     public void clear() {
         entries.clear();
+    }
+
+    private void makeRoom(long now) {
+        entries.values().removeIf(e -> now - e.expiresAtNanos() >= 0);
+        if (entries.size() < maxSize) {
+            return;
+        }
+        var toDrop = Math.max(maxSize / 10, 1);
+        var it = entries.keySet().iterator();
+        while (toDrop-- > 0 && it.hasNext()) {
+            it.next();
+            it.remove();
+        }
     }
 }

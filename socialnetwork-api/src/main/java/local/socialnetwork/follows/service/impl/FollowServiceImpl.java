@@ -19,6 +19,8 @@ import local.socialnetwork.profiles.service.UserProfileService;
 
 import local.socialnetwork.shared.dto.response.AuthorSummary;
 
+import local.socialnetwork.shared.pagination.Pages;
+
 import local.socialnetwork.shared.exception.SelfFollowException;
 import local.socialnetwork.shared.exception.UserNotFoundException;
 
@@ -96,6 +98,12 @@ public class FollowServiceImpl implements FollowService {
      */
     @Override
     @Transactional(readOnly = true)
+    public boolean followsAnyone(UUID followerId) {
+        return followRepository.existsByFollowerId(followerId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public FollowCounts getCounts(UUID authUserId) {
         return new FollowCounts(followRepository.countByFollowedId(authUserId), followRepository.countByFollowerId(authUserId));
     }
@@ -107,7 +115,7 @@ public class FollowServiceImpl implements FollowService {
     @Transactional(readOnly = true)
     public Page<FollowUserResponse> getFollowers(String username, UUID viewerId, Pageable pageable) {
         var target = resolveTargetOrThrow(username);
-        var page = followRepository.findByFollowedIdOrderByCreatedAtDesc(target.authUserId(), pageable);
+        var page = followRepository.findByFollowedIdOrderByCreatedAtDesc(target.authUserId(), Pages.withoutClientSort(pageable));
         return hydrate(page, Follow::getFollower, viewerId);
     }
 
@@ -118,19 +126,13 @@ public class FollowServiceImpl implements FollowService {
     @Transactional(readOnly = true)
     public Page<FollowUserResponse> getFollowing(String username, UUID viewerId, Pageable pageable) {
         var target = resolveTargetOrThrow(username);
-        var page = followRepository.findByFollowerIdOrderByCreatedAtDesc(target.authUserId(), pageable);
+        var page = followRepository.findByFollowerIdOrderByCreatedAtDesc(target.authUserId(), Pages.withoutClientSort(pageable));
         return hydrate(page, Follow::getFollowed, viewerId);
     }
 
     /**
      * {@inheritDoc}
      */
-    @Override
-    @Transactional(readOnly = true)
-    public List<UUID> getFollowedAuthorIds(UUID followerId) {
-        return followRepository.findFollowedIdsByFollowerId(followerId);
-    }
-
     private AuthorProfile resolveTargetOrThrow(String username) {
         return userProfileService.findAuthorByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException("User '" + username + "' not found"));
@@ -152,15 +154,8 @@ public class FollowServiceImpl implements FollowService {
         var alreadyFollowed = new HashSet<>(followRepository.findFollowedIdsByFollowerIdAndFollowedIdIn(viewerId, rowUserIds));
         return page.map(follow -> {
             var rowUserId = rowUser.apply(follow).getId();
-            return FollowUserResponse.from(follow, toAuthorSummary(authorsById, rowUserId), alreadyFollowed.contains(rowUserId));
+            return FollowUserResponse.from(follow, AuthorSummary.require(authorsById, rowUserId), alreadyFollowed.contains(rowUserId));
         });
     }
 
-    private AuthorSummary toAuthorSummary(Map<UUID, AuthorSummary> authorsById, UUID authUserId) {
-        var author = authorsById.get(authUserId);
-        if (author == null) {
-            throw new UserNotFoundException("Profile not found for user id: " + authUserId);
-        }
-        return author;
-    }
 }

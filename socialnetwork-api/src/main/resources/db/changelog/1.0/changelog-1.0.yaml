@@ -61,3 +61,21 @@ databaseChangeLog:
             path: db/changelog/1.0/007-add-lookup-indexes.sql
             relativeToChangelogFile: false
             encoding: UTF-8
+
+  - changeSet:
+      id: hash-refresh-tokens-and-indexes
+      author: stanislav.kovalenko
+      changes:
+        - sqlFile:
+            path: db/changelog/1.0/008-hash-refresh-tokens-and-indexes.sql
+            relativeToChangelogFile: false
+            encoding: UTF-8
+
+  - changeSet:
+      id: add-optimistic-lock-versions
+      author: stanislav.kovalenko
+      changes:
+        - sqlFile:
+            path: db/changelog/1.0/009-add-optimistic-lock-versions.sql
+            relativeToChangelogFile: false
+            encoding: UTF-8

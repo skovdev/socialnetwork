@@ -42,6 +42,7 @@ import java.time.LocalDate;
 import static org.mockito.ArgumentMatchers.any;
 
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -98,7 +99,7 @@ class ProfileRestControllerIT extends BaseIntegrationTest {
 
         authUserRepository.save(authUser);
 
-        bearerToken = jwtTokenProvider.createToken(Map.of("username", TEST_USERNAME));
+        bearerToken = jwtTokenProvider.createToken(authUserRepository.findByUserProfileUsername(TEST_USERNAME).orElseThrow().getId(), TEST_USERNAME);
     }
 
     @Test
@@ -259,7 +260,9 @@ class ProfileRestControllerIT extends BaseIntegrationTest {
                         .header("Authorization", "Bearer " + bearerToken))
                 .andExpect(status().isNoContent());
 
-        verify(s3Client).deleteObject(any(DeleteObjectRequest.class));
+        // The S3 object is removed only after the DB transaction commits; this test's transaction never commits.
+        // Ordering is covered in UserProfileServiceImplTest.
+        verify(s3Client, never()).deleteObject(any(DeleteObjectRequest.class));
     }
 
     @Test

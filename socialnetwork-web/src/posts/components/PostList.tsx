@@ -20,7 +20,7 @@ interface PostListProps {
 export function PostList({ username, mode = "feed", currentUser, showComposer, emptyMessage = "No posts yet." }: PostListProps) {
     const [posts, setPosts] = useState<Post[]>([]);
     const [page, setPage] = useState(0);
-    const [totalPages, setTotalPages] = useState(0);
+    const [hasNext, setHasNext] = useState(false);
     const [isComposing, setIsComposing] = useState(false);
     const [content, setContent] = useState("");
     const [isLoading, setIsLoading] = useState(true);
@@ -50,7 +50,7 @@ export function PostList({ username, mode = "feed", currentUser, showComposer, e
         fetchPage(0)
             .then((loaded) => {
                 setPosts(loaded.content);
-                setTotalPages(loaded.page.totalPages);
+                setHasNext(loaded.page.hasNext);
             })
             .catch((err) => setError(err instanceof ApiError ? err.message : "Failed to load posts"))
             .finally(() => setIsLoading(false));
@@ -67,7 +67,7 @@ export function PostList({ username, mode = "feed", currentUser, showComposer, e
             const loaded = await fetchPage(next);
             setPosts((prev) => [...prev, ...loaded.content]);
             setPage(next);
-            setTotalPages(loaded.page.totalPages);
+            setHasNext(loaded.page.hasNext);
         } catch (err) {
             setError(err instanceof ApiError ? err.message : "Failed to load posts");
         } finally {
@@ -208,7 +208,7 @@ export function PostList({ username, mode = "feed", currentUser, showComposer, e
                 ))}
             </div>
 
-            {page + 1 < totalPages && (
+            {hasNext && (
                 <button
                     type="button"
                     className="btn-secondary"

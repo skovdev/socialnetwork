@@ -2,6 +2,7 @@ package local.socialnetwork.auth.dto.http.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import jakarta.validation.constraints.Size;
 import jakarta.validation.constraints.NotBlank;
 
 /**
@@ -9,5 +10,5 @@ import jakarta.validation.constraints.NotBlank;
  */
 @Schema(description = "Token refresh payload")
 public record RefreshRequest(
-        @Schema(description = "Opaque refresh token (UUID) issued at login") @NotBlank String refreshToken) {
+        @Schema(description = "Opaque refresh token issued at login") @NotBlank @Size(max = 128) String refreshToken) {
 }

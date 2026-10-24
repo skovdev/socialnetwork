@@ -16,7 +16,8 @@ import local.socialnetwork.profiles.service.UserProfileService;
 
 import local.socialnetwork.shared.dto.response.AuthorSummary;
 
-import local.socialnetwork.shared.exception.UserNotFoundException;
+import local.socialnetwork.shared.pagination.Pages;
+
 import local.socialnetwork.shared.exception.PostNotFoundException;
 
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Pageable;
 
 import org.springframework.stereotype.Service;
@@ -34,6 +36,7 @@ import java.time.Instant;
 
 import java.util.Map;
 import java.util.UUID;
+import java.util.HashSet;
 import java.util.Collection;
 
 import java.util.stream.Collectors;
@@ -83,10 +86,10 @@ public class LikeServiceImpl implements LikeService {
     @Transactional(readOnly = true)
     public Page<LikeResponse> getLikers(UUID postId, Pageable pageable) {
         requirePostExists(postId);
-        var page = likeRepository.findByPostIdOrderByCreatedAtDesc(postId, pageable);
+        var page = likeRepository.findByPostIdOrderByCreatedAtDesc(postId, Pages.withoutClientSort(pageable));
         var authorIds = page.getContent().stream().map(like -> like.getAuthor().getId()).distinct().toList();
         var authorsById = userProfileService.getAuthorSummaries(authorIds);
-        return page.map(like -> LikeResponse.from(like, toAuthorSummary(authorsById, like.getAuthor().getId())));
+        return page.map(like -> LikeResponse.from(like, AuthorSummary.require(authorsById, like.getAuthor().getId())));
     }
 
     /**
@@ -111,9 +114,7 @@ public class LikeServiceImpl implements LikeService {
 
         var countsByPostId = likeRepository.countByPostIdIn(postIds).stream()
                 .collect(Collectors.toMap(PostLikeCount::postId, PostLikeCount::count));
-        var likedPostIds = likeRepository.findByPostIdInAndAuthorId(postIds, viewerId).stream()
-                .map(like -> like.getPost().getId())
-                .collect(Collectors.toSet());
+        var likedPostIds = new HashSet<>(likeRepository.findLikedPostIds(postIds, viewerId));
 
         return postIds.stream().distinct().collect(Collectors.toMap(
                 postId -> postId,
@@ -134,7 +135,7 @@ public class LikeServiceImpl implements LikeService {
      */
     @Override
     @Transactional(readOnly = true)
-    public Page<PostResponse> decorate(Page<PostResponse> posts, UUID viewerId) {
+    public Slice<PostResponse> decorate(Slice<PostResponse> posts, UUID viewerId) {
         var summaries = getSummaries(posts.getContent().stream().map(PostResponse::id).toList(), viewerId);
         return posts.map(post -> post.withLikeSummary(summaries.get(post.id())));
     }
@@ -149,11 +150,4 @@ public class LikeServiceImpl implements LikeService {
         }
     }
 
-    private AuthorSummary toAuthorSummary(Map<UUID, AuthorSummary> authorsById, UUID authUserId) {
-        var author = authorsById.get(authUserId);
-        if (author == null) {
-            throw new UserNotFoundException("Profile not found for user id: " + authUserId);
-        }
-        return author;
-    }
 }

@@ -18,6 +18,8 @@ import local.socialnetwork.likes.service.LikeService;
 
 import local.socialnetwork.shared.dto.response.ApiResponseDto;
 
+import local.socialnetwork.shared.dto.response.SliceResponse;
+
 import local.socialnetwork.posts.dto.http.request.CreatePostRequestDto;
 import local.socialnetwork.posts.dto.http.request.UpdatePostRequestDto;
 import local.socialnetwork.posts.dto.http.request.GeneratePostContentRequestDto;
@@ -33,8 +35,6 @@ import local.socialnetwork.shared.constant.VersionApi;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Pageable;
-
-import org.springframework.data.web.PagedModel;
 
 import org.springframework.http.HttpStatus;
 
@@ -92,10 +92,10 @@ public class PostRestController {
             @ApiResponse(responseCode = "401", description = "Not authenticated")
     })
     @GetMapping
-    public ApiResponseDto<PagedModel<PostResponse>> getFeed(
+    public ApiResponseDto<SliceResponse<PostResponse>> getFeed(
             @Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal principal, Pageable pageable) {
         return ApiResponseDto.buildSuccessResponse(
-                new PagedModel<>(likeService.decorate(postService.getFeed(pageable), principal.getId())));
+                SliceResponse.from(likeService.decorate(postService.getFeed(pageable), principal.getId())));
     }
 
     /**
@@ -109,10 +109,10 @@ public class PostRestController {
             @ApiResponse(responseCode = "401", description = "Not authenticated")
     })
     @GetMapping("/following")
-    public ApiResponseDto<PagedModel<PostResponse>> getFollowingFeed(
+    public ApiResponseDto<SliceResponse<PostResponse>> getFollowingFeed(
             @Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal principal, Pageable pageable) {
         return ApiResponseDto.buildSuccessResponse(
-                new PagedModel<>(likeService.decorate(postService.getFollowingFeed(principal.getId(), pageable), principal.getId())));
+                SliceResponse.from(likeService.decorate(postService.getFollowingFeed(principal.getId(), pageable), principal.getId())));
     }
 
     /**

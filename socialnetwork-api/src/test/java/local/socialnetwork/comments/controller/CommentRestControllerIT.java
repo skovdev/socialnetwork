@@ -93,7 +93,7 @@ class CommentRestControllerIT extends BaseIntegrationTest {
 
         authUserRepository.save(authUser);
 
-        return jwtTokenProvider.createToken(Map.of("username", username));
+        return jwtTokenProvider.createToken(authUserRepository.findByUserProfileUsername(username).orElseThrow().getId(), username);
     }
 
     private String createPostAndGetId(String bearerToken, String content) throws Exception {
@@ -202,6 +202,47 @@ class CommentRestControllerIT extends BaseIntegrationTest {
                 .andExpect(jsonPath("$.data.content[0].id").value(parentId))
                 .andExpect(jsonPath("$.data.content[0].replies[0].content").value("A reply"))
                 .andExpect(jsonPath("$.data.content[0].replies[0].author.username").value("author"));
+    }
+
+    @Test
+    void getComments_withManyReplies_inlinesOnlyFirstRepliesAndReportsTotalCount() throws Exception {
+        var parentId = createCommentAndGetId(otherUserToken, postId, "Busy thread", null);
+        for (int i = 1; i <= 5; i++) {
+            createCommentAndGetId(authorToken, postId, "reply " + i, parentId);
+        }
+
+        mockMvc.perform(get(POSTS_URL + "/" + postId + "/comments")
+                        .header("Authorization", "Bearer " + authorToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.content[0].replyCount").value(5))
+                .andExpect(jsonPath("$.data.content[0].replies.length()").value(3))
+                .andExpect(jsonPath("$.data.content[0].replies[0].content").value("reply 1"))
+                .andExpect(jsonPath("$.data.content[0].replies[2].content").value("reply 3"));
+    }
+
+    @Test
+    void getReplies_returnsPagedRepliesOldestFirst() throws Exception {
+        var parentId = createCommentAndGetId(otherUserToken, postId, "Busy thread", null);
+        for (int i = 1; i <= 5; i++) {
+            createCommentAndGetId(authorToken, postId, "reply " + i, parentId);
+        }
+
+        mockMvc.perform(get("/api/v1/comments/" + parentId + "/replies").param("page", "1").param("size", "2")
+                        .header("Authorization", "Bearer " + authorToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.content.length()").value(2))
+                .andExpect(jsonPath("$.data.content[0].content").value("reply 3"))
+                .andExpect(jsonPath("$.data.page.totalElements").value(5));
+    }
+
+    @Test
+    void getReplies_forAReply_returns400() throws Exception {
+        var parentId = createCommentAndGetId(otherUserToken, postId, "Top", null);
+        var replyId = createCommentAndGetId(authorToken, postId, "reply", parentId);
+
+        mockMvc.perform(get("/api/v1/comments/" + replyId + "/replies")
+                        .header("Authorization", "Bearer " + authorToken))
+                .andExpect(status().isBadRequest());
     }
 
     @Test

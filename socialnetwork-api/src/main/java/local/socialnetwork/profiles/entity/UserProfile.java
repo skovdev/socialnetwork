@@ -8,7 +8,6 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.CascadeType;
 
 import local.socialnetwork.auth.entity.AuthUser;
 
@@ -30,7 +29,7 @@ import java.util.Objects;
 @Entity
 public class UserProfile extends AbstractBaseModel {
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private AuthUser authUser;
 

@@ -9,8 +9,9 @@ import local.socialnetwork.profiles.repository.UserProfileRepository;
 
 import local.socialnetwork.profiles.service.impl.UserProfileServiceImpl;
 
-import local.socialnetwork.shared.exception.AvatarNotFoundException;
 import local.socialnetwork.shared.exception.UserNotFoundException;
+import local.socialnetwork.shared.exception.AvatarNotFoundException;
+import local.socialnetwork.shared.exception.InvalidAvatarFileException;
 
 import org.junit.jupiter.api.Test;
 
@@ -23,8 +24,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import org.springframework.mock.web.MockMultipartFile;
 
+import java.util.List;
 import java.util.UUID;
 import java.util.Optional;
+
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -33,6 +38,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.any;
 
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
@@ -139,7 +145,7 @@ class UserProfileServiceImplTest {
     }
 
     @Test
-    void updateAvatar_whenProfileHasExistingAvatar_deletesOldBeforeUploadingNew() {
+    void updateAvatar_whenProfileHasExistingAvatar_uploadsNewAndDeletesOld() {
         var userId = UUID.randomUUID();
         var existing = new UserProfile();
         existing.setAvatarUrl("avatars/old-key.png");
@@ -153,6 +159,73 @@ class UserProfileServiceImplTest {
 
         assertThat(result.getAvatarUrl()).isEqualTo("avatars/new-key.png");
         verify(avatarStorageService).delete("avatars/old-key.png");
+    }
+
+    @Test
+    void updateAvatar_whenUploadFails_keepsExistingAvatarAndDeletesNothing() {
+        var userId = UUID.randomUUID();
+        var existing = new UserProfile();
+        existing.setAvatarUrl("avatars/old-key.png");
+        var file = new MockMultipartFile("file", "avatar.png", "image/png", "content".getBytes());
+
+        when(userProfileRepository.findByAuthUserId(userId)).thenReturn(Optional.of(existing));
+        when(avatarStorageService.upload(eq(userId), any())).thenThrow(new InvalidAvatarFileException("storage error"));
+
+        assertThatThrownBy(() -> userProfileService.updateAvatar(userId, file))
+                .isInstanceOf(InvalidAvatarFileException.class);
+
+        assertThat(existing.getAvatarUrl()).isEqualTo("avatars/old-key.png");
+        verify(avatarStorageService, never()).delete(any());
+    }
+
+    @Test
+    void updateAvatar_inTransaction_deletesOldObjectOnlyAfterCommit() {
+        var userId = UUID.randomUUID();
+        var existing = new UserProfile();
+        existing.setAvatarUrl("avatars/old-key.png");
+        var file = new MockMultipartFile("file", "avatar.png", "image/png", "content".getBytes());
+        when(userProfileRepository.findByAuthUserId(userId)).thenReturn(Optional.of(existing));
+        when(avatarStorageService.upload(eq(userId), any())).thenReturn("avatars/new-key.png");
+        when(userProfileRepository.save(any(UserProfile.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        TransactionSynchronizationManager.initSynchronization();
+        try {
+            userProfileService.updateAvatar(userId, file);
+
+            verify(avatarStorageService, never()).delete(any());
+
+            var synchronizations = List.copyOf(TransactionSynchronizationManager.getSynchronizations());
+            synchronizations.forEach(TransactionSynchronization::afterCommit);
+            synchronizations.forEach(sync -> sync.afterCompletion(TransactionSynchronization.STATUS_COMMITTED));
+        } finally {
+            TransactionSynchronizationManager.clear();
+        }
+
+        verify(avatarStorageService).delete("avatars/old-key.png");
+        verify(avatarStorageService, never()).delete("avatars/new-key.png");
+    }
+
+    @Test
+    void updateAvatar_inTransaction_whenRolledBack_deletesNewObjectAndKeepsOld() {
+        var userId = UUID.randomUUID();
+        var existing = new UserProfile();
+        existing.setAvatarUrl("avatars/old-key.png");
+        var file = new MockMultipartFile("file", "avatar.png", "image/png", "content".getBytes());
+        when(userProfileRepository.findByAuthUserId(userId)).thenReturn(Optional.of(existing));
+        when(avatarStorageService.upload(eq(userId), any())).thenReturn("avatars/new-key.png");
+        when(userProfileRepository.save(any(UserProfile.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        TransactionSynchronizationManager.initSynchronization();
+        try {
+            userProfileService.updateAvatar(userId, file);
+            TransactionSynchronizationManager.getSynchronizations()
+                    .forEach(sync -> sync.afterCompletion(TransactionSynchronization.STATUS_ROLLED_BACK));
+        } finally {
+            TransactionSynchronizationManager.clear();
+        }
+
+        verify(avatarStorageService).delete("avatars/new-key.png");
+        verify(avatarStorageService, never()).delete("avatars/old-key.png");
     }
 
     @Test

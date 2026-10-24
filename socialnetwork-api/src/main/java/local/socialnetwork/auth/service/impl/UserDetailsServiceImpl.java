@@ -1,6 +1,7 @@
 package local.socialnetwork.auth.service.impl;
 
 import local.socialnetwork.auth.entity.AuthUser;
+import local.socialnetwork.auth.entity.AuthStatus;
 
 import local.socialnetwork.auth.repository.AuthUserRepository;
 
@@ -55,7 +56,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                     return new UsernameNotFoundException(normalized + " is not found");
                 });
         log.debug("Loaded user details for username: {}", normalized);
-        return new UserPrincipal(authUser.getId(), normalized, authUser.getPasswordHash(), getAuthorities(authUser));
+        return new UserPrincipal(authUser.getId(), normalized, authUser.getPasswordHash(), getAuthorities(authUser),
+                authUser.getAuthStatus() == AuthStatus.ACTIVE);
     }
 
     private List<GrantedAuthority> getAuthorities(AuthUser authUser) {

@@ -96,10 +96,8 @@ class CommentReplySuggestionServiceImplTest {
         return comment;
     }
 
-    private static final String THREE_LINE_RESPONSE = """
-            1. Thanks so much!
-            2. Really appreciate that.
-            3. Glad you liked it!""";
+    private static final List<String> THREE_SUGGESTIONS =
+            List.of("Thanks so much!", "Really appreciate that.", "Glad you liked it!");
 
     @Test
     void generateReplySuggestions_whenCommentNotFound_throwsCommentNotFoundException() {
@@ -122,7 +120,7 @@ class CommentReplySuggestionServiceImplTest {
         when(commentRepository.findByParentIdOrderByCreatedAtDesc(eq(commentId), any(Pageable.class)))
                 .thenReturn(List.of());
         when(postService.getPost(postId)).thenReturn(PostResponse.from(post, null));
-        when(aiChatService.chat(anyString(), anyString())).thenReturn(THREE_LINE_RESPONSE);
+        when(aiChatService.chatList(anyString(), anyString())).thenReturn(THREE_SUGGESTIONS);
 
         var result = service.generateReplySuggestions(UUID.randomUUID(), commentId, ReplyTone.FRIENDLY);
 
@@ -130,11 +128,11 @@ class CommentReplySuggestionServiceImplTest {
                 "Thanks so much!", "Really appreciate that.", "Glad you liked it!");
 
         var userPromptCaptor = ArgumentCaptor.forClass(String.class);
-        verify(aiChatService).chat(anyString(), userPromptCaptor.capture());
+        verify(aiChatService).chatList(anyString(), userPromptCaptor.capture());
         assertThat(userPromptCaptor.getValue())
                 .contains("Just launched my new project!")
                 .contains("Congrats, looks great!")
-                .doesNotContain("Parent comment");
+                .doesNotContain("<parent_comment>");
     }
 
     @Test
@@ -150,14 +148,14 @@ class CommentReplySuggestionServiceImplTest {
         when(commentRepository.findByParentIdOrderByCreatedAtDesc(eq(parentId), any(Pageable.class)))
                 .thenReturn(List.of());
         when(postService.getPost(postId)).thenReturn(PostResponse.from(post, null));
-        when(aiChatService.chat(anyString(), anyString())).thenReturn(THREE_LINE_RESPONSE);
+        when(aiChatService.chatList(anyString(), anyString())).thenReturn(THREE_SUGGESTIONS);
 
         service.generateReplySuggestions(UUID.randomUUID(), commentId, null);
 
         var userPromptCaptor = ArgumentCaptor.forClass(String.class);
-        verify(aiChatService).chat(anyString(), userPromptCaptor.capture());
+        verify(aiChatService).chatList(anyString(), userPromptCaptor.capture());
         assertThat(userPromptCaptor.getValue())
-                .contains("Parent comment")
+                .contains("<parent_comment>")
                 .contains("I did, works great.")
                 .contains("How fast was it?");
     }
@@ -173,12 +171,12 @@ class CommentReplySuggestionServiceImplTest {
         when(commentRepository.findByParentIdOrderByCreatedAtDesc(eq(commentId), any(Pageable.class)))
                 .thenReturn(List.of());
         when(postService.getPost(postId)).thenReturn(PostResponse.from(post, null));
-        when(aiChatService.chat(anyString(), anyString())).thenReturn(THREE_LINE_RESPONSE);
+        when(aiChatService.chatList(anyString(), anyString())).thenReturn(THREE_SUGGESTIONS);
 
         service.generateReplySuggestions(UUID.randomUUID(), commentId, null);
 
         var systemPromptCaptor = ArgumentCaptor.forClass(String.class);
-        verify(aiChatService).chat(systemPromptCaptor.capture(), anyString());
+        verify(aiChatService).chatList(systemPromptCaptor.capture(), anyString());
         assertThat(systemPromptCaptor.getValue()).contains(ReplyTone.NEUTRAL.promptDescriptor());
     }
 
@@ -193,7 +191,7 @@ class CommentReplySuggestionServiceImplTest {
         when(commentRepository.findByParentIdOrderByCreatedAtDesc(eq(commentId), any(Pageable.class)))
                 .thenReturn(List.of());
         when(postService.getPost(postId)).thenReturn(PostResponse.from(post, null));
-        when(aiChatService.chat(anyString(), anyString())).thenReturn("   ");
+        when(aiChatService.chatList(anyString(), anyString())).thenReturn(List.of());
 
         assertThatThrownBy(() -> service.generateReplySuggestions(UUID.randomUUID(), commentId, null))
                 .isInstanceOf(CommentSuggestionGenerationException.class);
@@ -210,7 +208,7 @@ class CommentReplySuggestionServiceImplTest {
         when(commentRepository.findByParentIdOrderByCreatedAtDesc(eq(commentId), any(Pageable.class)))
                 .thenReturn(List.of());
         when(postService.getPost(postId)).thenReturn(PostResponse.from(post, null));
-        when(aiChatService.chat(anyString(), anyString())).thenThrow(new AiChatException("boom"));
+        when(aiChatService.chatList(anyString(), anyString())).thenThrow(new AiChatException("boom"));
 
         assertThatThrownBy(() -> service.generateReplySuggestions(UUID.randomUUID(), commentId, null))
                 .isInstanceOf(CommentSuggestionGenerationException.class)

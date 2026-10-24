@@ -9,6 +9,7 @@ import local.socialnetwork.comments.dto.http.response.CommentResponse;
 
 import local.socialnetwork.comments.entity.Comment;
 
+import local.socialnetwork.comments.repository.ReplyCount;
 import local.socialnetwork.comments.repository.CommentRepository;
 
 import local.socialnetwork.comments.service.CommentService;
@@ -18,6 +19,8 @@ import local.socialnetwork.posts.repository.PostRepository;
 import local.socialnetwork.profiles.service.UserProfileService;
 
 import local.socialnetwork.shared.dto.response.AuthorSummary;
+
+import local.socialnetwork.shared.pagination.Pages;
 
 import local.socialnetwork.shared.exception.UserNotFoundException;
 import local.socialnetwork.shared.exception.PostNotFoundException;
@@ -54,6 +57,8 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class CommentServiceImpl implements CommentService {
 
+    private static final int INLINE_REPLY_LIMIT = 3;
+
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
     private final AuthUserRepository authUserRepository;
@@ -81,7 +86,7 @@ public class CommentServiceImpl implements CommentService {
 
         var saved = commentRepository.save(comment);
         log.info("Comment {} created by auth user id: {} on post: {}", saved.getId(), authUserId, postId);
-        return CommentResponse.from(saved, resolveAuthor(authUserId), List.of());
+        return CommentResponse.from(saved, resolveAuthor(authUserId), List.of(), 0L);
     }
 
     /**
@@ -94,11 +99,12 @@ public class CommentServiceImpl implements CommentService {
             throw new PostNotFoundException("Post not found for id: " + postId);
         }
 
-        var page = commentRepository.findByPostIdAndParentIsNullOrderByCreatedAtAsc(postId, pageable);
+        var page = commentRepository.findByPostIdAndParentIsNullOrderByCreatedAtAsc(postId, Pages.withoutClientSort(pageable));
         var topLevelIds = page.getContent().stream().map(Comment::getId).toList();
-        var repliesByParentId = commentRepository.findByParentIdInOrderByCreatedAtAsc(topLevelIds).stream()
+        var repliesByParentId = commentRepository.findFirstRepliesByParentIdIn(topLevelIds, INLINE_REPLY_LIMIT).stream()
                 .collect(Collectors.groupingBy(reply -> reply.getParent().getId()));
-
+        var replyCounts = commentRepository.countRepliesByParentIdIn(topLevelIds).stream()
+                .collect(Collectors.toMap(ReplyCount::parentId, ReplyCount::count));
         var authorIds = Stream.concat(
                         page.getContent().stream().map(comment -> comment.getAuthor().getId()),
                         repliesByParentId.values().stream().flatMap(List::stream)
@@ -106,19 +112,30 @@ public class CommentServiceImpl implements CommentService {
                 .distinct()
                 .toList();
         var authorsById = userProfileService.getAuthorSummaries(authorIds);
-
         return page.map(comment -> CommentResponse.from(
                 comment,
-                toAuthorSummary(authorsById, comment.getAuthor().getId()),
+                AuthorSummary.require(authorsById, comment.getAuthor().getId()),
                 repliesByParentId.getOrDefault(comment.getId(), List.of()).stream()
                         .map(reply -> CommentResponse.from(
-                                reply, toAuthorSummary(authorsById, reply.getAuthor().getId()), List.of()))
-                        .toList()));
+                                reply, AuthorSummary.require(authorsById, reply.getAuthor().getId()), List.of(), 0L))
+                        .toList(),
+                replyCounts.getOrDefault(comment.getId(), 0L)));
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    @Override
+    @Transactional(readOnly = true)
+    public Page<CommentResponse> getReplies(UUID commentId, Pageable pageable) {
+        var parent = findCommentOrThrow(commentId);
+        if (parent.getParent() != null) {
+            throw new InvalidCommentParentException("Comment " + commentId + " is itself a reply and has no replies");
+        }
+        var page = commentRepository.findByParentIdOrderByCreatedAtAsc(commentId, Pages.withoutClientSort(pageable));
+        var authorsById = userProfileService.getAuthorSummaries(
+                page.getContent().stream().map(reply -> reply.getAuthor().getId()).distinct().toList());
+        return page.map(reply -> CommentResponse.from(
+                reply, AuthorSummary.require(authorsById, reply.getAuthor().getId()), List.of(), 0L));
+    }
+
     @Override
     @Transactional
     public CommentResponse updateComment(UUID authUserId, UUID commentId, UpdateCommentRequestDto request) {
@@ -128,7 +145,8 @@ public class CommentServiceImpl implements CommentService {
         comment.setUpdatedAt(Instant.now());
         var saved = commentRepository.save(comment);
         log.info("Comment {} updated by auth user id: {}", commentId, authUserId);
-        return CommentResponse.from(saved, resolveAuthor(authUserId), List.of());
+        var replyCount = saved.getParent() == null ? commentRepository.countByParentId(commentId) : 0L;
+        return CommentResponse.from(saved, resolveAuthor(authUserId), List.of(), replyCount);
     }
 
     /**
@@ -173,11 +191,4 @@ public class CommentServiceImpl implements CommentService {
         return userProfileService.getAuthorSummary(authUserId);
     }
 
-    private AuthorSummary toAuthorSummary(Map<UUID, AuthorSummary> authorsById, UUID authUserId) {
-        var author = authorsById.get(authUserId);
-        if (author == null) {
-            throw new UserNotFoundException("Profile not found for user id: " + authUserId);
-        }
-        return author;
-    }
 }

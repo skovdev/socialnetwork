@@ -36,8 +36,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.util.Set;
+import java.util.List;
 import java.util.HashSet;
-import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.anyString;
 
@@ -53,10 +53,8 @@ class CommentReplySuggestionRestControllerIT extends BaseIntegrationTest {
 
     private static final String POSTS_URL = "/api/v1/posts";
     private static final String COMMENTS_URL = "/api/v1/comments";
-    private static final String THREE_LINE_RESPONSE = """
-            1. Thanks so much!
-            2. Really appreciate that.
-            3. Glad you liked it!""";
+    private static final List<String> THREE_SUGGESTIONS =
+            List.of("Thanks so much!", "Really appreciate that.", "Glad you liked it!");
 
     @Autowired
     private AuthUserRepository authUserRepository;
@@ -104,7 +102,7 @@ class CommentReplySuggestionRestControllerIT extends BaseIntegrationTest {
 
         authUserRepository.save(authUser);
 
-        return jwtTokenProvider.createToken(Map.of("username", username));
+        return jwtTokenProvider.createToken(authUserRepository.findByUserProfileUsername(username).orElseThrow().getId(), username);
     }
 
     private String createPostAndGetId(String bearerToken, String content) throws Exception {
@@ -138,7 +136,7 @@ class CommentReplySuggestionRestControllerIT extends BaseIntegrationTest {
 
     @Test
     void generateReplySuggestions_returns200WithThreeSuggestions() throws Exception {
-        when(aiChatService.chat(anyString(), anyString())).thenReturn(THREE_LINE_RESPONSE);
+        when(aiChatService.chatList(anyString(), anyString())).thenReturn(THREE_SUGGESTIONS);
 
         mockMvc.perform(post(COMMENTS_URL + "/" + commentId + "/suggestions")
                         .header("Authorization", "Bearer " + authorToken))
@@ -150,7 +148,7 @@ class CommentReplySuggestionRestControllerIT extends BaseIntegrationTest {
 
     @Test
     void generateReplySuggestions_withTone_returns200() throws Exception {
-        when(aiChatService.chat(anyString(), anyString())).thenReturn(THREE_LINE_RESPONSE);
+        when(aiChatService.chatList(anyString(), anyString())).thenReturn(THREE_SUGGESTIONS);
 
         mockMvc.perform(post(COMMENTS_URL + "/" + commentId + "/suggestions")
                         .header("Authorization", "Bearer " + authorToken)
@@ -184,7 +182,7 @@ class CommentReplySuggestionRestControllerIT extends BaseIntegrationTest {
 
     @Test
     void generateReplySuggestions_whenAiProviderFails_returns503() throws Exception {
-        doThrow(new AiChatException("boom")).when(aiChatService).chat(anyString(), anyString());
+        doThrow(new AiChatException("boom")).when(aiChatService).chatList(anyString(), anyString());
 
         mockMvc.perform(post(COMMENTS_URL + "/" + commentId + "/suggestions")
                         .header("Authorization", "Bearer " + authorToken))

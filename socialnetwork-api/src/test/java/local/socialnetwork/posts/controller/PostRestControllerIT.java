@@ -82,7 +82,7 @@ class PostRestControllerIT extends BaseIntegrationTest {
 
         authUserRepository.save(authUser);
 
-        return jwtTokenProvider.createToken(Map.of("username", username));
+        return jwtTokenProvider.createToken(authUserRepository.findByUserProfileUsername(username).orElseThrow().getId(), username);
     }
 
     private String createPostAndGetId(String bearerToken, String content) throws Exception {
@@ -95,6 +95,67 @@ class PostRestControllerIT extends BaseIntegrationTest {
         JsonNode json = objectMapper.readTree(response);
         return json.get("data").get("id").asText();
     }
+
+    @Test
+    void getFeed_returnsSliceWithHasNextAndNoTotals() throws Exception {
+        createPostAndGetId(authorToken, "first");
+        createPostAndGetId(authorToken, "second");
+
+        mockMvc.perform(get(BASE_URL).param("size", "1")
+                        .header("Authorization", "Bearer " + otherUserToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.content.length()").value(1))
+                .andExpect(jsonPath("$.data.page.hasNext").value(true))
+                .andExpect(jsonPath("$.data.page.totalElements").doesNotExist());
+    }
+
+    @Test
+    void getFeed_ignoresClientSuppliedSort() throws Exception {
+        createPostAndGetId(authorToken, "first");
+
+        mockMvc.perform(get(BASE_URL).param("sort", "author.passwordHash,asc")
+                        .header("Authorization", "Bearer " + otherUserToken))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void getPost_afterAuthorChangesDisplayName_returnsCurrentAuthorDetails() throws Exception {
+        var postId = createPostAndGetId(authorToken, "cached post");
+        mockMvc.perform(get(BASE_URL + "/" + postId).header("Authorization", "Bearer " + otherUserToken))
+                .andExpect(jsonPath("$.data.author.displayName").value("Author One"));
+
+        var profile = authUserRepository.findByUserProfileUsername("author").orElseThrow().getUserProfile();
+        profile.setDisplayName("Renamed Author");
+        authUserRepository.save(profile.getAuthUser());
+
+        mockMvc.perform(get(BASE_URL + "/" + postId).header("Authorization", "Bearer " + otherUserToken))
+                .andExpect(jsonPath("$.data.author.displayName").value("Renamed Author"));
+    }
+
+    @Test
+    void createPost_withTokenForDifferentAccountSubject_returns401() throws Exception {
+        var forged = jwtTokenProvider.createToken(java.util.UUID.randomUUID(), "author");
+
+        mockMvc.perform(post(BASE_URL)
+                        .header("Authorization", "Bearer " + forged)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(new CreatePostRequestDto("nope"))))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void createPost_whenAccountIsDisabled_returns401() throws Exception {
+        var user = authUserRepository.findByUserProfileUsername("author").orElseThrow();
+        user.setAuthStatus(AuthStatus.DISABLED);
+        authUserRepository.save(user);
+
+        mockMvc.perform(post(BASE_URL)
+                        .header("Authorization", "Bearer " + authorToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(new CreatePostRequestDto("nope"))))
+                .andExpect(status().isUnauthorized());
+    }
+
 
     @Test
     void createPost_withValidContent_returns201WithPostData() throws Exception {

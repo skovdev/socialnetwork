@@ -59,8 +59,8 @@ public interface FollowService {
     Page<FollowUserResponse> getFollowing(String username, UUID viewerId, Pageable pageable);
 
     /**
-     * Returns the auth-user IDs that {@code followerId} follows. Used by the posts feature to
-     * build a personalized, following-based feed.
+     * Whether {@code followerId} follows at least one user. Used by the posts feature to decide between the
+     * following feed and the global feed without loading the whole follow list.
      */
-    List<UUID> getFollowedAuthorIds(UUID followerId);
+    boolean followsAnyone(UUID followerId);
 }

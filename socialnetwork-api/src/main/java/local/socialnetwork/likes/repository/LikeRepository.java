@@ -33,7 +33,8 @@ public interface LikeRepository extends CrudRepository<Like, UUID>, PagingAndSor
     void deleteByPostIdAndAuthorId(UUID postId, UUID authorId);
     long countByPostId(UUID postId);
     Page<Like> findByPostIdOrderByCreatedAtDesc(UUID postId, Pageable pageable);
-    List<Like> findByPostIdInAndAuthorId(Collection<UUID> postIds, UUID authorId);
+    @Query("SELECT l.post.id FROM Like l WHERE l.post.id IN :postIds AND l.author.id = :authorId")
+    List<UUID> findLikedPostIds(@Param("postIds") Collection<UUID> postIds, @Param("authorId") UUID authorId);
     @Query("SELECT new local.socialnetwork.likes.repository.PostLikeCount(l.post.id, COUNT(l)) "
             + "FROM Like l WHERE l.post.id IN :postIds GROUP BY l.post.id")
     List<PostLikeCount> countByPostIdIn(@Param("postIds") Collection<UUID> postIds);

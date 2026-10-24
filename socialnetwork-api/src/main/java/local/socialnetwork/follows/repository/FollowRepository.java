@@ -32,12 +32,11 @@ public interface FollowRepository extends CrudRepository<Follow, UUID>, PagingAn
                        @Param("followedId") UUID followedId, @Param("createdAt") Instant createdAt);
     boolean existsByFollowerIdAndFollowedId(UUID followerId, UUID followedId);
     void deleteByFollowerIdAndFollowedId(UUID followerId, UUID followedId);
+    boolean existsByFollowerId(UUID followerId);
     long countByFollowedId(UUID followedId);
     long countByFollowerId(UUID followerId);
     Page<Follow> findByFollowedIdOrderByCreatedAtDesc(UUID followedId, Pageable pageable);
     Page<Follow> findByFollowerIdOrderByCreatedAtDesc(UUID followerId, Pageable pageable);
-    @Query("SELECT f.followed.id FROM Follow f WHERE f.follower.id = :followerId")
-    List<UUID> findFollowedIdsByFollowerId(@Param("followerId") UUID followerId);
     @Query("SELECT f.followed.id FROM Follow f WHERE f.follower.id = :followerId AND f.followed.id IN :followedIds")
     List<UUID> findFollowedIdsByFollowerIdAndFollowedIdIn(
             @Param("followerId") UUID followerId, @Param("followedIds") Collection<UUID> followedIds);

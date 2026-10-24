@@ -25,6 +25,9 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Service;
 
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
+
 import org.springframework.transaction.annotation.Transactional;
 
 import org.springframework.web.multipart.MultipartFile;
@@ -135,7 +138,7 @@ public class UserProfileServiceImpl implements UserProfileService {
     @Override
     @Transactional(readOnly = true)
     public Optional<AuthorProfile> findAuthorByUsername(String username) {
-        return userProfileRepository.findByUsername(username)
+        return userProfileRepository.findSummaryByUsername(username)
                 .map(profile -> new AuthorProfile(profile.getAuthUser().getId(), toAuthorSummary(profile)));
     }
 
@@ -160,11 +163,13 @@ public class UserProfileServiceImpl implements UserProfileService {
     public UserProfile updateAvatar(UUID authUserId, MultipartFile file) {
         var profile = userProfileRepository.findByAuthUserId(authUserId)
                 .orElseThrow(() -> new UserNotFoundException("Profile not found for user id: " + authUserId));
-        if (profile.getAvatarUrl() != null) {
-            avatarStorageService.delete(profile.getAvatarUrl());
-        }
+        var previousKey = profile.getAvatarUrl();
+        // Upload first: if it fails, the user keeps the avatar they have. The old object is only removed
+        // once the new key is committed, and the new object is removed again if the transaction rolls back.
         var key = avatarStorageService.upload(authUserId, file);
         profile.setAvatarUrl(key);
+        deleteAfterCommit(previousKey);
+        deleteOnRollback(key);
         log.info("Avatar updated for auth user id: {}", authUserId);
         return userProfileRepository.save(profile);
     }
@@ -180,10 +185,55 @@ public class UserProfileServiceImpl implements UserProfileService {
         if (profile.getAvatarUrl() == null) {
             throw new AvatarNotFoundException("No avatar set for user id: " + authUserId);
         }
-        avatarStorageService.delete(profile.getAvatarUrl());
+        deleteAfterCommit(profile.getAvatarUrl());
         profile.setAvatarUrl(null);
         userProfileRepository.save(profile);
         log.info("Avatar removed for auth user id: {}", authUserId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public void purgeAvatar(UUID authUserId) {
+        userProfileRepository.findByAuthUserId(authUserId)
+                .map(UserProfile::getAvatarUrl)
+                .ifPresent(this::deleteAfterCommit);
+    }
+
+    private void deleteAfterCommit(String key) {
+        if (key == null) {
+            return;
+        }
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    deleteQuietly(key);
+                }
+            });
+        } else {
+            deleteQuietly(key);
+        }
+    }
+
+    private void deleteOnRollback(String key) {
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCompletion(int status) {
+                    if (status != STATUS_COMMITTED) {
+                        deleteQuietly(key);
+                    }
+                }
+            });
+        }
+    }
+
+    private void deleteQuietly(String key) {
+        try {
+            avatarStorageService.delete(key);
+        } catch (RuntimeException e) {
+            log.warn("Could not delete avatar object '{}', it is now orphaned: {}", key, e.getMessage());
+        }
     }
 
     private AuthorSummary toAuthorSummary(UserProfile profile) {

@@ -10,11 +10,16 @@ import org.springframework.cache.annotation.EnableCaching;
 
 import org.springframework.retry.annotation.EnableRetry;
 
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
+
 /**
  * Spring Boot entry point for the SocialNetwork API.
  */
+@EnableAsync
 @EnableRetry
 @EnableCaching
+@EnableScheduling
 @SpringBootApplication
 @ConfigurationPropertiesScan
 public class SocialNetworkApp {

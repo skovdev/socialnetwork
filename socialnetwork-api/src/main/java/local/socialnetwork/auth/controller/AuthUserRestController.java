@@ -10,6 +10,8 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 
@@ -23,7 +25,9 @@ import local.socialnetwork.auth.dto.http.request.ResendVerificationRequest;
 
 import local.socialnetwork.auth.dto.http.response.TokenResponse;
 
-import local.socialnetwork.auth.service.AuthUserService;
+import local.socialnetwork.auth.service.AuthAccountService;
+import local.socialnetwork.auth.service.AuthSessionService;
+import local.socialnetwork.auth.service.AuthRegistrationService;
 
 import local.socialnetwork.core.config.security.principal.UserPrincipal;
 
@@ -62,7 +66,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Tag(name = "Auth", description = "Authentication and authorization endpoints")
 public class AuthUserRestController {
 
-    private final AuthUserService authUserService;
+    private final AuthSessionService sessionService;
+    private final AuthAccountService accountService;
+    private final AuthRegistrationService registrationService;
 
     /**
      * Registers a new user account and triggers email verification.
@@ -77,7 +83,7 @@ public class AuthUserRestController {
     @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponseDto<Void> register(@RequestBody @Valid RegisterRequest request) {
-        authUserService.register(request);
+        registrationService.register(request);
         return ApiResponseDto.buildSuccessResponse(null);
     }
 
@@ -93,7 +99,7 @@ public class AuthUserRestController {
     })
     @GetMapping("/verify")
     public ApiResponseDto<Void> verify(@NotBlank @RequestParam("token") String token) {
-        authUserService.verify(new VerifyRequest(token));
+        registrationService.verify(new VerifyRequest(token));
         return ApiResponseDto.buildSuccessResponse(null);
     }
 
@@ -109,8 +115,9 @@ public class AuthUserRestController {
             @ApiResponse(responseCode = "429", description = "Too many failed login attempts — retry after the Retry-After header duration")
     })
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ApiResponseDto<TokenResponse> login(@RequestBody @Valid LoginRequest request) {
-        return ApiResponseDto.buildSuccessResponse(authUserService.login(request));
+    public ApiResponseDto<TokenResponse> login(@RequestBody @Valid LoginRequest request,
+                                                   HttpServletRequest httpRequest) {
+        return ApiResponseDto.buildSuccessResponse(sessionService.login(request, httpRequest.getRemoteAddr()));
     }
 
     /**
@@ -125,7 +132,7 @@ public class AuthUserRestController {
     })
     @PostMapping(value = "/refresh", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ApiResponseDto<TokenResponse> refresh(@RequestBody @Valid RefreshRequest request) {
-        return ApiResponseDto.buildSuccessResponse(authUserService.refresh(request));
+        return ApiResponseDto.buildSuccessResponse(sessionService.refresh(request));
     }
 
     /**
@@ -138,7 +145,7 @@ public class AuthUserRestController {
     })
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(@AuthenticationPrincipal UserPrincipal principal) {
-        authUserService.logout(principal.getId());
+        sessionService.logout(principal.getId());
         return ResponseEntity.noContent().build();
     }
 
@@ -155,7 +162,7 @@ public class AuthUserRestController {
     })
     @PostMapping(value = "/resend-verification", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ApiResponseDto<Void> resendVerification(@RequestBody @Valid ResendVerificationRequest request) {
-        authUserService.resendVerification(request);
+        registrationService.resendVerification(request);
         return ApiResponseDto.buildSuccessResponse(null);
     }
 
@@ -173,7 +180,7 @@ public class AuthUserRestController {
     public ResponseEntity<Void> changePassword(
             @Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal principal,
             @RequestBody @Valid ChangePasswordRequest request) {
-        authUserService.changePassword(principal.getId(), request);
+        accountService.changePassword(principal.getId(), request);
         return ResponseEntity.noContent().build();
     }
 
@@ -191,7 +198,7 @@ public class AuthUserRestController {
     public ResponseEntity<Void> deleteAccount(
             @Parameter(hidden = true) @AuthenticationPrincipal UserPrincipal principal,
             @RequestBody @Valid DeleteAccountRequest request) {
-        authUserService.deleteAccount(principal.getId(), request);
+        accountService.deleteAccount(principal.getId(), request);
         return ResponseEntity.noContent().build();
     }
 

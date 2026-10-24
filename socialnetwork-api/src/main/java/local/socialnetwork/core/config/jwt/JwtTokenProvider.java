@@ -19,12 +19,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Value;
 
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
-import org.springframework.security.core.Authentication;
 
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 
 import org.springframework.stereotype.Component;
 
@@ -38,7 +34,7 @@ import java.security.spec.X509EncodedKeySpec;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.InvalidKeySpecException;
 
-import java.util.Map;
+import java.util.UUID;
 import java.util.Date;
 import java.util.Base64;
 import java.util.Optional;
@@ -54,6 +50,9 @@ public class JwtTokenProvider {
 
     private static final String PRIVATE_KEY = "socialnetwork-private-key";
     private static final String PUBLIC_KEY = "socialnetwork-public-key";
+    private static final String KEY_ID = "socialnetwork-rsa-1";
+    private static final String ISSUER = "socialnetwork-api";
+    private static final String USERNAME_CLAIM = "username";
 
     @Value("${aws.secretsmanager.secretName.socialnetwork-security-private-public-keys}")
     private String privatePublicKeysSecretName;
@@ -61,7 +60,6 @@ public class JwtTokenProvider {
     private PrivateKey privateKey;
     private PublicKey publicKey;
 
-    private final UserDetailsService userDetailsService;
     private final AWSSecretsManagerProvider awsSecretsManagerProvider;
 
     @PostConstruct
@@ -70,21 +68,33 @@ public class JwtTokenProvider {
         publicKey = loadKey(PUBLIC_KEY, "RSA", false);
     }
 
-    public String createToken(Map<String, Object> data) {
+    public String createToken(UUID userId, String username) {
         Date now = new Date();
         Date validity = new Date(now.getTime() + 3600 * 1000);
         return Jwts.builder()
-                .claims(data)
+                .header().keyId(KEY_ID).and()
+                .issuer(ISSUER)
+                .subject(userId.toString())
+                .id(UUID.randomUUID().toString())
+                .claim(USERNAME_CLAIM, username)
+                .issuedAt(now)
                 .expiration(validity)
                 .signWith(privateKey)
                 .compact();
 
     }
 
-    public Authentication authenticate(String token) {
-        var username = parseSignedClaims(token).getPayload().get("username", String.class);
-        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+    /**
+     * Verifies the token's signature, issuer and expiry and returns the identity it asserts.
+     *
+     * @throws InvalidJwtAuthenticationException if the token is malformed, expired or not signed by this API
+     */
+    public JwtIdentity verify(String token) {
+        var claims = parseSignedClaims(token).getPayload();
+        return new JwtIdentity(claims.getSubject(), claims.get(USERNAME_CLAIM, String.class));
+    }
+
+    public record JwtIdentity(String subject, String username) {
     }
 
     public String resolveToken(HttpServletRequest request) {
@@ -98,6 +108,7 @@ public class JwtTokenProvider {
         try {
             return Jwts.parser()
                     .verifyWith(publicKey)
+                    .requireIssuer(ISSUER)
                     .build()
                     .parseSignedClaims(token);
         } catch (JwtException | IllegalArgumentException e) {

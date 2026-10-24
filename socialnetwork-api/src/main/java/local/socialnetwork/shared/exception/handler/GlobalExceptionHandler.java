@@ -29,6 +29,8 @@ import local.socialnetwork.shared.exception.InvalidJwtAuthenticationException;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
+
 import org.springframework.http.MediaType;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpHeaders;
@@ -64,13 +66,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(UsernameAlreadyExistsException.class)
     public ResponseEntity<ProblemDetail> handleUsernameAlreadyExists(UsernameAlreadyExistsException ex) {
-        log.warn("Username conflict: {}", ex.getMessage(), ex);
+        log.warn("Username conflict: {}", ex.getMessage());
         return problem(HttpStatus.CONFLICT, "USERNAME_ALREADY_EXISTS", ex.getMessage());
     }
 
     @ExceptionHandler(EmailAlreadyExistsException.class)
     public ResponseEntity<ProblemDetail> handleEmailAlreadyExists(EmailAlreadyExistsException ex) {
-        log.warn("Email conflict: {}", ex.getMessage(), ex);
+        log.warn("Email conflict: {}", ex.getMessage());
         return problem(HttpStatus.CONFLICT, "EMAIL_ALREADY_EXISTS", ex.getMessage());
     }
 
@@ -83,19 +85,19 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(InvalidJwtAuthenticationException.class)
     public ResponseEntity<ProblemDetail> handleInvalidJwt(InvalidJwtAuthenticationException ex) {
-        log.warn("Invalid JWT: {}", ex.getMessage(), ex);
+        log.warn("Invalid JWT: {}", ex.getMessage());
         return problem(HttpStatus.UNAUTHORIZED, "INVALID_TOKEN", "Invalid or expired token.");
     }
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ProblemDetail> handleBadCredentials(BadCredentialsException ex) {
-        log.warn("Bad credentials: {}", ex.getMessage(), ex);
+        log.warn("Bad credentials: {}", ex.getMessage());
         return problem(HttpStatus.UNAUTHORIZED, "INVALID_CREDENTIALS", "Invalid username or password.");
     }
 
     @ExceptionHandler(UsernameNotFoundException.class)
     public ResponseEntity<ProblemDetail> handleUsernameNotFound(UsernameNotFoundException ex) {
-        log.warn("Username not found: {}", ex.getMessage(), ex);
+        log.warn("Username not found: {}", ex.getMessage());
         return problem(HttpStatus.UNAUTHORIZED, "INVALID_CREDENTIALS", "Invalid username or password.");
     }
 
@@ -123,91 +125,91 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AccountNotVerifiedException.class)
     public ResponseEntity<ProblemDetail> handleAccountNotVerified(AccountNotVerifiedException ex) {
-        log.warn("Account not verified: {}", ex.getMessage(), ex);
+        log.warn("Account not verified: {}", ex.getMessage());
         return problem(HttpStatus.FORBIDDEN, "ACCOUNT_NOT_VERIFIED", ex.getMessage());
     }
 
     @ExceptionHandler(AccountAlreadyVerifiedException.class)
     public ResponseEntity<ProblemDetail> handleAccountAlreadyVerified(AccountAlreadyVerifiedException ex) {
-        log.warn("Account already verified: {}", ex.getMessage(), ex);
+        log.warn("Account already verified: {}", ex.getMessage());
         return problem(HttpStatus.CONFLICT, "ACCOUNT_ALREADY_VERIFIED", ex.getMessage());
     }
 
     @ExceptionHandler(InvalidCurrentPasswordException.class)
     public ResponseEntity<ProblemDetail> handleInvalidCurrentPassword(InvalidCurrentPasswordException ex) {
-        log.warn("Invalid current password: {}", ex.getMessage(), ex);
+        log.warn("Invalid current password: {}", ex.getMessage());
         return problem(HttpStatus.BAD_REQUEST, "INVALID_CURRENT_PASSWORD", ex.getMessage());
     }
 
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<ProblemDetail> handleUserNotFound(UserNotFoundException ex) {
-        log.warn("User not found: {}", ex.getMessage(), ex);
+        log.warn("User not found: {}", ex.getMessage());
         return problem(HttpStatus.NOT_FOUND, "USER_NOT_FOUND", ex.getMessage());
     }
 
     @ExceptionHandler(TokenNotFoundException.class)
     public ResponseEntity<ProblemDetail> handleTokenNotFound(TokenNotFoundException ex) {
-        log.warn("Token not found: {}", ex.getMessage(), ex);
+        log.warn("Token not found: {}", ex.getMessage());
         return problem(HttpStatus.NOT_FOUND, "TOKEN_NOT_FOUND", ex.getMessage());
     }
 
     @ExceptionHandler(TokenExpiredException.class)
     public ResponseEntity<ProblemDetail> handleTokenExpired(TokenExpiredException ex) {
-        log.warn("Token expired: {}", ex.getMessage(), ex);
+        log.warn("Token expired: {}", ex.getMessage());
         return problem(HttpStatus.GONE, "TOKEN_EXPIRED", ex.getMessage());
     }
 
     @ExceptionHandler(TokenAlreadyUsedException.class)
     public ResponseEntity<ProblemDetail> handleTokenAlreadyUsed(TokenAlreadyUsedException ex) {
-        log.warn("Token already used: {}", ex.getMessage(), ex);
+        log.warn("Token already used: {}", ex.getMessage());
         return problem(HttpStatus.GONE, "TOKEN_ALREADY_USED", ex.getMessage());
     }
 
     @ExceptionHandler(InvalidAvatarFileException.class)
     public ResponseEntity<ProblemDetail> handleInvalidAvatarFile(InvalidAvatarFileException ex) {
-        log.warn("Invalid avatar file: {}", ex.getMessage(), ex);
+        log.warn("Invalid avatar file: {}", ex.getMessage());
         return problem(HttpStatus.UNPROCESSABLE_ENTITY, "INVALID_AVATAR_FILE", ex.getMessage());
     }
 
     @ExceptionHandler(AvatarNotFoundException.class)
     public ResponseEntity<ProblemDetail> handleAvatarNotFound(AvatarNotFoundException ex) {
-        log.warn("Avatar not found: {}", ex.getMessage(), ex);
+        log.warn("Avatar not found: {}", ex.getMessage());
         return problem(HttpStatus.NOT_FOUND, "AVATAR_NOT_FOUND", ex.getMessage());
     }
 
     @ExceptionHandler(PostNotFoundException.class)
     public ResponseEntity<ProblemDetail> handlePostNotFound(PostNotFoundException ex) {
-        log.warn("Post not found: {}", ex.getMessage(), ex);
+        log.warn("Post not found: {}", ex.getMessage());
         return problem(HttpStatus.NOT_FOUND, "POST_NOT_FOUND", ex.getMessage());
     }
 
     @ExceptionHandler(PostAccessDeniedException.class)
     public ResponseEntity<ProblemDetail> handlePostAccessDenied(PostAccessDeniedException ex) {
-        log.warn("Post access denied: {}", ex.getMessage(), ex);
+        log.warn("Post access denied: {}", ex.getMessage());
         return problem(HttpStatus.FORBIDDEN, "POST_ACCESS_DENIED", ex.getMessage());
     }
 
     @ExceptionHandler(SelfFollowException.class)
     public ResponseEntity<ProblemDetail> handleSelfFollow(SelfFollowException ex) {
-        log.warn("Self-follow attempt: {}", ex.getMessage(), ex);
+        log.warn("Self-follow attempt: {}", ex.getMessage());
         return problem(HttpStatus.BAD_REQUEST, "SELF_FOLLOW_NOT_ALLOWED", ex.getMessage());
     }
 
     @ExceptionHandler(CommentNotFoundException.class)
     public ResponseEntity<ProblemDetail> handleCommentNotFound(CommentNotFoundException ex) {
-        log.warn("Comment not found: {}", ex.getMessage(), ex);
+        log.warn("Comment not found: {}", ex.getMessage());
         return problem(HttpStatus.NOT_FOUND, "COMMENT_NOT_FOUND", ex.getMessage());
     }
 
     @ExceptionHandler(CommentAccessDeniedException.class)
     public ResponseEntity<ProblemDetail> handleCommentAccessDenied(CommentAccessDeniedException ex) {
-        log.warn("Comment access denied: {}", ex.getMessage(), ex);
+        log.warn("Comment access denied: {}", ex.getMessage());
         return problem(HttpStatus.FORBIDDEN, "COMMENT_ACCESS_DENIED", ex.getMessage());
     }
 
     @ExceptionHandler(InvalidCommentParentException.class)
     public ResponseEntity<ProblemDetail> handleInvalidCommentParent(InvalidCommentParentException ex) {
-        log.warn("Invalid comment parent: {}", ex.getMessage(), ex);
+        log.warn("Invalid comment parent: {}", ex.getMessage());
         return problem(HttpStatus.BAD_REQUEST, "INVALID_COMMENT_PARENT", ex.getMessage());
     }
 
@@ -253,9 +255,13 @@ public class GlobalExceptionHandler {
                 .body(problemDetail);
     }
 
-    /**
-     * Catch-all for unexpected exceptions. The cause is logged; only a generic message is returned.
-     */
+    @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
+    public ResponseEntity<ProblemDetail> handleOptimisticLock(ObjectOptimisticLockingFailureException ex) {
+        log.warn("Concurrent modification: {}", ex.getMessage());
+        return problem(HttpStatus.CONFLICT, "CONCURRENT_MODIFICATION",
+                "The resource was modified by someone else. Reload it and try again.");
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ProblemDetail> handleGeneral(Exception ex) {
         log.error("Unexpected error: {}", ex.getMessage(), ex);

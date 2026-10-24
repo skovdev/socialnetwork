@@ -102,6 +102,21 @@ public class CommentRestController {
     }
 
     /**
+     * Returns a page of replies to a top-level comment, oldest first.
+     */
+    @Operation(summary = "Get replies", security = @SecurityRequirement(name = "bearerAuth"))
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Replies retrieved"),
+            @ApiResponse(responseCode = "400", description = "Comment is itself a reply"),
+            @ApiResponse(responseCode = "401", description = "Not authenticated"),
+            @ApiResponse(responseCode = "404", description = "Comment not found")
+    })
+    @GetMapping("/comments/{id}/replies")
+    public ApiResponseDto<PagedModel<CommentResponse>> getReplies(@PathVariable("id") UUID id, Pageable pageable) {
+        return ApiResponseDto.buildSuccessResponse(new PagedModel<>(commentService.getReplies(id, pageable)));
+    }
+
+    /**
      * Updates a comment's content. Only the author may update their own comment.
      */
     @Operation(summary = "Update comment", security = @SecurityRequirement(name = "bearerAuth"))

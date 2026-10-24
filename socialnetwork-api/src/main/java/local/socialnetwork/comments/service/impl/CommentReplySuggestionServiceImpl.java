@@ -31,7 +31,6 @@ import org.springframework.transaction.support.TransactionOperations;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -58,14 +57,13 @@ public class CommentReplySuggestionServiceImpl implements CommentReplySuggestion
     @Override
     public List<String> generateReplySuggestions(UUID authUserId, UUID commentId, ReplyTone tone) {
         var effectiveTone = Objects.requireNonNullElse(tone, ReplyTone.NEUTRAL);
+        aiRequestLimiter.acquire(authUserId);
         var userPrompt = transactionOperations.execute(status -> loadUserPrompt(commentId));
         var systemPrompt = CommentReplyPrompts.systemPrompt(effectiveTone);
-        aiRequestLimiter.acquire(authUserId);
         try {
             log.info("Generating reply suggestions for comment {} (tone={}) requested by auth user id: {}",
                     commentId, effectiveTone, authUserId);
-            var response = aiChatService.chat(systemPrompt, userPrompt);
-            var suggestions = parseSuggestions(response);
+            var suggestions = aiChatService.chatList(systemPrompt, userPrompt);
             if (suggestions.isEmpty()) {
                 throw new CommentSuggestionGenerationException(
                         "AI provider returned no usable suggestions for comment: " + commentId);
@@ -98,31 +96,23 @@ public class CommentReplySuggestionServiceImpl implements CommentReplySuggestion
 
     private String buildUserPrompt(String postContent, Comment comment, List<String> threadContext) {
         var prompt = new StringBuilder()
-                .append("Post: ").append(postContent).append("\n");
+                .append("<post>").append(escape(postContent)).append("</post>\n");
         if (comment.getParent() != null) {
-            prompt.append("Parent comment: ").append(comment.getParent().getContent()).append("\n");
+            prompt.append("<parent_comment>").append(escape(comment.getParent().getContent())).append("</parent_comment>\n");
         }
-        if (threadContext.isEmpty()) {
-            prompt.append("Thread context: none\n");
-        } else {
-            prompt.append("Thread context (other replies in this thread, most recent first):\n");
+        if (!threadContext.isEmpty()) {
+            prompt.append("<thread_context>\n");
             for (int i = 0; i < threadContext.size(); i++) {
-                prompt.append(i + 1).append(". ").append(threadContext.get(i)).append("\n");
+                prompt.append(i + 1).append(". ").append(escape(threadContext.get(i))).append("\n");
             }
+            prompt.append("</thread_context>\n");
         }
-        prompt.append("Comment to reply to: ").append(comment.getContent());
+        prompt.append("<comment_to_reply_to>").append(escape(comment.getContent())).append("</comment_to_reply_to>");
         return prompt.toString();
     }
 
-    /**
-     * Parses the model's numbered-list response into individual suggestion strings, stripping any
-     * leading numbering (e.g. {@code "1. "} or {@code "1) "}).
-     */
-    private List<String> parseSuggestions(String response) {
-        return Arrays.stream(response.split("\n"))
-                .map(String::trim)
-                .map(line -> line.replaceFirst("^\\d+[.)]\\s*", ""))
-                .filter(line -> !line.isBlank())
-                .toList();
+    /** Stops user text from closing or opening the tags that delimit untrusted content in the prompt. */
+    private static String escape(String text) {
+        return text.replace("<", "&lt;").replace(">", "&gt;");
     }
 }

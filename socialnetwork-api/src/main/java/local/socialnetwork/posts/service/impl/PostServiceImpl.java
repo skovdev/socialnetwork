@@ -19,6 +19,8 @@ import local.socialnetwork.profiles.service.UserProfileService;
 
 import local.socialnetwork.shared.dto.response.AuthorSummary;
 
+import local.socialnetwork.shared.pagination.Pages;
+
 import local.socialnetwork.shared.exception.UserNotFoundException;
 import local.socialnetwork.shared.exception.PostNotFoundException;
 import local.socialnetwork.shared.exception.PostAccessDeniedException;
@@ -27,23 +29,20 @@ import lombok.RequiredArgsConstructor;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.CacheEvict;
 
-import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Pageable;
 
 import org.springframework.stereotype.Service;
 
 import org.springframework.transaction.annotation.Transactional;
 
-import static local.socialnetwork.core.config.RedisCacheConfig.POSTS_CACHE_NAME;
+import static local.socialnetwork.posts.config.PostsCacheConfig.POSTS_CACHE_NAME;
 
 import java.time.Instant;
 
-import java.util.Map;
 import java.util.UUID;
-import java.util.HashSet;
 
 /**
  * Default implementation of {@link PostService}.
@@ -57,6 +56,7 @@ public class PostServiceImpl implements PostService {
     private final AuthUserRepository authUserRepository;
     private final UserProfileService userProfileService;
     private final FollowService followService;
+    private final PostCacheReader postCacheReader;
 
     /**
      * {@inheritDoc}
@@ -80,10 +80,10 @@ public class PostServiceImpl implements PostService {
      */
     @Override
     @Transactional(readOnly = true)
-    @Cacheable(cacheNames = POSTS_CACHE_NAME, key = "#postId")
     public PostResponse getPost(UUID postId) {
-        var post = findPostOrThrow(postId);
-        return PostResponse.from(post, resolveAuthor(post.getAuthor().getId()));
+        var post = postCacheReader.read(postId);
+        return new PostResponse(post.id(), resolveAuthor(post.authorId()), post.content(),
+                post.createdAt(), post.updatedAt(), 0L, false);
     }
 
     /**
@@ -91,11 +91,8 @@ public class PostServiceImpl implements PostService {
      */
     @Override
     @Transactional(readOnly = true)
-    public Page<PostResponse> getFeed(Pageable pageable) {
-        var page = postRepository.findAllByOrderByCreatedAtDesc(pageable);
-        var authorIds = page.getContent().stream().map(post -> post.getAuthor().getId()).distinct().toList();
-        var authorsById = userProfileService.getAuthorSummaries(authorIds);
-        return page.map(post -> PostResponse.from(post, toAuthorSummary(authorsById, post.getAuthor().getId())));
+    public Slice<PostResponse> getFeed(Pageable pageable) {
+        return withAuthors(postRepository.findAllByOrderByCreatedAtDesc(Pages.withoutClientSort(pageable)));
     }
 
     /**
@@ -103,10 +100,10 @@ public class PostServiceImpl implements PostService {
      */
     @Override
     @Transactional(readOnly = true)
-    public Page<PostResponse> getPostsByUsername(String username, Pageable pageable) {
+    public Slice<PostResponse> getPostsByUsername(String username, Pageable pageable) {
         var author = userProfileService.findAuthorByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException("User '" + username + "' not found"));
-        var page = postRepository.findByAuthorIdOrderByCreatedAtDesc(author.authUserId(), pageable);
+        var page = postRepository.findByAuthorIdOrderByCreatedAtDesc(author.authUserId(), Pages.withoutClientSort(pageable));
         return page.map(post -> PostResponse.from(post, author.summary()));
     }
 
@@ -115,17 +112,11 @@ public class PostServiceImpl implements PostService {
      */
     @Override
     @Transactional(readOnly = true)
-    public Page<PostResponse> getFollowingFeed(UUID viewerId, Pageable pageable) {
-        var followedIds = followService.getFollowedAuthorIds(viewerId);
-        if (followedIds.isEmpty()) {
+    public Slice<PostResponse> getFollowingFeed(UUID viewerId, Pageable pageable) {
+        if (!followService.followsAnyone(viewerId)) {
             return getFeed(pageable);
         }
-        var authorIds = new HashSet<>(followedIds);
-        authorIds.add(viewerId);
-        var page = postRepository.findByAuthorIdInOrderByCreatedAtDesc(authorIds, pageable);
-        var authorsById = userProfileService.getAuthorSummaries(
-                page.getContent().stream().map(post -> post.getAuthor().getId()).distinct().toList());
-        return page.map(post -> PostResponse.from(post, toAuthorSummary(authorsById, post.getAuthor().getId())));
+        return withAuthors(postRepository.findFollowingFeed(viewerId, Pages.withoutClientSort(pageable)));
     }
 
     /**
@@ -157,6 +148,12 @@ public class PostServiceImpl implements PostService {
         log.info("Post {} deleted by auth user id: {}", postId, authUserId);
     }
 
+    private Slice<PostResponse> withAuthors(Slice<Post> posts) {
+        var authorIds = posts.getContent().stream().map(post -> post.getAuthor().getId()).distinct().toList();
+        var authorsById = userProfileService.getAuthorSummaries(authorIds);
+        return posts.map(post -> PostResponse.from(post, AuthorSummary.require(authorsById, post.getAuthor().getId())));
+    }
+
     private Post findPostOrThrow(UUID postId) {
         return postRepository.findById(postId)
                 .orElseThrow(() -> new PostNotFoundException("Post not found for id: " + postId));
@@ -172,11 +169,4 @@ public class PostServiceImpl implements PostService {
         return userProfileService.getAuthorSummary(authUserId);
     }
 
-    private AuthorSummary toAuthorSummary(Map<UUID, AuthorSummary> authorsById, UUID authUserId) {
-        var author = authorsById.get(authUserId);
-        if (author == null) {
-            throw new UserNotFoundException("Profile not found for user id: " + authUserId);
-        }
-        return author;
-    }
 }

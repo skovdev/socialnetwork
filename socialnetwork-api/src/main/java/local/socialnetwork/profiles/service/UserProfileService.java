@@ -100,4 +100,12 @@ public interface UserProfileService {
      * @throws local.socialnetwork.shared.exception.AvatarNotFoundException if the profile has no avatar set
      */
     void deleteAvatar(UUID authUserId);
+
+    /**
+     * Schedules removal of the user's stored avatar object (if any) once the current transaction commits.
+     * Used when an account is deleted, since the profile row itself goes away with the user.
+     *
+     * @param authUserId the owning user's auth ID
+     */
+    void purgeAvatar(UUID authUserId);
 }

@@ -94,6 +94,19 @@ class AuthUserRestControllerIT extends BaseIntegrationTest {
     }
 
     @Test
+    void login_twiceInARow_succeedsBothTimes() throws Exception {
+        // Spring Security erases the password of the principal it authenticated; the cached principal
+        // must survive that, or the second login within the cache TTL fails with 401.
+        createActiveUser("repeatuser", "repeat@example.com");
+        var body = objectMapper.writeValueAsString(new LoginRequest("repeatuser", "Secret1234"));
+
+        for (int i = 0; i < 2; i++) {
+            mockMvc.perform(post(BASE_URL + "/login").contentType(MediaType.APPLICATION_JSON).content(body))
+                    .andExpect(status().isOk());
+        }
+    }
+
+    @Test
     void login_withValidCredentials_returns200WithTokens() throws Exception {
         createActiveUser("loginuser", "login@example.com");
 

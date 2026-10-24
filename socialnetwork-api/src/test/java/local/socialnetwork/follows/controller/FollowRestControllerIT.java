@@ -80,7 +80,7 @@ class FollowRestControllerIT extends BaseIntegrationTest {
 
         authUserRepository.save(authUser);
 
-        return jwtTokenProvider.createToken(Map.of("username", username));
+        return jwtTokenProvider.createToken(authUserRepository.findByUserProfileUsername(username).orElseThrow().getId(), username);
     }
 
     /**

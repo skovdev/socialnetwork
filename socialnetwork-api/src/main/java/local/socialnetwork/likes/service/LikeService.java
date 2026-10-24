@@ -6,6 +6,7 @@ import local.socialnetwork.likes.dto.http.response.LikeResponse;
 import local.socialnetwork.posts.dto.http.response.PostResponse;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Pageable;
 
 import java.util.Map;
@@ -64,5 +65,5 @@ public interface LikeService {
      * Batch variant of {@link #decorate(PostResponse, UUID)} for rendering feeds/lists
      * efficiently: fetches all summaries in a single query rather than one per post.
      */
-    Page<PostResponse> decorate(Page<PostResponse> posts, UUID viewerId);
+    Slice<PostResponse> decorate(Slice<PostResponse> posts, UUID viewerId);
 }

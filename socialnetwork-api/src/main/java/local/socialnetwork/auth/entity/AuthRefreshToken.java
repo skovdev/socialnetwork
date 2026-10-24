@@ -18,7 +18,7 @@ import java.util.Objects;
 import java.time.Instant;
 
 /**
- * Persisted refresh token identifier (JTI) that allows a user to obtain a new
+ * Persisted refresh token (stored as a SHA-256 hash of an opaque random value) that allows a user to obtain a new
  * access token without re-authenticating.
  */
 @Setter
@@ -27,8 +27,8 @@ import java.time.Instant;
 @Entity
 public class AuthRefreshToken extends AbstractBaseModel {
 
-    @Column(columnDefinition = "uuid")
-    private UUID jti;
+    @Column(name = "token_hash", nullable = false)
+    private byte[] tokenHash;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)

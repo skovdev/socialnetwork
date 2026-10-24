@@ -33,8 +33,7 @@ export interface GeneratedPostContent {
 export interface PostPage {
     content: Post[];
     page: {
-        totalPages: number;
-        totalElements: number;
+        hasNext: boolean;
         number: number;
         size: number;
     };

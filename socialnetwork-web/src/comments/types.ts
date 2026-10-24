@@ -12,6 +12,8 @@ export interface Comment {
     createdAt: string;
     updatedAt: string | null;
     replies: Comment[];
+    /** Total replies under a top-level comment; `replies` holds only the first few until loaded in full. */
+    replyCount: number;
 }
 
 export interface CreateCommentRequest {

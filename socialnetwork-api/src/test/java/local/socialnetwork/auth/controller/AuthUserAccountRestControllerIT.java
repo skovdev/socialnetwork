@@ -79,7 +79,7 @@ class AuthUserAccountRestControllerIT extends BaseIntegrationTest {
 
         authUserRepository.save(authUser);
 
-        bearerToken = jwtTokenProvider.createToken(Map.of("username", TEST_USERNAME));
+        bearerToken = jwtTokenProvider.createToken(authUserRepository.findByUserProfileUsername(TEST_USERNAME).orElseThrow().getId(), TEST_USERNAME);
     }
 
     // --- resend-verification ---

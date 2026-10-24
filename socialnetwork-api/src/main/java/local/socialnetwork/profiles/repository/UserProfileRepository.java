@@ -20,6 +20,7 @@ import java.util.Collection;
 public interface UserProfileRepository extends CrudRepository<UserProfile, UUID> {
     @EntityGraph(attributePaths = {"authUser", "authUser.authUserRoles"})
     Optional<UserProfile> findByUsername(String username);
+    Optional<UserProfile> findSummaryByUsername(String username);
     Optional<UserProfile> findByAuthUserId(UUID authUserId);
     List<UserProfile> findByAuthUserIdIn(Collection<UUID> authUserIds);
     boolean existsByUsername(String username);

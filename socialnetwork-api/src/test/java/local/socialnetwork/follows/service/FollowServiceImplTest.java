@@ -229,13 +229,10 @@ class FollowServiceImplTest {
     }
 
     @Test
-    void getFollowedAuthorIds_delegatesToRepository() {
+    void followsAnyone_delegatesToRepository() {
         var followerId = UUID.randomUUID();
-        var followedIds = List.of(UUID.randomUUID(), UUID.randomUUID());
-        when(followRepository.findFollowedIdsByFollowerId(followerId)).thenReturn(followedIds);
+        when(followRepository.existsByFollowerId(followerId)).thenReturn(true);
 
-        var result = followService.getFollowedAuthorIds(followerId);
-
-        assertThat(result).isEqualTo(followedIds);
+        assertThat(followService.followsAnyone(followerId)).isTrue();
     }
 }

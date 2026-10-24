@@ -17,6 +17,13 @@ export const commentApi = {
         return response.data;
     },
 
+    async getReplies(commentId: string, page = 0, size = 50): Promise<CommentPage> {
+        const response = await apiRequest<CommentPage>(
+            `/api/v1/comments/${encodeURIComponent(commentId)}/replies?page=${page}&size=${size}`,
+        );
+        return response.data;
+    },
+
     async updateComment(id: string, request: UpdateCommentRequest): Promise<Comment> {
         const response = await apiRequest<Comment>(`/api/v1/comments/${encodeURIComponent(id)}`, {
             method: "PUT",

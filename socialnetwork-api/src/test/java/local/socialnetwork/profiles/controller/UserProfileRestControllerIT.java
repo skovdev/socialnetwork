@@ -73,7 +73,7 @@ class UserProfileRestControllerIT extends BaseIntegrationTest {
 
         authUserRepository.save(authUser);
 
-        bearerToken = jwtTokenProvider.createToken(Map.of("username", TEST_USERNAME));
+        bearerToken = jwtTokenProvider.createToken(authUserRepository.findByUserProfileUsername(TEST_USERNAME).orElseThrow().getId(), TEST_USERNAME);
 
         var otherAuthUser = new AuthUser();
         otherAuthUser.setEmail("bob@example.com");
@@ -95,7 +95,7 @@ class UserProfileRestControllerIT extends BaseIntegrationTest {
 
         authUserRepository.save(otherAuthUser);
 
-        otherBearerToken = jwtTokenProvider.createToken(Map.of("username", "bob"));
+        otherBearerToken = jwtTokenProvider.createToken(authUserRepository.findByUserProfileUsername("bob").orElseThrow().getId(), "bob");
     }
 
     @Test

@@ -5,7 +5,7 @@ import local.socialnetwork.posts.dto.http.request.UpdatePostRequestDto;
 
 import local.socialnetwork.posts.dto.http.response.PostResponse;
 
-import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Pageable;
 
 import java.util.UUID;
@@ -30,21 +30,21 @@ public interface PostService {
     /**
      * Returns a page of posts ordered from newest to oldest.
      */
-    Page<PostResponse> getFeed(Pageable pageable);
+    Slice<PostResponse> getFeed(Pageable pageable);
 
     /**
      * Returns a page of posts authored by the user with the given username, ordered from newest to oldest.
      *
      * @throws local.socialnetwork.shared.exception.UserNotFoundException if no user exists with the given username
      */
-    Page<PostResponse> getPostsByUsername(String username, Pageable pageable);
+    Slice<PostResponse> getPostsByUsername(String username, Pageable pageable);
 
     /**
      * Returns a page of posts authored by {@code viewerId} or by users {@code viewerId} follows,
      * ordered from newest to oldest. Falls back to {@link #getFeed(Pageable)} when {@code viewerId}
      * follows nobody, so a new account is never shown an empty feed.
      */
-    Page<PostResponse> getFollowingFeed(UUID viewerId, Pageable pageable);
+    Slice<PostResponse> getFollowingFeed(UUID viewerId, Pageable pageable);
 
     /**
      * Updates the content of the post belonging to {@code postId}, provided {@code authUserId} is the author.
