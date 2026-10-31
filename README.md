@@ -106,7 +106,8 @@ All paginated endpoints cap the page size at 50 (default 20) and ignore client-s
 | Method | Path | Auth | Description |
 |---|---|---|---|
 | `POST` | `/posts/{postId}/comments` | Bearer | Create a new comment (or reply) on a post |
-| `GET` | `/posts/{postId}/comments` | Bearer | Retrieve a paginated page of top-level comments (oldest first), with replies nested inline |
+| `GET` | `/posts/{postId}/comments` | Bearer | Retrieve a paginated page of top-level comments (oldest first), with the first 3 replies of each nested inline |
+| `GET` | `/comments/{id}/replies` | Bearer | Retrieve a paginated page of all replies to a top-level comment, oldest first (400 if the comment is itself a reply) |
 | `PUT` | `/comments/{id}` | Bearer | Update a comment's content — author only |
 | `DELETE` | `/comments/{id}` | Bearer | Delete a comment and its replies — author only |
 | `POST` | `/comments/{id}/suggestions` | Bearer | AI-generate 3 draft reply suggestions for a comment (optional `?tone=` query param; for review — nothing auto-posted) |
@@ -132,7 +133,7 @@ Migrations are managed by Liquibase and run automatically on startup.
 | `auth_users` | Core credentials and account status (`PENDING_VERIFICATION`, `ACTIVE`, `DISABLED`) |
 | `auth_user_roles` | Roles assigned to each user |
 | `auth_email_verification_tokens` | One-time tokens sent by email on registration |
-| `auth_refresh_tokens` | Issued refresh tokens (JTI-based, supports full logout) |
+| `auth_refresh_tokens` | Issued refresh tokens (stored as SHA-256 hashes, single-use, supports full logout) |
 | `user_profiles` | Public profile data — username, display name, bio, avatar (S3 storage key), etc. |
 | `posts` | User-authored posts — content, author reference, timestamps |
 | `comments` | User-authored comments on posts — content, post/author references, optional parent comment (for replies), timestamps |
